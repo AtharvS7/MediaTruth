@@ -1,0 +1,260 @@
+# MediaTruth — AI Media Forensics Platform
+
+> **Detect AI-generated, AI-edited, deepfaked, and traditionally manipulated images and videos using a multi-model forensics pipeline.**
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        MediaTruth Stack                         │
+├────────────────────────┬────────────────────────────────────────┤
+│  Frontend              │  Backend                               │
+│  Next.js 14 + Tailwind │  FastAPI + PyTorch                     │
+│  Vercel                │  Docker / Render                       │
+├────────────────────────┼────────────────────────────────────────┤
+│  Database              │  ML Models                             │
+│  Supabase (Postgres)   │  EfficientNet-B5 (deepfake)            │
+│                        │  ResNet-50 CNNDetect (GAN)             │
+│                        │  ELA + DCT (manipulation)              │
+│                        │  EXIF parser (metadata)                │
+└────────────────────────┴────────────────────────────────────────┘
+```
+
+---
+
+## Project Structure
+
+```
+MediaTruth/
+├── backend/
+│   ├── main.py                          # FastAPI entrypoint
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   ├── .env.example
+│   ├── api/
+│   │   └── routes/
+│   │       ├── image_routes.py          # POST /image/analyze
+│   │       ├── video_routes.py          # POST /video/analyze
+│   │       ├── scan_routes.py           # GET /scan/history, /scan/{id}
+│   │       └── health_routes.py
+│   ├── services/
+│   │   ├── model_loader.py              # Startup model loading + caching
+│   │   ├── image_analyzer.py            # Image pipeline orchestrator
+│   │   ├── video_analyzer.py            # Video pipeline orchestrator
+│   │   └── supabase_service.py          # DB persistence
+│   ├── inference_pipeline/
+│   │   ├── deepfake_detector.py         # EfficientNet-B5 deepfake clf
+│   │   ├── gan_detector.py              # CNNDetect GAN fingerprint
+│   │   ├── manipulation_localizer.py    # ELA + DCT heatmap generation
+│   │   ├── metadata_analyzer.py         # EXIF anomaly detection
+│   │   └── aggregator.py               # Confidence matrix + verdict
+│   ├── utils/
+│   │   ├── file_utils.py
+│   │   ├── video_utils.py
+│   │   ├── auth.py
+│   │   └── logger.py
+│   └── models/weights/                  # Downloaded model weights (gitignored)
+├── frontend/
+│   ├── src/app/
+│   │   ├── page.tsx                     # Landing page
+│   │   ├── upload/page.tsx              # Upload + analysis progress
+│   │   ├── results/[id]/page.tsx        # Full forensics dashboard
+│   │   ├── history/page.tsx             # Scan history
+│   │   └── auth/page.tsx               # Sign in / Sign up
+│   └── src/components/
+│       ├── charts/ProbabilityMatrix.tsx
+│       ├── charts/HeatmapViewer.tsx
+│       ├── ui/DetectorCard.tsx
+│       └── layout/Nav.tsx
+├── supabase/
+│   └── schema.sql                       # Full DB schema with RLS
+└── docker-compose.yml
+```
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- Docker & Docker Compose
+- Supabase account (free tier works)
+
+---
+
+### 1. Clone & Configure
+
+```bash
+git clone https://github.com/yourname/mediatruth
+cd mediatruth
+```
+
+**Backend config:**
+```bash
+cp backend/.env.example backend/.env
+# Edit backend/.env with your Supabase credentials
+```
+
+**Frontend config:**
+```bash
+cp frontend/.env.local.example frontend/.env.local
+# Edit frontend/.env.local with your API URL and Supabase keys
+```
+
+---
+
+### 2. Database Setup
+
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+2. Open the SQL editor and run `supabase/schema.sql`
+3. Copy your **Project URL** and **service role key** into `backend/.env`
+4. Copy your **Project URL** and **anon key** into `frontend/.env.local`
+
+---
+
+### 3. Run with Docker (Recommended)
+
+```bash
+docker compose up --build
+```
+
+This starts:
+- **FastAPI backend** on `http://localhost:8000`
+- **Redis** on `localhost:6379`
+
+Model weights are downloaded on first startup (~1–2 GB, saved to Docker volume).
+
+---
+
+### 4. Run Locally (Development)
+
+**Backend:**
+```bash
+cd backend
+python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+# Open http://localhost:3000
+```
+
+---
+
+## API Reference
+
+### `POST /image/analyze`
+
+Upload an image for forensic analysis.
+
+**Request:** `multipart/form-data` with field `file`
+
+**Response:**
+```json
+{
+  "scan_id": "uuid",
+  "file_type": "image",
+  "ai_generated_probability": 0.22,
+  "ai_edited_probability": 0.41,
+  "traditional_edit_probability": 0.63,
+  "authentic_probability": 0.12,
+  "final_verdict": "Traditionally Edited",
+  "confidence": 0.63,
+  "manipulation_heatmap": "<base64 PNG>",
+  "detector_scores": {
+    "deepfake_score": 0.15,
+    "gan_score": 0.08,
+    "manipulation_score": 0.72,
+    "metadata_anomaly_score": 0.45
+  },
+  "metadata_findings": ["✏️ Adobe Photoshop CC 2024 detected"],
+  "explanation": "Analysis indicates traditional image editing..."
+}
+```
+
+### `POST /video/analyze`
+
+Upload a video (max 180s) for forensic analysis. Same response schema plus:
+```json
+{
+  "duration_seconds": 47.3,
+  "frames_analyzed": 15,
+  "per_frame_results": [...]
+}
+```
+
+### `GET /scan/history?page=1&page_size=20`
+
+Returns paginated scan history.
+
+### `GET /scan/{scan_id}`
+
+Returns full scan result by ID.
+
+---
+
+## ML Models
+
+| Detector | Architecture | Purpose | Weight Source |
+|---|---|---|---|
+| Deepfake | EfficientNet-B5 | Face deepfake detection | timm pretrained + optional fine-tune |
+| GAN | ResNet-50 (CNNDetect) | GAN-generated image detection | CNNDetect (Wang et al. 2020) |
+| Manipulation | ELA + DCT analysis | Pixel-level edit localization | Algorithmic (no weights needed) |
+| Metadata | Rule-based EXIF parser | AI software signature detection | Algorithmic |
+
+### Adding Custom Weights
+
+Place `.pth` files in `backend/models/weights/`:
+- `efficientnet_b5_deepfake.pth` — fine-tuned deepfake classifier
+- `cnn_detect.pth` — CNNDetect GAN detector weights
+
+The model loader will automatically use them on next startup.
+
+---
+
+## Deployment
+
+### Backend — Docker + Render/Railway/Fly.io
+
+```bash
+docker build -t mediatruth-backend ./backend
+docker push your-registry/mediatruth-backend
+```
+
+Set these environment variables in your hosting provider:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_KEY`
+- `JWT_SECRET`
+- `ALLOWED_ORIGINS`
+
+### Frontend — Vercel
+
+```bash
+cd frontend
+npx vercel --prod
+```
+
+Set environment variables in Vercel dashboard (see `frontend/.env.local.example`).
+
+---
+
+## Performance Notes
+
+- **Model caching:** All models are loaded once at startup and kept in memory
+- **Async inference:** `asyncio.gather` runs all detectors concurrently
+- **Video batching:** Frames analyzed in batches of 8 to control VRAM usage
+- **GPU support:** Automatically uses CUDA if available, falls back to CPU
+
+---
+
+## License
+
+MIT — free to use, modify, and deploy commercially.

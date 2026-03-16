@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.env
+*.egg-info/
+
+# Model weights (large binaries — download on deploy)
+backend/models/weights/*.pth
+backend/models/weights/*.bin
+
+# Node
+node_modules/
+.next/
+out/
+frontend/.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+
+# Temp uploads
+/tmp/mediatruth_uploads/

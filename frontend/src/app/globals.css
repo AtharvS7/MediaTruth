@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cyan: #00f5ff;
+  --acid: #b8ff57;
+  --coral: #ff4d6d;
+  --violet: #8b5cf6;
+  --obsidian-950: #030308;
+  --obsidian-900: #07070f;
+  --obsidian-800: #0d0d1a;
+  --obsidian-700: #131326;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(0, 245, 255, 0.2);
+  color: #00f5ff;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track { background: #030308; }
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 255, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 245, 255, 0.5);
+}
+
+@layer components {
+  /* Glass panel */
+  .glass {
+    @apply bg-obsidian-800/60 backdrop-blur-xl border border-white/5;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-cyan {
+    @apply glass border-cyan/20;
+    box-shadow: inset 0 1px 0 rgba(0, 245, 255, 0.08), 0 0 40px rgba(0, 245, 255, 0.06), 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Neon text */
+  .text-glow-cyan {
+    color: var(--cyan);
+    text-shadow: 0 0 20px rgba(0, 245, 255, 0.6), 0 0 60px rgba(0, 245, 255, 0.2);
+  }
+  .text-glow-acid {
+    color: var(--acid);
+    text-shadow: 0 0 20px rgba(184, 255, 87, 0.6), 0 0 60px rgba(184, 255, 87, 0.2);
+  }
+  .text-glow-coral {
+    color: var(--coral);
+    text-shadow: 0 0 20px rgba(255, 77, 109, 0.6), 0 0 60px rgba(255, 77, 109, 0.2);
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply relative px-6 py-3 font-display font-semibold text-obsidian-950 bg-cyan rounded-lg overflow-hidden;
+    @apply transition-all duration-200;
+    @apply hover:shadow-glow-cyan hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply px-6 py-3 font-display font-medium text-white/70 border border-white/10 rounded-lg;
+    @apply transition-all duration-200 hover:border-cyan/40 hover:text-white hover:bg-white/5;
+  }
+
+  /* Scan line overlay */
+  .scan-overlay::after {
+    content: "";
+    @apply absolute inset-0 pointer-events-none;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 245, 255, 0.04) 50%,
+      transparent 100%
+    );
+    animation: scanLine 3s linear infinite;
+  }
+
+  /* Probability bar */
+  .prob-bar {
+    @apply relative h-2 rounded-full overflow-hidden bg-white/5;
+  }
+  .prob-bar-fill {
+    @apply h-full rounded-full transition-all duration-1000 ease-out;
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: var(--font-display); }
+  .font-mono    { font-family: var(--font-mono); }
+  .font-body    { font-family: var(--font-body); }
+}
