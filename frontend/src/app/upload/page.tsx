@@ -100,65 +100,66 @@ export default function UploadPage() {
         </motion.div>
 
         {/* Drop zone */}
-        <motion.div
-          {...getRootProps()}
-          className={`
-            relative rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer overflow-hidden
-            ${isDragActive ? "border-cyan bg-cyan/5 shadow-glow-cyan" : "border-white/10 hover:border-cyan/40 hover:bg-white/[0.02]"}
-            ${stage !== "idle" ? "pointer-events-none" : ""}
-          `}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          style={{ minHeight: 280 }}
-        >
-          <input {...getInputProps()} />
+        <div {...getRootProps()}>
+          <motion.div
+            className={`
+              relative rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer overflow-hidden
+              ${isDragActive ? "border-cyan bg-cyan/5 shadow-glow-cyan" : "border-white/10 hover:border-cyan/40 hover:bg-white/[0.02]"}
+              ${stage !== "idle" ? "pointer-events-none" : ""}
+            `}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            style={{ minHeight: 280 }}
+          >
+            <input {...getInputProps()} />
 
-          {/* Scan line on drag */}
-          {isDragActive && (
-            <motion.div
-              className="absolute left-0 right-0 h-px bg-cyan/60"
-              animate={{ top: ["0%", "100%"] }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-            />
-          )}
-
-          <div className="flex flex-col items-center justify-center gap-4 py-16 px-8 text-center">
-            {preview ? (
-              <img src={preview} alt="preview" className="max-h-48 rounded-xl object-contain" />
-            ) : (
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors ${isDragActive ? "bg-cyan/20" : "bg-white/5"}`}>
-                <Upload size={28} className={isDragActive ? "text-cyan" : "text-white/30"} />
-              </div>
+            {/* Scan line on drag */}
+            {isDragActive && (
+              <motion.div
+                className="absolute left-0 right-0 h-px bg-cyan/60"
+                animate={{ top: ["0%", "100%"] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+              />
             )}
 
-            {file ? (
-              <div className="text-center">
-                <p className="font-display font-semibold text-lg">{file.name}</p>
-                <p className="font-mono text-xs text-white/30 mt-1">
-                  {file.type} · {(file.size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              </div>
-            ) : (
-              <>
-                <p className="font-display text-xl font-semibold text-white/70">
-                  {isDragActive ? "Drop to analyze" : "Drop your file here"}
-                </p>
-                <p className="font-mono text-xs text-white/30">
-                  Images (JPG, PNG, WebP) · Videos (MP4, MOV) up to 500 MB
-                </p>
-                <div className="flex items-center gap-3 mt-2">
-                  <span className="flex items-center gap-1.5 text-xs font-mono text-white/20 bg-white/5 px-3 py-1.5 rounded-full">
-                    <ImageIcon size={12} /> Images
-                  </span>
-                  <span className="flex items-center gap-1.5 text-xs font-mono text-white/20 bg-white/5 px-3 py-1.5 rounded-full">
-                    <Film size={12} /> Videos
-                  </span>
+            <div className="flex flex-col items-center justify-center gap-4 py-16 px-8 text-center">
+              {preview ? (
+                <img src={preview} alt="preview" className="max-h-48 rounded-xl object-contain" />
+              ) : (
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors ${isDragActive ? "bg-cyan/20" : "bg-white/5"}`}>
+                  <Upload size={28} className={isDragActive ? "text-cyan" : "text-white/30"} />
                 </div>
-              </>
-            )}
-          </div>
-        </motion.div>
+              )}
+
+              {file ? (
+                <div className="text-center">
+                  <p className="font-display font-semibold text-lg">{file.name}</p>
+                  <p className="font-mono text-xs text-white/30 mt-1">
+                    {file.type} · {(file.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="font-display text-xl font-semibold text-white/70">
+                    {isDragActive ? "Drop to analyze" : "Drop your file here"}
+                  </p>
+                  <p className="font-mono text-xs text-white/30">
+                    Images (JPG, PNG, WebP) · Videos (MP4, MOV) up to 500 MB
+                  </p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="flex items-center gap-1.5 text-xs font-mono text-white/20 bg-white/5 px-3 py-1.5 rounded-full">
+                      <ImageIcon size={12} /> Images
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs font-mono text-white/20 bg-white/5 px-3 py-1.5 rounded-full">
+                      <Film size={12} /> Videos
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          </motion.div>
+        </div>
 
         {/* Analyze button */}
         <AnimatePresence mode="wait">
