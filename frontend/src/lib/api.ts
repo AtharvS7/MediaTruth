@@ -4,6 +4,7 @@
  */
 
 import axios from "axios";
+import { supabase } from "./supabase";
 
 const API = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
@@ -11,10 +12,12 @@ const API = axios.create({
 });
 
 // Inject auth token if present
-API.interceptors.request.use((config) => {
+API.interceptors.request.use(async (config) => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("mt_token");
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
+    }
   }
   return config;
 });

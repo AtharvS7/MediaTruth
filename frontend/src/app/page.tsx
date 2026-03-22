@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Shield, Zap, Eye, Film, ArrowRight, GitBranch } from "lucide-react";
+import Nav from "@/components/layout/Nav";
 
 const FEATURES = [
   { icon: Eye,      label: "Deepfake Detection",        desc: "EfficientNet-B5 deepfake classifier with frame-level analysis" },
@@ -27,18 +28,7 @@ export default function Home() {
       <div className="fixed bottom-[-10%] right-[5%] w-[400px] h-[400px] rounded-full bg-violet/5 blur-[100px] pointer-events-none" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 border-b border-white/5 glass">
-        <span className="font-display font-bold text-xl tracking-tight text-glow-cyan">
-          MEDIA<span className="text-white">TRUTH</span>
-        </span>
-        <div className="flex items-center gap-6 text-sm font-mono text-white/50">
-          <Link href="/upload" className="hover:text-cyan transition-colors">Analyze</Link>
-          <Link href="/history" className="hover:text-cyan transition-colors">History</Link>
-          <Link href="/auth" className="btn-primary text-sm py-2 px-4">
-            Sign In
-          </Link>
-        </div>
-      </nav>
+      <Nav />
 
       {/* Hero */}
       <section className="relative flex flex-col items-center justify-center min-h-screen pt-24 pb-16 px-6 text-center">

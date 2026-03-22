@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
 
 from services.supabase_service import SupabaseService
-from utils.auth import get_optional_user
+from utils.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -19,7 +19,7 @@ router = APIRouter()
 async def get_scan_history(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
-    user=Depends(get_optional_user),
+    user=Depends(get_current_user),
 ):
     """Return paginated scan history for the authenticated user."""
     try:
@@ -37,13 +37,18 @@ async def get_scan_history(
 
 
 @router.get("/{scan_id}")
-async def get_scan(scan_id: str, user=Depends(get_optional_user)):
+async def get_scan(scan_id: str, user=Depends(get_current_user)):
     """Return a specific scan result by scan ID."""
     try:
         db = SupabaseService()
         scan = await db.get_scan_by_id(scan_id)
         if not scan:
             raise HTTPException(status_code=404, detail="Scan not found.")
+        
+        # Prevent IDOR 
+        if scan.get("user_id") != user["id"]:
+            raise HTTPException(status_code=403, detail="Forbidden. You do not own this scan.")
+            
         return JSONResponse(content=scan)
     except HTTPException:
         raise

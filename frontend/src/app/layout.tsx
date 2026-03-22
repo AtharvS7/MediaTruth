@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Syne, JetBrains_Mono, DM_Sans } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import Background3D from "@/components/ui/Background3D";
 import "./globals.css";
 
 const syne = Syne({
@@ -35,7 +36,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${syne.variable} ${jetbrains.variable} ${dmSans.variable}`}>
       <body className="bg-obsidian-950 text-white font-body antialiased">
-        <div className="fixed inset-0 bg-grid-fine bg-grid-fine pointer-events-none opacity-100" />
+        <Background3D />
+        <div className="fixed inset-0 bg-grid-fine pointer-events-none opacity-100" />
         <div className="fixed inset-0 bg-radial-glow pointer-events-none" />
         {children}
         <Toaster

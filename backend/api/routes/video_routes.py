@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 from services.video_analyzer import VideoAnalyzer
 from services.supabase_service import SupabaseService
 from utils.file_utils import validate_video_file, save_temp_file, cleanup_temp_file
-from utils.auth import get_optional_user
+from utils.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -22,7 +22,7 @@ async def analyze_video(
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    user=Depends(get_optional_user),
+    user=Depends(get_current_user),
 ):
     """
     Analyze an uploaded video for authenticity.

@@ -1,10 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function Nav() {
   const path = usePathname();
+  const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    // Initial fetch
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserEmail(session?.user?.email || null);
+    });
+
+    // Listen for auth events (login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user?.email || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    setDropdownOpen(false);
+    router.push("/");
+  }
+
   const links = [
     { href: "/upload",  label: "Analyze" },
     { href: "/history", label: "History" },
@@ -25,9 +51,35 @@ export default function Nav() {
             {l.label}
           </Link>
         ))}
-        <Link href="/auth" className="btn-primary text-xs py-2 px-4">
-          Account
-        </Link>
+        
+        {userEmail ? (
+          <div className="relative">
+            <button 
+              onClick={() => setDropdownOpen(!dropdownOpen)} 
+              className="btn-ghost text-xs py-2 px-4 hover:text-white transition-colors flex items-center gap-2"
+            >
+              Account <span className="text-[10px]">▼</span>
+            </button>
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-52 bg-[#12121a] border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1">
+                <div className="px-4 py-3 border-b border-white/10">
+                  <p className="text-white/30 text-[10px] uppercase tracking-wider mb-1">Signed in as</p>
+                  <p className="text-white text-xs truncate max-w-full block" title={userEmail}>{userEmail}</p>
+                </div>
+                <button 
+                  onClick={handleSignOut}
+                  className="w-full text-left px-4 py-3 text-coral hover:bg-white/5 transition-colors text-xs font-semibold"
+                >
+                  Log Out
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link href="/auth" className="btn-primary text-xs py-2 px-4">
+            Sign In
+          </Link>
+        )}
       </div>
     </nav>
   );

@@ -2,16 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Loader2, Lock, Mail, User } from "lucide-react";
 import Link from "next/link";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from "@/lib/supabase";
 
 export default function AuthPage() {
   const router = useRouter();

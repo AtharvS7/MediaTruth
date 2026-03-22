@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 from services.image_analyzer import ImageAnalyzer
 from services.supabase_service import SupabaseService
 from utils.file_utils import validate_image_file, save_temp_file, cleanup_temp_file
-from utils.auth import get_optional_user
+from utils.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -21,7 +21,7 @@ router = APIRouter()
 async def analyze_image(
     request: Request,
     file: UploadFile = File(...),
-    user=Depends(get_optional_user),
+    user=Depends(get_current_user),
 ):
     """
     Analyze an uploaded image for authenticity.
