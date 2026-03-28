@@ -3,6 +3,9 @@ ImageAnalyzer — Full image forensics pipeline.
 
 Runs multiple independent detectors and aggregates results
 into a final confidence matrix with a verdict.
+
+BUG-006 fix: Replaced asyncio.get_event_loop() with asyncio.get_running_loop()
+BUG-012 fix: Removed duplicate "scan_id" from the returned dict
 """
 
 import asyncio
@@ -10,7 +13,7 @@ import base64
 import io
 import logging
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import numpy as np
 from PIL import Image
@@ -27,7 +30,7 @@ logger = logging.getLogger(__name__)
 class ImageAnalyzer:
     """Orchestrates the complete image forensics pipeline."""
 
-    def __init__(self, model_loader):
+    def __init__(self, model_loader: Any) -> None:
         self.model_loader = model_loader
         self.deepfake_detector = DeepfakeDetector(model_loader)
         self.gan_detector = GANDetector(model_loader)
@@ -41,7 +44,7 @@ class ImageAnalyzer:
 
         Returns a unified result dict ready to be serialised as JSON.
         """
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         # Run CPU/GPU-bound tasks in thread pool to keep event loop free
         (
@@ -67,8 +70,8 @@ class ImageAnalyzer:
         # Encode heatmap as base64 PNG for frontend
         heatmap_b64 = self._encode_heatmap(manip_result.get("heatmap"))
 
+        # BUG-012: scan_id is NOT included here — the route handler adds it
         return {
-            "scan_id": scan_id,
             "file_type": "image",
             "ai_generated_probability": verdict["ai_generated"],
             "ai_edited_probability": verdict["ai_edited"],
@@ -88,7 +91,7 @@ class ImageAnalyzer:
         }
 
     @staticmethod
-    def _encode_heatmap(heatmap: np.ndarray | None) -> str | None:
+    def _encode_heatmap(heatmap: Optional[np.ndarray]) -> Optional[str]:
         if heatmap is None:
             return None
         img = Image.fromarray((heatmap * 255).astype(np.uint8))

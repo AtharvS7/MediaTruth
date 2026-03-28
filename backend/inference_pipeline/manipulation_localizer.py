@@ -7,8 +7,12 @@ and a lightweight CNN to produce:
   - spatial heatmap (per-region anomaly map)
 
 For production: integrate ManTraNet or MVSS-Net weights when available.
+
+BUG-011 fix: ELA returns zero map for lossless image formats (PNG, BMP, TIFF, WEBP)
+BUG-024 fix: Removed unused os/tempfile imports from _error_level_analysis, moved io to module level
 """
 
+import io
 import logging
 from typing import Dict, Any, Optional
 
@@ -18,14 +22,27 @@ from PIL import Image
 
 logger = logging.getLogger(__name__)
 
+# Lossless formats where ELA is invalid (uniform artifacts everywhere)
+_LOSSLESS_FORMATS = frozenset({"PNG", "BMP", "TIFF", "WEBP"})
+
 
 def _error_level_analysis(img_path: str, quality: int = 90) -> np.ndarray:
     """
     ELA — save image at reduced quality, measure per-pixel difference.
     High residuals indicate potential manipulation.
+
+    BUG-011: For lossless formats (PNG, BMP, TIFF, WEBP), ELA produces
+    uniformly high scores because the JPEG re-save introduces compression
+    artifacts everywhere. Return a zero map in that case.
     """
-    import io, os, tempfile
-    img = Image.open(img_path).convert("RGB")
+    img = Image.open(img_path)
+
+    # Detect lossless format — ELA is unreliable
+    if img.format in _LOSSLESS_FORMATS:
+        width, height = img.size
+        return np.zeros((height, width), dtype=np.float32)
+
+    img = img.convert("RGB")
     buf = io.BytesIO()
     img.save(buf, format="JPEG", quality=quality)
     buf.seek(0)
@@ -61,7 +78,7 @@ def _dct_artifact_map(img_path: str) -> np.ndarray:
 
 
 class ManipulationLocalizer:
-    def __init__(self, model_loader):
+    def __init__(self, model_loader: Any) -> None:
         # Future: load ManTraNet / MVSS-Net here
         self.device = model_loader.device
 
@@ -89,7 +106,7 @@ class ManipulationLocalizer:
             # Global score = mean anomaly in top 10% pixels
             threshold = np.percentile(combined, 90)
             high_anomaly = combined[combined >= threshold]
-            score = float(high_anomaly.mean()) if len(high_anomaly) > 0 else 0.0
+            score: float = float(high_anomaly.mean()) if len(high_anomaly) > 0 else 0.0
 
             return {
                 "score": min(score * 2.5, 1.0),  # calibrate to [0,1]

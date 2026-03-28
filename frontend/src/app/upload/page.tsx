@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, Image as ImageIcon, Film, AlertCircle, Loader2 } from "lucide-react";
@@ -29,14 +29,36 @@ export default function UploadPage() {
   const [stepIdx, setStepIdx] = useState(0);
   const [progress, setProgress] = useState(0);
 
+  // BUG-015: Track object URL for cleanup
+  const previewUrlRef = useRef<string | null>(null);
+
+  // BUG-015: Cleanup object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+      }
+    };
+  }, []);
+
   const onDrop = useCallback((accepted: File[]) => {
     const f = accepted[0];
     if (!f) return;
     setFile(f);
     if (f.type.startsWith("image/")) {
+      // BUG-015: Revoke old URL before creating new one
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+      }
       const url = URL.createObjectURL(f);
+      previewUrlRef.current = url;
       setPreview(url);
     } else {
+      // Revoke if switching from image to non-image
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = null;
+      }
       setPreview(null);
     }
   }, []);
@@ -79,8 +101,26 @@ export default function UploadPage() {
     } catch (err: any) {
       clearInterval(stepInterval);
       setStage("error");
-      toast.error(err?.message || "Analysis failed. Please try again.");
+      // BUG-016: Improved error messages based on status code
+      const status = err?.response?.status;
+      if (status === 401 || status === 403) {
+        toast.error("Please sign in to analyze media.");
+      } else if (status === 422) {
+        toast.error("Unsupported file type or file too large.");
+      } else {
+        toast.error("Analysis failed. Please try again.");
+      }
     }
+  }
+
+  function handleClear() {
+    // Clean up preview URL on clear
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+    setFile(null);
+    setPreview(null);
   }
 
   return (
@@ -174,7 +214,7 @@ export default function UploadPage() {
               <button onClick={handleAnalyze} className="btn-primary flex-1 flex items-center justify-center gap-2 py-4 text-base">
                 Run Forensic Analysis
               </button>
-              <button onClick={() => { setFile(null); setPreview(null); }} className="btn-ghost px-4">
+              <button onClick={handleClear} className="btn-ghost px-4">
                 Clear
               </button>
             </motion.div>

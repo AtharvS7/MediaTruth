@@ -1,17 +1,22 @@
 """
 Video analysis API routes.
 POST /video/analyze — Upload and analyze a video file (up to 180 seconds).
+
+BUG-002 fix: Switched from get_current_user to get_optional_user
+  so anonymous uploads are allowed for the portfolio demo.
 """
 
 import uuid
 import logging
+from typing import Optional
+
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request, BackgroundTasks, Depends
 from fastapi.responses import JSONResponse
 
 from services.video_analyzer import VideoAnalyzer
 from services.supabase_service import SupabaseService
 from utils.file_utils import validate_video_file, save_temp_file, cleanup_temp_file
-from utils.auth import get_current_user
+from utils.auth import get_optional_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -22,8 +27,8 @@ async def analyze_video(
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    user=Depends(get_current_user),
-):
+    user: Optional[dict] = Depends(get_optional_user),
+) -> JSONResponse:
     """
     Analyze an uploaded video for authenticity.
 
@@ -46,8 +51,8 @@ async def analyze_video(
         - duration_seconds
         - frames_analyzed
     """
-    scan_id = str(uuid.uuid4())
-    temp_path = None
+    scan_id: str = str(uuid.uuid4())
+    temp_path: Optional[str] = None
 
     try:
         await validate_video_file(file)

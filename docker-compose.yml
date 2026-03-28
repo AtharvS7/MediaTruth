@@ -16,11 +16,8 @@ services:
       timeout: 10s
       retries: 3
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
+  # BUG-022: Removed unused redis service.
+  # No code in the codebase uses Celery or Redis.
 
 volumes:
   model_weights:

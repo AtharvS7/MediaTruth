@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Shield, AlertTriangle, CheckCircle, XCircle, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from "recharts";
+import Link from "next/link";
 import Nav from "@/components/layout/Nav";
 import ProbabilityMatrix from "@/components/charts/ProbabilityMatrix";
 import HeatmapViewer from "@/components/charts/HeatmapViewer";
@@ -22,6 +23,7 @@ export default function ResultsPage() {
   const { id } = useParams<{ id: string }>();
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showMeta, setShowMeta] = useState(false);
 
   useEffect(() => {
@@ -37,11 +39,26 @@ export default function ResultsPage() {
         }
       } catch {}
     }
-    // Fetch from API
-    getScanById(id).then((data) => {
-      setResult(data?.full_result || data);
-      setLoading(false);
-    });
+    // Fetch from API — BUG-013 fix: added .catch() handler
+    getScanById(id)
+      .then((data) => {
+        setResult(data?.full_result || data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load scan:", err);
+        // BUG-017: Show meaningful message for auth errors
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) {
+          setError("Sign in to view this scan. This scan belongs to an authenticated user.");
+        } else if (status === 404) {
+          setError("Scan not found. It may have been deleted.");
+        } else {
+          setError("Failed to load analysis results. Please try again later.");
+        }
+        setResult(null);
+        setLoading(false);
+      });
   }, [id]);
 
   if (loading) {
@@ -55,10 +72,21 @@ export default function ResultsPage() {
     );
   }
 
-  if (!result) {
+  if (error || !result) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="font-mono text-white/40">Scan not found.</p>
+        <div className="flex flex-col items-center gap-4 text-center max-w-md px-6">
+          <AlertTriangle size={32} className="text-coral" />
+          <p className="font-mono text-white/60">{error || "Scan not found."}</p>
+          {(error?.includes("Sign in")) && (
+            <Link href="/auth" className="btn-primary px-6 py-2 text-sm mt-2">
+              Sign In
+            </Link>
+          )}
+          <Link href="/upload" className="text-cyan text-sm hover:underline mt-2">
+            ← Back to Upload
+          </Link>
+        </div>
       </div>
     );
   }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import Link from "next/link";
-import { Film, Image as ImageIcon, ArrowRight, Clock } from "lucide-react";
+import { Film, Image as ImageIcon, ArrowRight, Clock, AlertTriangle } from "lucide-react";
 import Nav from "@/components/layout/Nav";
 import { getScanHistory } from "@/lib/api";
 
@@ -18,13 +18,29 @@ const VERDICT_COLORS: Record<string, string> = {
 export default function HistoryPage() {
   const [scans, setScans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    getScanHistory(page).then((d) => {
-      setScans(d.scans || []);
-      setLoading(false);
-    });
+    setLoading(true);
+    setError(null);
+    // BUG-014 fix: added .catch() handler
+    getScanHistory(page)
+      .then((d) => {
+        setScans(d.scans || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load history:", err);
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) {
+          setError("Please sign in to view your scan history.");
+        } else {
+          setError("Failed to load scan history. Please try again.");
+        }
+        setScans([]);
+        setLoading(false);
+      });
   }, [page]);
 
   return (
@@ -39,6 +55,16 @@ export default function HistoryPage() {
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 rounded-full border-2 border-cyan/30 border-t-cyan animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="glass rounded-2xl p-12 text-center">
+            <AlertTriangle size={32} className="text-coral mx-auto mb-4" />
+            <p className="font-mono text-white/50 mb-4">{error}</p>
+            {error.includes("sign in") && (
+              <Link href="/auth" className="btn-primary inline-flex gap-2">
+                Sign In
+              </Link>
+            )}
           </div>
         ) : scans.length === 0 ? (
           <div className="glass rounded-2xl p-12 text-center">

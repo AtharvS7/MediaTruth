@@ -5,6 +5,9 @@ VideoAnalyzer — Full video forensics pipeline.
 2. Sample evenly (target: ~1 frame/3 seconds, max 60 frames)
 3. Run ImageAnalyzer on each frame in batches
 4. Aggregate per-frame results to video-level verdict
+
+BUG-006 fix: Replaced asyncio.get_event_loop() with asyncio.get_running_loop()
+BUG-023 fix: Removed duplicate `import tempfile, cv2` inside _analyze_single_frame()
 """
 
 import asyncio
@@ -22,43 +25,52 @@ from utils.video_utils import extract_frames, get_video_metadata
 
 logger = logging.getLogger(__name__)
 
-MAX_FRAMES = 60
-TARGET_FPS_SAMPLE = 1 / 3  # 1 frame every 3 seconds
+MAX_FRAMES: int = 60
+TARGET_FPS_SAMPLE: float = 1 / 3  # 1 frame every 3 seconds
 
 
 class VideoAnalyzer:
     """Orchestrates per-frame analysis and video-level aggregation."""
 
-    def __init__(self, model_loader):
+    def __init__(self, model_loader: Any) -> None:
         self.model_loader = model_loader
         self.image_analyzer = ImageAnalyzer(model_loader)
         self.aggregator = ConfidenceAggregator()
 
     async def analyze(self, video_path: str, scan_id: str) -> Dict[str, Any]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         # Extract video metadata
-        meta = await loop.run_in_executor(None, get_video_metadata, video_path)
+        meta: Dict[str, Any] = await loop.run_in_executor(
+            None, get_video_metadata, video_path
+        )
 
-        duration = meta.get("duration_seconds", 0)
+        duration: float = meta.get("duration_seconds", 0)
         if duration > 180:
-            raise ValueError(f"Video exceeds maximum duration of 180 seconds ({duration:.1f}s).")
+            raise ValueError(
+                f"Video exceeds maximum duration of 180 seconds ({duration:.1f}s)."
+            )
 
         # Extract frames in thread pool
         frames, timestamps = await loop.run_in_executor(
             None, extract_frames, video_path, MAX_FRAMES
         )
 
-        logger.info(f"[{scan_id}] Extracted {len(frames)} frames from {duration:.1f}s video.")
+        logger.info(
+            f"[{scan_id}] Extracted {len(frames)} frames from {duration:.1f}s video."
+        )
 
         # Analyze each frame (batched, concurrent)
-        per_frame_results = await self._analyze_frames_batch(frames, timestamps, scan_id)
+        per_frame_results: List[Dict[str, Any]] = await self._analyze_frames_batch(
+            frames, timestamps, scan_id
+        )
 
         # Aggregate to video-level verdict
-        video_verdict = self.aggregator.aggregate_video(per_frame_results)
+        video_verdict: Dict[str, Any] = self.aggregator.aggregate_video(
+            per_frame_results
+        )
 
         return {
-            "scan_id": scan_id,
             "file_type": "video",
             "duration_seconds": duration,
             "frames_analyzed": len(frames),
@@ -81,7 +93,7 @@ class VideoAnalyzer:
         batch_size: int = 8,
     ) -> List[Dict[str, Any]]:
         """Analyze frames in batches to avoid memory exhaustion."""
-        results = []
+        results: List[Dict[str, Any]] = []
         for i in range(0, len(frames), batch_size):
             batch_frames = frames[i : i + batch_size]
             batch_ts = timestamps[i : i + batch_size]
@@ -101,14 +113,15 @@ class VideoAnalyzer:
         idx: int,
     ) -> Dict[str, Any]:
         """Save frame to temp file and run image analysis."""
-        import tempfile, cv2
-
+        # BUG-023: cv2 and tempfile are already imported at module level
         with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
             cv2.imwrite(tmp.name, frame)
-            tmp_path = tmp.name
+            tmp_path: str = tmp.name
 
         try:
-            result = await self.image_analyzer.analyze(tmp_path, f"{scan_id}_frame{idx}")
+            result: Dict[str, Any] = await self.image_analyzer.analyze(
+                tmp_path, f"{scan_id}_frame{idx}"
+            )
             result["timestamp"] = timestamp
             result["frame_index"] = idx
             return result

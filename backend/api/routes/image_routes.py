@@ -1,17 +1,22 @@
 """
 Image analysis API routes.
 POST /image/analyze — Upload and analyze an image file.
+
+BUG-002 fix: Switched from get_current_user to get_optional_user
+  so anonymous uploads are allowed for the portfolio demo.
 """
 
 import uuid
 import logging
+from typing import Optional
+
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
 
 from services.image_analyzer import ImageAnalyzer
 from services.supabase_service import SupabaseService
 from utils.file_utils import validate_image_file, save_temp_file, cleanup_temp_file
-from utils.auth import get_current_user
+from utils.auth import get_optional_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -21,8 +26,8 @@ router = APIRouter()
 async def analyze_image(
     request: Request,
     file: UploadFile = File(...),
-    user=Depends(get_current_user),
-):
+    user: Optional[dict] = Depends(get_optional_user),
+) -> JSONResponse:
     """
     Analyze an uploaded image for authenticity.
 
@@ -36,8 +41,8 @@ async def analyze_image(
         - metadata_findings
         - confidence_scores per detector
     """
-    scan_id = str(uuid.uuid4())
-    temp_path = None
+    scan_id: str = str(uuid.uuid4())
+    temp_path: Optional[str] = None
 
     try:
         # Validate file type and size
