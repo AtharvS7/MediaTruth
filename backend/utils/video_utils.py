@@ -1,32 +1,53 @@
 """
 Video utilities — OpenCV-based frame extraction and metadata reading.
+
+IMPROVE-004 fixes:
+  - FPS fallback: if OpenCV returns fps <= 0, assume 25.0 and log warning
+  - Duration cap: extract_frames validates MAX_VIDEO_DURATION_SECONDS
+  - Frame read timeout guard: limits total frames read to prevent hangs
 """
 
 import logging
-from typing import List, Tuple
+from typing import Dict, List, Tuple, Any
 
 import cv2
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
+MAX_VIDEO_DURATION_SECONDS: float = 180.0
+_DEFAULT_FPS: float = 25.0
 
-def get_video_metadata(video_path: str) -> dict:
+
+def _safe_fps(cap: cv2.VideoCapture, video_path: str) -> float:
+    """Return FPS from capture, falling back to 25 if invalid."""
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    if fps is None or fps <= 0:
+        logger.warning(f"Could not read FPS for {video_path}, assuming {_DEFAULT_FPS}fps")
+        return _DEFAULT_FPS
+    return fps
+
+
+def get_video_metadata(video_path: str) -> Dict[str, Any]:
     """Return duration, fps, resolution, and codec info."""
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise ValueError(f"Cannot open video: {video_path}")
 
-    fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    duration = frame_count / fps if fps > 0 else 0.0
+    fps: float = _safe_fps(cap, video_path)
+    frame_count: int = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    width: int = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height: int = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    duration: float = frame_count / fps if fps > 0 else 0.0
     cap.release()
 
-    findings = []
+    findings: List[str] = []
     if duration == 0:
         findings.append("⚠️ Could not determine video duration.")
+    if duration > MAX_VIDEO_DURATION_SECONDS:
+        findings.append(
+            f"⚠️ Video duration ({duration:.1f}s) exceeds {MAX_VIDEO_DURATION_SECONDS}s limit."
+        )
 
     return {
         "duration_seconds": duration,
@@ -45,6 +66,11 @@ def extract_frames(
     """
     Extract evenly-spaced frames from a video.
 
+    IMPROVE-004:
+      - Validates fps > 0 (falls back to 25)
+      - Validates duration <= MAX_VIDEO_DURATION_SECONDS
+      - Limits total frame reads to prevent infinite loops on corrupt files
+
     Returns:
         frames: list of BGR numpy arrays
         timestamps: list of timestamps in seconds
@@ -53,8 +79,17 @@ def extract_frames(
     if not cap.isOpened():
         raise ValueError(f"Cannot open video: {video_path}")
 
-    fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps: float = _safe_fps(cap, video_path)
+    total_frames: int = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    # Validate duration
+    duration: float = total_frames / fps if fps > 0 else 0.0
+    if duration > MAX_VIDEO_DURATION_SECONDS:
+        cap.release()
+        raise ValueError(
+            f"Video duration ({duration:.1f}s) exceeds maximum of "
+            f"{MAX_VIDEO_DURATION_SECONDS}s."
+        )
 
     # Calculate frame indices to sample
     if total_frames <= max_frames:
@@ -63,12 +98,20 @@ def extract_frames(
         step = total_frames / max_frames
         sample_indices = [int(i * step) for i in range(max_frames)]
 
-    frames = []
-    timestamps = []
+    frames: List[np.ndarray] = []
+    timestamps: List[float] = []
 
+    # Guard: limit total read attempts to prevent infinite loops on corrupt files
+    max_read_attempts: int = len(sample_indices) * 2
+
+    attempts: int = 0
     for idx in sample_indices:
+        if attempts >= max_read_attempts:
+            logger.warning(f"Max read attempts reached for {video_path}, stopping")
+            break
         cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
         ret, frame = cap.read()
+        attempts += 1
         if ret:
             frames.append(frame)
             timestamps.append(idx / fps)

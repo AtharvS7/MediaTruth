@@ -18,6 +18,14 @@ export default function AuthPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+
+    // REMAINING-005: Client-side password validation
+    if (mode === "signup" && password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      setLoading(false);
+      return;
+    }
+
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({ email, password });
@@ -69,6 +77,7 @@ export default function AuthPage() {
           <div className="relative">
             <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
             <input
+              id="auth-email"
               type="email"
               placeholder="Email address"
               value={email}
@@ -80,16 +89,19 @@ export default function AuthPage() {
           <div className="relative">
             <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
             <input
+              id="auth-password"
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 font-mono text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-cyan/50 transition-colors"
             />
           </div>
 
           <button
+            id="auth-submit"
             type="submit"
             disabled={loading}
             className="btn-primary w-full flex items-center justify-center gap-2 py-3 mt-2 disabled:opacity-60"

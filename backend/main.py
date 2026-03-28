@@ -1,12 +1,15 @@
 """
 MediaTruth - AI Media Forensics Platform
 Main FastAPI Application Entry Point
+
+IMPROVE-008: Added global exception handler to prevent HTML stack trace leaks.
 """
 
 import os
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from dotenv import load_dotenv
@@ -29,7 +32,11 @@ async def lifespan(app: FastAPI):
     app.state.model_loader = loader
     logger.info("✅ All models loaded successfully.")
     yield
+    # Graceful shutdown: release model memory
     logger.info("🛑 Shutting down MediaTruth backend...")
+    if hasattr(app.state, "model_loader"):
+        app.state.model_loader.models.clear()
+        logger.info("🧹 Model memory released.")
 
 
 app = FastAPI(
@@ -48,6 +55,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── IMPROVE-008: Global exception handler ──────────────────────────────────────
+# Catches unhandled exceptions and returns clean JSON instead of HTML stack traces.
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled exception on {request.url}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal error occurred. Please try again."},
+    )
 
 # ── Routers ─────────────────────────────────────────────────────────────────────
 app.include_router(health_router, prefix="/health", tags=["Health"])

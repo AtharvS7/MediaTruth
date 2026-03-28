@@ -1,6 +1,8 @@
 /**
  * MediaTruth API client.
  * Talks to FastAPI backend via environment variable NEXT_PUBLIC_API_URL.
+ *
+ * REMAINING-004: Added response error interceptor for centralised API error logging.
  */
 
 import axios from "axios";
@@ -21,6 +23,20 @@ API.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+// REMAINING-004: Centralised response error logging
+// Logs all API errors in one place. Does NOT change caller behaviour —
+// callers can still .catch() specific status codes as before.
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const url = error?.config?.url;
+    console.error(`[MediaTruth API] ${status || "network"} error on ${url}`);
+    // Re-throw so callers can still handle specific cases
+    return Promise.reject(error);
+  }
+);
 
 export async function analyzeMedia(file: File): Promise<any> {
   const form = new FormData();

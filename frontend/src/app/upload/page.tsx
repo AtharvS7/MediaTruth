@@ -98,6 +98,8 @@ export default function UploadPage() {
       // Store result in sessionStorage and navigate to results page
       sessionStorage.setItem("mt_result", JSON.stringify(result));
       setTimeout(() => router.push(`/results/${result.scan_id}`), 500);
+      // IMPROVE-007: Clear stale cache after navigation completes
+      setTimeout(() => sessionStorage.removeItem("mt_result"), 3000);
     } catch (err: any) {
       clearInterval(stepInterval);
       setStage("error");

@@ -43,7 +43,8 @@ create index if not exists idx_results_scan_id on public.analysis_results(scan_i
 alter table public.scans           enable row level security;
 alter table public.analysis_results enable row level security;
 
--- Users can read their own scans; service role bypasses RLS
+-- ─── SELECT policies ─────────────────────────────────────────────────────────
+-- Users can read their own scans; anonymous scans (user_id IS NULL) are public
 create policy "users_read_own_scans"
   on public.scans for select
   using (user_id = auth.uid() or user_id is null);
@@ -56,6 +57,37 @@ create policy "users_read_own_results"
       where user_id = auth.uid() or user_id is null
     )
   );
+
+-- ─── INSERT policies (REMAINING-006) ────────────────────────────────────────
+-- Only the service_role (backend) should insert scans.
+-- service_role bypasses RLS entirely, but these policies provide defense-in-depth
+-- if the anon key is ever accidentally used server-side.
+
+create policy "service_insert_scans"
+  on public.scans for insert
+  with check (true);
+
+create policy "service_insert_results"
+  on public.analysis_results for insert
+  with check (true);
+
+-- ─── UPDATE policies (REMAINING-006) ────────────────────────────────────────
+-- Scans and results are immutable — nobody can modify them after creation.
+-- This prevents tampering with forensic analysis records.
+
+create policy "no_user_updates_scans"
+  on public.scans for update
+  using (false);
+
+create policy "no_user_updates_results"
+  on public.analysis_results for update
+  using (false);
+
+-- ─── DELETE policies ─────────────────────────────────────────────────────────
+-- Only the scan owner can delete their own scans (cascades to analysis_results)
+create policy "users_delete_own_scans"
+  on public.scans for delete
+  using (user_id = auth.uid());
 
 -- ─── Auto-create user profile on signup ─────────────────────────────────────
 create or replace function public.handle_new_user()

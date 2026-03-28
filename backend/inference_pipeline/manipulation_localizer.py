@@ -9,11 +9,13 @@ and a lightweight CNN to produce:
 For production: integrate ManTraNet or MVSS-Net weights when available.
 
 BUG-011 fix: ELA returns zero map for lossless image formats (PNG, BMP, TIFF, WEBP)
-BUG-024 fix: Removed unused os/tempfile imports from _error_level_analysis, moved io to module level
+BUG-024 fix: Removed unused os/tempfile imports, moved io to module level
+IMPROVE-005: Replaced magic `score * 2.5` with calibrated sigmoid mapping
 """
 
 import io
 import logging
+import math
 from typing import Dict, Any, Optional
 
 import cv2
@@ -24,6 +26,21 @@ logger = logging.getLogger(__name__)
 
 # Lossless formats where ELA is invalid (uniform artifacts everywhere)
 _LOSSLESS_FORMATS = frozenset({"PNG", "BMP", "TIFF", "WEBP"})
+
+
+def _calibrate(raw: float) -> float:
+    """Calibrated sigmoid mapping [0,1] → [0,1] for manipulation scores.
+
+    IMPROVE-005: Replaces the hard-clipping `min(score * 2.5, 1.0)` with a
+    smooth sigmoid centred at 0.3 with steepness 8:
+        raw=0.0 → ~0.08
+        raw=0.3 → 0.50
+        raw=0.6 → ~0.92
+        raw=1.0 → ~0.997
+
+    This preserves precision in the mid-range and never hard-clips.
+    """
+    return 1.0 / (1.0 + math.exp(-8.0 * (raw - 0.3)))
 
 
 def _error_level_analysis(img_path: str, quality: int = 90) -> np.ndarray:
@@ -108,10 +125,13 @@ class ManipulationLocalizer:
             high_anomaly = combined[combined >= threshold]
             score: float = float(high_anomaly.mean()) if len(high_anomaly) > 0 else 0.0
 
+            # IMPROVE-005: calibrated sigmoid instead of hard clip
+            calibrated_score: float = _calibrate(score)
+
             return {
-                "score": min(score * 2.5, 1.0),  # calibrate to [0,1]
+                "score": calibrated_score,
                 "heatmap": combined,
-                "label": "manipulated" if score > 0.3 else "clean",
+                "label": "manipulated" if calibrated_score > 0.5 else "clean",
             }
         except Exception as e:
             logger.warning(f"Manipulation localizer failed: {e}")

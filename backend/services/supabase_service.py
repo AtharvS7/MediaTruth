@@ -5,12 +5,10 @@ Tables:
   scans             — scan record metadata
   analysis_results  — full JSON result per scan
 
-BUG-005 fixes:
-  - Module-level singleton Supabase client (no per-request creation)
-  - All sync .execute() calls wrapped in asyncio.run_in_executor()
-  - Replaced .single() with .limit(1) to avoid exception on zero rows
-IMPROVE-001:
-  - save_scan logs WARNING with scan_id on persist failures
+REMAINING-002 fix:
+  - Configured 10-second HTTP timeout on Supabase client
+  - All run_in_executor calls wrapped in asyncio.wait_for(timeout=12)
+  - Prevents thread pool exhaustion when Supabase is slow/unreachable
 """
 
 import asyncio
@@ -28,10 +26,25 @@ logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=1)
 def get_supabase_client() -> Client:
-    """Return a singleton Supabase client (created once, reused globally)."""
+    """Return a singleton Supabase client (created once, reused globally).
+    
+    REMAINING-002: Configures a 10-second HTTP timeout on the PostgREST
+    session so slow/unreachable Supabase won't block threads forever.
+    """
     url: str = os.environ["SUPABASE_URL"]
     key: str = os.environ["SUPABASE_SERVICE_KEY"]
-    return create_client(url, key)
+    client = create_client(url, key)
+    # Set 10-second timeout on all Supabase HTTP requests
+    try:
+        client.postgrest.session.timeout = 10
+    except AttributeError:
+        # Some supabase-py versions don't expose session.timeout directly
+        logger.warning("Could not set Supabase HTTP timeout — version may not support it")
+    return client
+
+
+# Default outer timeout for all DB operations (slightly above HTTP timeout)
+_DB_TIMEOUT: float = 12.0
 
 
 class SupabaseService:
@@ -48,8 +61,8 @@ class SupabaseService:
     ) -> None:
         """Persist scan metadata and full result JSON to Supabase.
 
-        Silently swallows errors so a DB failure never crashes the analysis
-        response. Logs a WARNING with the scan_id for traceability.
+        Silently swallows errors (including timeouts) so a DB failure
+        never crashes the analysis response.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -66,14 +79,22 @@ class SupabaseService:
                 "authentic_probability": result.get("authentic_probability"),
                 "confidence": result.get("confidence"),
             })
-            await loop.run_in_executor(None, scan_query.execute)
+            await asyncio.wait_for(
+                loop.run_in_executor(None, scan_query.execute),
+                timeout=_DB_TIMEOUT,
+            )
 
             result_query = self.client.table("analysis_results").insert({
                 "scan_id": scan_id,
                 "result_json": json.dumps(result),
             })
-            await loop.run_in_executor(None, result_query.execute)
+            await asyncio.wait_for(
+                loop.run_in_executor(None, result_query.execute),
+                timeout=_DB_TIMEOUT,
+            )
 
+        except asyncio.TimeoutError:
+            logger.error(f"Supabase query timed out while saving scan {scan_id}")
         except Exception as e:
             logger.warning(f"Failed to persist scan {scan_id}: {e}")
 
@@ -99,8 +120,14 @@ class SupabaseService:
                 # Anonymous: show scans with no owner
                 query = query.is_("user_id", "null")
 
-            response = await loop.run_in_executor(None, query.execute)
+            response = await asyncio.wait_for(
+                loop.run_in_executor(None, query.execute),
+                timeout=_DB_TIMEOUT,
+            )
             return {"scans": response.data, "page": page, "page_size": page_size}
+        except asyncio.TimeoutError:
+            logger.error("Supabase query timed out while fetching scan history")
+            return {"scans": [], "page": page, "page_size": page_size}
         except Exception as e:
             logger.error(f"Failed to retrieve scan history: {e}")
             return {"scans": [], "page": page, "page_size": page_size}
@@ -116,7 +143,10 @@ class SupabaseService:
                 .eq("id", scan_id)
                 .limit(1)
             )
-            scan_resp = await loop.run_in_executor(None, scan_query.execute)
+            scan_resp = await asyncio.wait_for(
+                loop.run_in_executor(None, scan_query.execute),
+                timeout=_DB_TIMEOUT,
+            )
 
             if not scan_resp.data or len(scan_resp.data) == 0:
                 return None
@@ -129,12 +159,18 @@ class SupabaseService:
                 .eq("scan_id", scan_id)
                 .limit(1)
             )
-            result_resp = await loop.run_in_executor(None, result_query.execute)
+            result_resp = await asyncio.wait_for(
+                loop.run_in_executor(None, result_query.execute),
+                timeout=_DB_TIMEOUT,
+            )
 
             if result_resp.data and len(result_resp.data) > 0:
                 scan["full_result"] = json.loads(result_resp.data[0]["result_json"])
 
             return scan
+        except asyncio.TimeoutError:
+            logger.error(f"Supabase query timed out while fetching scan {scan_id}")
+            return None
         except Exception as e:
             logger.error(f"Failed to retrieve scan {scan_id}: {e}")
             return None
