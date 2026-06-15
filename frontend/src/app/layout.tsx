@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Syne, JetBrains_Mono, DM_Sans } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import Background3D from "@/components/ui/Background3D";
@@ -22,19 +22,49 @@ const dmSans = DM_Sans({
   weight: ["300", "400", "500", "600"],
 });
 
+// Next.js 14: themeColor and viewport MUST be in generateViewport(), not metadata.
+// Putting them in metadata causes "Unsupported metadata" warnings and they are ignored.
+export const viewport: Viewport = {
+  themeColor: "#0d0d1a",
+  width: "device-width",
+  initialScale: 1,
+  // viewport-fit=cover makes content reach iPhone X+ notch area
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "MediaTruth — AI Media Forensics",
-  description: "Detect AI-generated, AI-edited, and manipulated images and videos with state-of-the-art forensic analysis.",
+  description:
+    "Detect AI-generated, AI-edited, and manipulated images and videos with state-of-the-art forensic analysis.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
   openGraph: {
-    title: "MediaTruth",
-    description: "AI Media Forensics Platform",
+    title: "MediaTruth — AI Media Forensics",
+    description:
+      "Detect AI-generated, AI-edited, and manipulated images and videos.",
+    images: ["/og-image.png"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MediaTruth — AI Media Forensics",
+    description:
+      "Detect AI-generated, AI-edited, and manipulated images and videos.",
     images: ["/og-image.png"],
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${syne.variable} ${jetbrains.variable} ${dmSans.variable}`}>
+    <html
+      lang="en"
+      className={`${syne.variable} ${jetbrains.variable} ${dmSans.variable}`}
+    >
       <body className="bg-obsidian-950 text-white font-body antialiased">
         <Background3D />
         <div className="fixed inset-0 bg-grid-fine pointer-events-none opacity-100" />

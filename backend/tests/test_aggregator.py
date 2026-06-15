@@ -163,13 +163,37 @@ class TestAggregatorBasic:
 
     def test_result_contains_all_keys(self, agg):
         result = agg.aggregate(
-            deepfake={"score": 0.5},
-            gan={"score": 0.5},
+            deepfake={"score": 0.5, "weights_available": True},
+            gan={"score": 0.5, "weights_available": True},
             manipulation={"score": 0.5},
             metadata={"anomaly_score": 0.5},
         )
         required_keys = {
             "ai_generated", "ai_edited", "traditional_edit", "authentic",
-            "verdict", "verdict_key", "confidence", "explanation",
+            "verdict", "verdict_key", "confidence", "explanation", "limited_mode",
         }
         assert required_keys.issubset(result.keys())
+
+    # ── Test: limited_mode detected when weights unavailable ─────────────
+
+    def test_limited_mode_when_no_weights(self, agg):
+        """When both deepfake and GAN report weights_available=False, limited_mode=True."""
+        result = agg.aggregate(
+            deepfake={"score": 0.0, "weights_available": False},
+            gan={"score": 0.0, "weights_available": False},
+            manipulation={"score": 0.0},
+            metadata={"anomaly_score": 0.0},
+        )
+        assert result["limited_mode"] is True
+        # Confidence should be capped at 0.75 in limited mode
+        assert result["confidence"] <= 0.75
+
+    def test_not_limited_mode_when_weights_available(self, agg):
+        """When detectors have fine-tuned weights, limited_mode=False."""
+        result = agg.aggregate(
+            deepfake={"score": 0.8, "weights_available": True},
+            gan={"score": 0.7, "weights_available": True},
+            manipulation={"score": 0.0},
+            metadata={"anomaly_score": 0.0},
+        )
+        assert result["limited_mode"] is False

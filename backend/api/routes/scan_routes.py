@@ -3,8 +3,8 @@ Scan history and retrieval routes.
 GET /scan/history  — List all scans for the current user (or anonymous scans).
 GET /scan/{id}     — Get a specific scan result by ID.
 
-BUG-003 fixes:
-  - Both endpoints now use get_optional_user (supports anonymous access).
+Access control:
+  - Both endpoints use get_optional_user (supports anonymous access).
   - IDOR check: anonymous scans (user_id=None) are accessible to anyone;
     owned scans require matching authenticated user.
 """
@@ -79,3 +79,48 @@ async def get_scan(
     except Exception as e:
         logger.error(f"Failed to fetch scan {scan_id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to retrieve scan.")
+
+
+@router.delete("/{scan_id}")
+async def delete_scan(
+    scan_id: str,
+    user: Optional[dict] = Depends(get_optional_user),
+) -> JSONResponse:
+    """Delete a scan by ID.
+
+    Access rules:
+      - Authentication required (anonymous users cannot delete scans).
+      - Only the scan owner can delete their own scan.
+      - Anonymous scans (user_id=None) are immutable forensic records.
+    """
+    if not user:
+        raise HTTPException(
+            status_code=401, detail="Authentication required to delete scans."
+        )
+
+    try:
+        db = SupabaseService()
+        scan = await db.get_scan_by_id(scan_id)
+
+        if not scan:
+            raise HTTPException(status_code=404, detail="Scan not found.")
+
+        owner_id: Optional[str] = scan.get("user_id")
+        if owner_id is None:
+            raise HTTPException(
+                status_code=403,
+                detail="Anonymous scans are immutable forensic records and cannot be deleted.",
+            )
+        if user["id"] != owner_id:
+            raise HTTPException(
+                status_code=403, detail="Forbidden. You do not own this scan."
+            )
+
+        await db.delete_scan(scan_id)
+        return JSONResponse(content={"deleted": scan_id})
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to delete scan {scan_id}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to delete scan.")
+

@@ -1,28 +1,88 @@
-# Python
+# ═══════════════════════════════════════════════════════════════
+# MediaTruth — Root .gitignore
+# ═══════════════════════════════════════════════════════════════
+
+# ── Python / Backend ──────────────────────────────────────────
 __pycache__/
-*.pyc
-*.pyo
-.venv/
-venv/
-.env
+*.py[cod]
+*$py.class
+*.so
+*.egg
 *.egg-info/
+dist/
+build/
+.eggs/
 
-# Model weights (large binaries — download on deploy)
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Environment / secrets
+backend/.env
+*.env.local
+.env
+
+# Model weights (large binary files — never commit these)
 backend/models/weights/*.pth
+backend/models/weights/*.pt
 backend/models/weights/*.bin
+backend/models/weights/*.ckpt
+backend/models/weights/*.h5
+# Root-level models dir (accidental download location)
+models/
 
-# Node
+# pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# mypy / ruff / pylint
+.mypy_cache/
+.ruff_cache/
+
+# Temp / uploads
+backend/mediatruth_uploads/
+backend/pip_install.log
+/tmp/
+
+# ── Node.js / Frontend ────────────────────────────────────────
 node_modules/
-.next/
-out/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+
+# Environment / secrets
 frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
-# OS
+# npm / yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ── OS / Editor ───────────────────────────────────────────────
 .DS_Store
+.DS_Store?
+._*
 Thumbs.db
+desktop.ini
 
-# Docker
-*.log
+# VSCode
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
 
-# Temp uploads
-/tmp/mediatruth_uploads/
+# JetBrains
+.idea/
+
+# ── Docker ────────────────────────────────────────────────────
+# Keep docker-compose but ignore override files with real secrets
+docker-compose.override.yml

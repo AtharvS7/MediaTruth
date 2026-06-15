@@ -1,18 +1,14 @@
 """
 ImageAnalyzer — Full image forensics pipeline.
 
-Runs multiple independent detectors and aggregates results
-into a final confidence matrix with a verdict.
-
-BUG-006 fix: Replaced asyncio.get_event_loop() with asyncio.get_running_loop()
-BUG-012 fix: Removed duplicate "scan_id" from the returned dict
+Runs multiple independent detectors concurrently and aggregates
+results into a final confidence matrix with a verdict.
 """
 
 import asyncio
 import base64
 import io
 import logging
-from pathlib import Path
 from typing import Any, Dict, Optional
 
 import numpy as np
@@ -70,7 +66,11 @@ class ImageAnalyzer:
         # Encode heatmap as base64 PNG for frontend
         heatmap_b64 = self._encode_heatmap(manip_result.get("heatmap"))
 
-        # BUG-012: scan_id is NOT included here — the route handler adds it
+        # Merge format-specific notes from manipulation localizer into findings
+        all_findings = (
+            metadata_result.get("findings", []) + manip_result.get("format_note", [])
+        )
+
         return {
             "file_type": "image",
             "ai_generated_probability": verdict["ai_generated"],
@@ -79,6 +79,7 @@ class ImageAnalyzer:
             "authentic_probability": verdict["authentic"],
             "final_verdict": verdict["verdict"],
             "confidence": verdict["confidence"],
+            "limited_mode": verdict.get("limited_mode", False),
             "manipulation_heatmap": heatmap_b64,
             "detector_scores": {
                 "deepfake_score": deepfake_result.get("score", 0.0),
@@ -86,15 +87,26 @@ class ImageAnalyzer:
                 "manipulation_score": manip_result.get("score", 0.0),
                 "metadata_anomaly_score": metadata_result.get("anomaly_score", 0.0),
             },
-            "metadata_findings": metadata_result.get("findings", []),
+            "metadata_findings": all_findings,
             "explanation": verdict.get("explanation", ""),
         }
 
     @staticmethod
     def _encode_heatmap(heatmap: Optional[np.ndarray]) -> Optional[str]:
+        """Encode heatmap as base64 PNG.
+
+        Supports both:
+          - (H, W, 3) uint8 RGB  — colored inferno heatmap from ManipulationLocalizer
+          - (H, W) float32 [0,1] — legacy grayscale fallback
+        """
         if heatmap is None:
             return None
-        img = Image.fromarray((heatmap * 255).astype(np.uint8))
+        if heatmap.ndim == 3:
+            # Already a colored RGB uint8 array
+            img = Image.fromarray(heatmap.astype(np.uint8))
+        else:
+            # Grayscale float32 — convert to uint8
+            img = Image.fromarray((heatmap * 255).astype(np.uint8))
         buf = io.BytesIO()
         img.save(buf, format="PNG")
         return base64.b64encode(buf.getvalue()).decode()

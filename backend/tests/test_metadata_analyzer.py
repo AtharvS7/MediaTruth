@@ -79,7 +79,7 @@ class TestIsAiSoftware:
         assert _is_ai_software("stable DIFFUSION")
 
     def test_partial_match_ai_not_flagged(self):
-        """The word 'ai' alone should NOT trigger (was BUG-010)."""
+        """The word 'ai' alone should NOT trigger false positives."""
         assert not _is_ai_software("ai")
         assert not _is_ai_software("Repair")
         assert not _is_ai_software("Mountain")

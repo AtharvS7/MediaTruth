@@ -2,8 +2,8 @@
 Video analysis API routes.
 POST /video/analyze — Upload and analyze a video file (up to 180 seconds).
 
-BUG-002 fix: Switched from get_current_user to get_optional_user
-  so anonymous uploads are allowed for the portfolio demo.
+Rate limited to 3 requests/minute per IP via slowapi.
+Supports anonymous uploads via get_optional_user.
 """
 
 import uuid
@@ -12,6 +12,8 @@ from typing import Optional
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request, BackgroundTasks, Depends
 from fastapi.responses import JSONResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from services.video_analyzer import VideoAnalyzer
 from services.supabase_service import SupabaseService
@@ -21,8 +23,11 @@ from utils.auth import get_optional_user
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+limiter = Limiter(key_func=get_remote_address)
+
 
 @router.post("/analyze")
+@limiter.limit("3/minute")
 async def analyze_video(
     request: Request,
     background_tasks: BackgroundTasks,
@@ -32,24 +37,14 @@ async def analyze_video(
     """
     Analyze an uploaded video for authenticity.
 
+    Rate limited: 3 requests per minute per IP address.
+
     Pipeline:
         1. Extract frames with OpenCV
         2. Sample frames evenly (max 60 frames for 180s video)
         3. Run image detectors on each frame
         4. Aggregate per-frame probabilities
         5. Produce final video-level verdict
-
-    Returns:
-        - ai_generated_probability
-        - ai_edited_probability
-        - traditional_edit_probability
-        - authentic_probability
-        - final_verdict
-        - per_frame_results (list)
-        - frame_heatmaps (list of base64 PNGs)
-        - metadata_findings
-        - duration_seconds
-        - frames_analyzed
     """
     scan_id: str = str(uuid.uuid4())
     temp_path: Optional[str] = None

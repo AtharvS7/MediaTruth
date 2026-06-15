@@ -1,0 +1,47 @@
+# render.yaml — Render.com Infrastructure Blueprint
+# Deploy: https://render.com → New → Blueprint → connect this repo
+#
+# This deploys:
+#   - mediatruth-backend: FastAPI/Python web service
+#
+# Frontend is deployed separately on Vercel (see deployment.md)
+# Database is on Supabase (see deployment.md Step 1)
+
+services:
+  - type: web
+    name: mediatruth-backend
+    runtime: python
+    plan: starter           # $7/month — required for ML models (2GB RAM)
+    # plan: free            # 512MB RAM — models will be disabled (graceful fallback)
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health/
+    
+    # Auto-deploy on push to main branch
+    autoDeploy: true
+    branch: main
+    
+    envVars:
+      - key: ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false         # Set manually in Render dashboard
+      - key: SUPABASE_SERVICE_KEY
+        sync: false         # Set manually in Render dashboard (secret)
+      - key: JWT_SECRET
+        generateValue: true # Render auto-generates a secure random value
+      - key: ALLOWED_ORIGINS
+        sync: false         # Set to your Vercel URL after frontend deploys
+      - key: WORKERS
+        value: "1"
+      # HuggingFace token (optional — increases rate limits for model downloads)
+      # - key: HF_TOKEN
+      #   sync: false
+
+    # Persistent disk for model weight cache
+    # Prevents re-downloading models on every restart
+    disk:
+      name: ml-model-cache
+      mountPath: /root/.cache
+      sizeGB: 2             # Stores HF models (~700MB) + CNNDetect weights (~270MB)

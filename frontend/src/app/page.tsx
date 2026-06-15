@@ -10,14 +10,14 @@ const FEATURES = [
   { icon: Zap,      label: "GAN Fingerprinting",         desc: "CNNDetect identifies GAN-generated images (StyleGAN, BigGAN)" },
   { icon: Shield,   label: "Manipulation Localization",  desc: "ELA + DCT artifact maps pinpoint edited regions" },
   { icon: Film,     label: "Video Forensics",            desc: "Frame-by-frame analysis for videos up to 180 seconds" },
-  { icon: GitBranch,"label": "Metadata Analysis",       desc: "EXIF anomaly detection flags AI generator software signatures" },
+  { icon: GitBranch, label: "Metadata Analysis",        desc: "EXIF anomaly detection flags AI generator software signatures" },
 ];
 
 const STATS = [
   { value: "4+",    label: "Detection Models" },
   { value: "180s",  label: "Max Video Length" },
   { value: "<3s",   label: "Avg Analysis Time" },
-  { value: "99.1%", label: "GAN Detection Accuracy" },
+  { value: "5-Layer", label: "Detection Pipeline" },
 ];
 
 export default function Home() {

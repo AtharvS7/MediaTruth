@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function Nav() {
@@ -10,6 +10,7 @@ export default function Nav() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Initial fetch
@@ -22,7 +23,19 @@ export default function Nav() {
       setUserEmail(session?.user?.email || null);
     });
 
-    return () => subscription.unsubscribe();
+    // Handle click outside to close dropdown
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      subscription.unsubscribe();
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   async function handleSignOut() {
@@ -53,7 +66,7 @@ export default function Nav() {
         ))}
         
         {userEmail ? (
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setDropdownOpen(!dropdownOpen)} 
               className="btn-ghost text-xs py-2 px-4 hover:text-white transition-colors flex items-center gap-2"

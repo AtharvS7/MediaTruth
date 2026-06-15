@@ -1,18 +1,15 @@
 """
-ConfidenceAggregator — fuses signals from all detectors into a final verdict.
+ConfidenceAggregator — Fuses signals from all detectors into a final verdict.
 
 Signal weights (tuned empirically):
-  deepfake    → ai_generated (0.40)
-  gan         → ai_generated (0.35)
+  deepfake     → ai_generated (0.40)
+  gan          → ai_generated (0.35)
   manipulation → ai_edited / traditional_edit (0.35)
-  metadata    → boosts/suppresses all categories (0.20)
+  metadata     → boosts/suppresses all categories (0.20)
 
-BUG-009 fix:
-  - authentic is now computed as additive complement:
-      authentic = max(0.0, 1.0 - (ai_generated + ai_edited + traditional_edit))
-    instead of 1.0 - max(...). This is semantically correct: authentic is what's
-    left after all manipulation signals are accounted for.
-  - Clamp before computing authentic, then normalise all four together.
+Authentic probability is computed as the additive complement:
+  authentic = max(0.0, 1.0 - (ai_generated + ai_edited + traditional_edit))
+All four probabilities are then normalised to sum to 1.0.
 """
 
 import logging
@@ -50,7 +47,14 @@ class ConfidenceAggregator:
         manip_score: float = manipulation.get("score", 0.0)
         meta_score: float = metadata.get("anomaly_score", 0.0)
 
-        # ── Base probabilities ────────────────────────────────────────────────
+        # Detect whether ML detectors are in limited mode (no fine-tuned weights).
+        # When both deepfake and GAN scores are 0.0 due to unavailable weights,
+        # the system relies only on ELA (manipulation) and metadata analysis.
+        df_available: bool = deepfake.get("weights_available", True) and df_score > 0.0
+        gan_available: bool = gan.get("weights_available", True) and gan_score > 0.0
+        limited_mode: bool = not df_available and not gan_available
+
+        # Base probabilities
         ai_generated: float = 0.40 * df_score + 0.35 * gan_score + 0.15 * meta_score
         ai_edited: float = 0.35 * manip_score + 0.10 * df_score + 0.15 * meta_score
         traditional_edit: float = 0.45 * manip_score + 0.10 * meta_score
@@ -60,17 +64,17 @@ class ConfidenceAggregator:
         ai_edited = min(max(ai_edited, 0.0), 1.0)
         traditional_edit = min(max(traditional_edit, 0.0), 1.0)
 
-        # BUG-009: additive complement — authentic = leftover probability
+        # Additive complement — authentic = leftover probability
         authentic: float = max(0.0, 1.0 - (ai_generated + ai_edited + traditional_edit))
 
-        # ── Normalise to sum=1 ────────────────────────────────────────────────
+        # Normalise to sum=1
         total: float = ai_generated + ai_edited + traditional_edit + authentic + 1e-8
         ai_generated /= total
         ai_edited /= total
         traditional_edit /= total
         authentic /= total
 
-        # ── Verdict = argmax ──────────────────────────────────────────────────
+        # Verdict = argmax
         scores: Dict[str, float] = {
             "ai_generated": ai_generated,
             "ai_edited": ai_edited,
@@ -80,6 +84,19 @@ class ConfidenceAggregator:
         verdict_key: str = max(scores, key=scores.get)  # type: ignore[arg-type]
         confidence: float = scores[verdict_key]
 
+        # In limited mode: confidence is based only on ELA+metadata,
+        # so cap at 0.75 and append a note to the explanation.
+        explanation = EXPLANATIONS[verdict_key]
+        if limited_mode:
+            confidence = min(confidence, 0.75)
+            explanation = (
+                f"{explanation} "
+                "[Limited Mode: Deepfake and GAN detectors are running without "
+                "fine-tuned weights. Results are based on Error Level Analysis and "
+                "metadata forensics only. Upload fine-tuned .pth files to enable "
+                "full AI-generation detection.]"
+            )
+
         return {
             "ai_generated": round(ai_generated, 4),
             "ai_edited": round(ai_edited, 4),
@@ -88,7 +105,8 @@ class ConfidenceAggregator:
             "verdict": VERDICT_LABELS[verdict_key],
             "verdict_key": verdict_key,
             "confidence": round(confidence, 4),
-            "explanation": EXPLANATIONS[verdict_key],
+            "explanation": explanation,
+            "limited_mode": limited_mode,
         }
 
     def aggregate_video(self, frame_results: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -133,4 +151,7 @@ class ConfidenceAggregator:
             "verdict_key": verdict_key,
             "confidence": round(confidence, 4),
             "explanation": EXPLANATIONS[verdict_key],
+            # Video-level limited_mode is not tracked per-frame; detectors already
+            # return 0.0 when no weights, which propagates correctly through averages.
+            "limited_mode": False,
         }

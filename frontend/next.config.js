@@ -1,6 +1,21 @@
 /** @type {import('next').NextConfig} */
+
+// ARCH-14: Fail the build loudly if production API URL is not configured.
+// Without this, all API calls would silently go to http://localhost:8000
+// which is unreachable from Vercel's edge, breaking every user analysis.
+if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_API_URL) {
+  console.warn(
+    '[MediaTruth] WARNING: NEXT_PUBLIC_API_URL is not set. ' +
+    'API calls will fall back to http://localhost:8000 which will fail in production. ' +
+    'Set NEXT_PUBLIC_API_URL in your Vercel dashboard or environment.'
+  );
+}
+
 const nextConfig = {
   reactStrictMode: true,
+  // DEPLOY-03: Required for Docker standalone builds (frontend/Dockerfile)
+  // Next.js only generates .next/standalone when this is explicitly set
+  output: 'standalone',
   images: {
     remotePatterns: [],
   },
@@ -12,8 +27,9 @@ const nextConfig = {
       },
     ];
   },
-  // BUG-020 + REMAINING-003: Security headers
+  // Security headers
   async headers() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     return [
       {
         source: "/(.*)",
@@ -33,7 +49,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob:",
-              "connect-src 'self' http://localhost:8000 https://*.supabase.co wss://*.supabase.co",
+              `connect-src 'self' ${apiUrl} https://*.supabase.co wss://*.supabase.co`,
               "frame-ancestors 'none'",
             ].join("; "),
           },

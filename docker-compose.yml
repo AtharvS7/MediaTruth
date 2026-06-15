@@ -1,4 +1,21 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# MediaTruth — docker-compose.yml
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# ARCH-07 fix: Now includes both backend AND frontend services.
+# Usage:
+#   docker-compose up --build           # start both services
+#   docker-compose up backend           # backend only
+#   docker-compose logs -f backend      # stream backend logs
+#
+# Prerequisites:
+#   - backend/.env must exist with real Supabase credentials
+#   - frontend/.env.local must exist with NEXT_PUBLIC_* vars
+# ═══════════════════════════════════════════════════════════════════════════════
+
 services:
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────────
   backend:
     build:
       context: ./backend
@@ -8,16 +25,41 @@ services:
     env_file:
       - ./backend/.env
     volumes:
+      # Persist model weights across container restarts
       - model_weights:/app/models/weights
+      # Optional: mount source for hot-reload in development
+      # - ./backend:/app
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s   # wait for model loading
 
-  # BUG-022: Removed unused redis service.
-  # No code in the codebase uses Celery or Redis.
+  # ── Next.js Frontend ─────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      # In Docker, the frontend talks to the backend via service name
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
   model_weights:
+    driver: local

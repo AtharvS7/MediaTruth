@@ -1,0 +1,16 @@
+User-agent: *
+
+# Allow landing page and auth for SEO
+Allow: /
+Allow: /auth
+
+# Block user-specific and app pages from indexing
+# These pages either require auth or are dynamically generated per-user
+Disallow: /upload
+Disallow: /history
+Disallow: /results/
+
+# Block Next.js build artifacts
+Disallow: /_next/
+
+Sitemap: https://mediatruth.vercel.app/sitemap.xml

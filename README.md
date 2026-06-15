@@ -55,7 +55,8 @@ MediaTruth/
 │   │   ├── video_utils.py
 │   │   ├── auth.py
 │   │   └── logger.py
-│   └── models/weights/                  # Downloaded model weights (gitignored)
+│   ├── models/weights/                  # Downloaded model weights (gitignored)
+│   └── tests/                           # Unit tests (pytest)
 ├── frontend/
 │   ├── src/app/
 │   │   ├── page.tsx                     # Landing page
@@ -80,7 +81,7 @@ MediaTruth/
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+
-- Docker & Docker Compose
+- Docker & Docker Compose (optional)
 - Supabase account (free tier works)
 
 ---
@@ -88,8 +89,8 @@ MediaTruth/
 ### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/yourname/mediatruth
-cd mediatruth
+git clone https://github.com/AtharvS7/MediaTruth.git
+cd MediaTruth
 ```
 
 **Backend config:**
@@ -115,15 +116,13 @@ cp frontend/.env.local.example frontend/.env.local
 
 ---
 
-### 3. Run with Docker (Recommended)
+### 3. Run with Docker
 
 ```bash
 docker compose up --build
 ```
 
-This starts:
-- **FastAPI backend** on `http://localhost:8000`
-- **Redis** on `localhost:6379`
+This starts the **FastAPI backend** on `http://localhost:8000`.
 
 Model weights are downloaded on first startup (~1–2 GB, saved to Docker volume).
 
@@ -134,7 +133,7 @@ Model weights are downloaded on first startup (~1–2 GB, saved to Docker volume
 **Backend:**
 ```bash
 cd backend
-python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
+python -m venv .venv && .venv\Scripts\activate   # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
@@ -199,6 +198,10 @@ Returns paginated scan history.
 
 Returns full scan result by ID.
 
+### `GET /health/`
+
+Public health check endpoint.
+
 ---
 
 ## ML Models
@@ -217,6 +220,18 @@ Place `.pth` files in `backend/models/weights/`:
 - `cnn_detect.pth` — CNNDetect GAN detector weights
 
 The model loader will automatically use them on next startup.
+
+---
+
+## Security
+
+- **Input Validation:** Magic-byte file validation prevents file-type spoofing
+- **Rate Limiting:** 5 req/min for image analysis, 3 req/min for video analysis
+- **IDOR Protection:** Scan ownership enforcement — users can only access their own scans
+- **CORS:** Configurable origin allowlist via `ALLOWED_ORIGINS` env var
+- **CSP Headers:** Content Security Policy, X-Frame-Options, and more
+- **Container Security:** Non-root user in Docker, no stack trace leakage
+- **RLS:** Row Level Security policies on all Supabase tables
 
 ---
 
@@ -246,12 +261,29 @@ Set environment variables in Vercel dashboard (see `frontend/.env.local.example`
 
 ---
 
+## Testing
+
+### Backend Unit Tests
+```bash
+cd backend
+python -m pytest tests/ -v
+```
+
+Tests cover:
+- Aggregator probability fusion and verdict logic
+- IDOR ownership access control
+- Magic-byte file validation
+- Metadata analyzer AI software detection
+
+---
+
 ## Performance Notes
 
 - **Model caching:** All models are loaded once at startup and kept in memory
 - **Async inference:** `asyncio.gather` runs all detectors concurrently
 - **Video batching:** Frames analyzed in batches of 8 to control VRAM usage
 - **GPU support:** Automatically uses CUDA if available, falls back to CPU
+- **Timeout guards:** All DB operations wrapped in 12-second timeouts
 
 ---
 

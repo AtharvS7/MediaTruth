@@ -2,8 +2,8 @@
 Image analysis API routes.
 POST /image/analyze — Upload and analyze an image file.
 
-BUG-002 fix: Switched from get_current_user to get_optional_user
-  so anonymous uploads are allowed for the portfolio demo.
+Rate limited to 5 requests/minute per IP via slowapi.
+Supports anonymous uploads via get_optional_user.
 """
 
 import uuid
@@ -12,6 +12,8 @@ from typing import Optional
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from services.image_analyzer import ImageAnalyzer
 from services.supabase_service import SupabaseService
@@ -21,8 +23,14 @@ from utils.auth import get_optional_user
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+# SEC-05: Module-level singleton Limiter — all requests share state.
+# Each route module must have its OWN limiter; they cannot share the same
+# limiter instance across modules or the slowapi state registration fails.
+limiter = Limiter(key_func=get_remote_address, default_limits=[])
+
 
 @router.post("/analyze")
+@limiter.limit("5/minute")
 async def analyze_image(
     request: Request,
     file: UploadFile = File(...),
@@ -30,6 +38,8 @@ async def analyze_image(
 ) -> JSONResponse:
     """
     Analyze an uploaded image for authenticity.
+
+    Rate limited: 5 requests per minute per IP address.
 
     Returns:
         - ai_generated_probability
@@ -45,17 +55,12 @@ async def analyze_image(
     temp_path: Optional[str] = None
 
     try:
-        # Validate file type and size
         await validate_image_file(file)
-
-        # Save to temp storage
         temp_path = await save_temp_file(file, scan_id)
 
-        # Run full analysis pipeline
         analyzer = ImageAnalyzer(model_loader=request.app.state.model_loader)
         result = await analyzer.analyze(temp_path, scan_id)
 
-        # Persist to Supabase
         db = SupabaseService()
         await db.save_scan(
             scan_id=scan_id,

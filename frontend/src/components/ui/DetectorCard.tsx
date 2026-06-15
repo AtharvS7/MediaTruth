@@ -5,6 +5,10 @@ import { motion } from "framer-motion";
 interface Props {
   label: string;
   score?: number;
+  /** When true, renders a greyed-out "N/A" state instead of the gauge. */
+  disabled?: boolean;
+  /** Label shown when disabled (e.g. "No weights", "N/A"). */
+  disabledLabel?: string;
 }
 
 const THRESHOLDS = [
@@ -13,15 +17,52 @@ const THRESHOLDS = [
   { max: 1.01, color: "#ff4d6d", label: "Flagged" },
 ];
 
-export default function DetectorCard({ label, score = 0 }: Props) {
+export default function DetectorCard({
+  label,
+  score = 0,
+  disabled = false,
+  disabledLabel = "N/A",
+}: Props) {
   const pct = Math.round(score * 100);
   const tier = THRESHOLDS.find((t) => score < t.max) || THRESHOLDS[2];
+
+  if (disabled) {
+    return (
+      <div className="glass rounded-xl p-4 flex flex-col gap-3 opacity-50">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-xs text-white/40 uppercase tracking-widest">{label}</span>
+          <span className="font-mono text-xs px-2 py-0.5 rounded-full text-white/30 bg-white/5">
+            {disabledLabel}
+          </span>
+        </div>
+
+        {/* Disabled gauge — grey ring */}
+        <div className="flex items-center justify-center py-2">
+          <div className="relative w-20 h-20">
+            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
+              <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="font-mono text-xs text-white/20">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="font-mono text-xs text-white/20 text-center">
+          Detector disabled
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="glass rounded-xl p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <span className="font-mono text-xs text-white/40 uppercase tracking-widest">{label}</span>
-        <span className="font-mono text-xs px-2 py-0.5 rounded-full" style={{ color: tier.color, background: tier.color + "18" }}>
+        <span
+          className="font-mono text-xs px-2 py-0.5 rounded-full"
+          style={{ color: tier.color, background: tier.color + "18" }}
+        >
           {tier.label}
         </span>
       </div>
@@ -45,7 +86,9 @@ export default function DetectorCard({ label, score = 0 }: Props) {
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-display font-bold text-lg" style={{ color: tier.color }}>{pct}%</span>
+            <span className="font-display font-bold text-lg" style={{ color: tier.color }}>
+              {pct}%
+            </span>
           </div>
         </div>
       </div>

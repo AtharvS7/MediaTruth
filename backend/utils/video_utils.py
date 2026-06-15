@@ -1,10 +1,10 @@
 """
 Video utilities — OpenCV-based frame extraction and metadata reading.
 
-IMPROVE-004 fixes:
-  - FPS fallback: if OpenCV returns fps <= 0, assume 25.0 and log warning
-  - Duration cap: extract_frames validates MAX_VIDEO_DURATION_SECONDS
-  - Frame read timeout guard: limits total frames read to prevent hangs
+Features:
+  - FPS fallback: assumes 25.0 if OpenCV returns invalid fps
+  - Duration cap: validates against MAX_VIDEO_DURATION_SECONDS
+  - Frame read guard: limits total read attempts to prevent hangs on corrupt files
 """
 
 import logging
@@ -66,7 +66,7 @@ def extract_frames(
     """
     Extract evenly-spaced frames from a video.
 
-    IMPROVE-004:
+    Safety features:
       - Validates fps > 0 (falls back to 25)
       - Validates duration <= MAX_VIDEO_DURATION_SECONDS
       - Limits total frame reads to prevent infinite loops on corrupt files
@@ -82,7 +82,6 @@ def extract_frames(
     fps: float = _safe_fps(cap, video_path)
     total_frames: int = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    # Validate duration
     duration: float = total_frames / fps if fps > 0 else 0.0
     if duration > MAX_VIDEO_DURATION_SECONDS:
         cap.release()

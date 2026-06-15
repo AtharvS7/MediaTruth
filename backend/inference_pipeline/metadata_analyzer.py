@@ -5,14 +5,10 @@ Flags anomalies such as:
   - Missing EXIF on a JPEG (suspicious)
   - Software tag indicating AI generator (Midjourney, DALL-E, Stable Diffusion)
   - Inconsistent timestamps
-  - Geolocation impossibilities
-  - Thumbnail / full-image mismatch
+  - Thumbnail / full-image software tag mismatch
 
-BUG-010 fix:
-  - Removed bare "ai" from KNOWN_AI_SOFTWARE (caused false positives for any
-    software name containing "ai" as a substring — e.g. "Paint", "Canva").
-  - Added more specific AI terms instead.
-  - Use word-boundary regex for "neural" to avoid substring false positives.
+Uses precise AI software matching to avoid false positives from common
+software names (e.g. "Paint", "Canva").
 """
 
 import logging
@@ -34,7 +30,7 @@ KNOWN_AI_SOFTWARE: List[str] = [
     "generative fill", "imagemagick ai", "openai", "stablediffusion",
 ]
 
-# Compiled regex for word-boundary matching of "neural"
+# Word-boundary regex for "neural" to avoid substring false positives
 _NEURAL_RE = re.compile(r"\bneural\b", re.IGNORECASE)
 
 KNOWN_EDITOR_SOFTWARE: List[str] = [
@@ -60,7 +56,6 @@ class MetadataAnalyzer:
         raw_meta: Dict[str, Any] = {}
 
         try:
-            # Read EXIF with exifread
             with open(image_path, "rb") as f:
                 tags = exifread.process_file(f, stop_tag="UNDEF", details=False)
 
@@ -92,10 +87,11 @@ class MetadataAnalyzer:
                     )
                     anomaly_score += 0.15
 
-                # Check for thumbnail / image inconsistency via PIL
+                # Cross-check with PIL EXIF (use public .getexif() — Pillow 6+)
+                # _getexif() is a private method that raises AttributeError on PNG/WebP
                 try:
                     img = Image.open(image_path)
-                    exif_data = img._getexif() or {}
+                    exif_data = img.getexif() or {}
                     img_software: str = exif_data.get(305, "")
                     if img_software and _is_ai_software(img_software):
                         findings.append(

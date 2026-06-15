@@ -1,20 +1,18 @@
 """
 VideoAnalyzer — Full video forensics pipeline.
 
-1. Extract frames with OpenCV
-2. Sample evenly (target: ~1 frame/3 seconds, max 60 frames)
-3. Run ImageAnalyzer on each frame in batches
-4. Aggregate per-frame results to video-level verdict
-
-BUG-006 fix: Replaced asyncio.get_event_loop() with asyncio.get_running_loop()
-BUG-023 fix: Removed duplicate `import tempfile, cv2` inside _analyze_single_frame()
+Pipeline:
+  1. Extract frames with OpenCV
+  2. Sample evenly (target: ~1 frame/3 seconds, max 60 frames)
+  3. Run ImageAnalyzer on each frame in batches of 8
+  4. Aggregate per-frame results to video-level verdict
 """
 
 import asyncio
 import logging
 import os
 import tempfile
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import cv2
 import numpy as np
@@ -113,12 +111,12 @@ class VideoAnalyzer:
         idx: int,
     ) -> Dict[str, Any]:
         """Save frame to temp file and run image analysis."""
-        # BUG-023: cv2 and tempfile are already imported at module level
-        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
-            cv2.imwrite(tmp.name, frame)
-            tmp_path: str = tmp.name
-
+        tmp_path: Optional[str] = None
         try:
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                cv2.imwrite(tmp.name, frame)
+                tmp_path = tmp.name
+
             result: Dict[str, Any] = await self.image_analyzer.analyze(
                 tmp_path, f"{scan_id}_frame{idx}"
             )
@@ -126,4 +124,8 @@ class VideoAnalyzer:
             result["frame_index"] = idx
             return result
         finally:
-            os.unlink(tmp_path)
+            if tmp_path:
+                try:
+                    os.unlink(tmp_path)
+                except OSError as e:
+                    logger.warning(f"Failed to cleanup frame temp file {tmp_path}: {e}")
