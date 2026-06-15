@@ -81,12 +81,22 @@ class ModelLoader:
         self.models: Dict[str, Any] = {}
         self._ready: bool = False
         self._warned_models: Set[str] = set()
-        # Tracks which models have FINE-TUNED weights loaded (vs ImageNet-only).
-        # Critical for correctness: models without fine-tuned weights have randomly
-        # initialized classification heads that output ~0.5 (noise) for any input.
-        # Detectors must check has_weights() and return 0.0 if False.
         self._weights_loaded: Set[str] = set()
-        logger.info(f"ModelLoader initialised on device: {self.device}")
+
+        # ─── HuggingFace Inference API mode ─────────────────────────────────────
+        # When USE_HF_API=true, no local PyTorch models are loaded.
+        # All ML inference is delegated to HuggingFace Inference API (free tier).
+        # RAM usage: ~120MB (vs ~1.5GB with local models) — works on Render Free.
+        import os
+        self._hf_api_mode: bool = os.environ.get("USE_HF_API", "").lower() in ("1", "true", "yes")
+
+        if self._hf_api_mode:
+            logger.info(
+                "ModelLoader: HF Inference API mode enabled (USE_HF_API=true). "
+                "No local models loaded. ML inference via huggingface.co API."
+            )
+        else:
+            logger.info(f"ModelLoader initialised on device: {self.device}")
 
     async def load_all_models(self) -> None:
         """Async wrapper — runs blocking loads in thread pool."""
@@ -95,6 +105,22 @@ class ModelLoader:
 
     def _load_all_models_sync(self) -> None:
         """Load each model independently — one failure doesn't crash the other."""
+
+        # ─── HF Inference API mode: skip all local model loading ───────────────
+        # All ML inference routes to HuggingFace API. No PyTorch models loaded.
+        # This keeps RAM < 200MB so the service runs on Render Free (512MB).
+        if self._hf_api_mode:
+            # Mark both detectors as available — API provides real inference
+            self._weights_loaded.add("deepfake")
+            self._weights_loaded.add("gan_detect")
+            self.models["deepfake"] = {"type": "hf_api", "model_id": HF_DEEPFAKE_MODEL_ID}
+            self.models["gan_detect"] = {"type": "hf_api", "model_id": HF_GAN_MODEL_ID}
+            self._ready = True
+            logger.info(
+                "ModelLoader ready (HF API mode). "
+                "Deepfake: %s | GAN: %s", HF_DEEPFAKE_MODEL_ID, HF_GAN_MODEL_ID
+            )
+            return
 
         # EfficientNet deepfake classifier (local weights → HF pre-trained → disabled)
         deepfake_weights = WEIGHTS_DIR / "efficientnet_b5_deepfake.pth"
@@ -117,7 +143,6 @@ class ModelLoader:
             except Exception as e:
                 logger.error(f"HuggingFace deepfake pipeline failed: {e}. Detector disabled.")
                 self.models["deepfake"] = None
-
 
         # CNNDetect GAN detector (local weights → HF pre-trained → disabled)
         try:

@@ -47,11 +47,12 @@ class ConfidenceAggregator:
         manip_score: float = manipulation.get("score", 0.0)
         meta_score: float = metadata.get("anomaly_score", 0.0)
 
-        # Detect whether ML detectors are in limited mode (no fine-tuned weights).
-        # When both deepfake and GAN scores are 0.0 due to unavailable weights,
-        # the system relies only on ELA (manipulation) and metadata analysis.
-        df_available: bool = deepfake.get("weights_available", True) and df_score > 0.0
-        gan_available: bool = gan.get("weights_available", True) and gan_score > 0.0
+        # Detect whether ML detectors are in limited mode (no weights loaded).
+        # CORRECTNESS: Use weights_available flag exclusively — do NOT check score > 0.
+        # A real image can legitimately score 0.0 on deepfake (clean image),
+        # which is not the same as the model being unavailable.
+        df_available: bool = deepfake.get("weights_available", False)
+        gan_available: bool = gan.get("weights_available", False)
         limited_mode: bool = not df_available and not gan_available
 
         # Base probabilities

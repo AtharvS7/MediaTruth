@@ -1,94 +1,102 @@
-# MediaTruth — Complete Free Deployment Guide
+# MediaTruth — Complete Deployment Guide
 
-> **Goal:** Deploy the entire MediaTruth stack (Frontend + Backend + Database) for **$0/month** using free tiers.
+> **Last Updated:** June 2026 | **Status:** Production Ready | **Cost:** $0/month
 
 ---
 
-## Architecture Overview
+## Architecture
 
 ```
 ┌──────────────────────────┐     HTTPS      ┌─────────────────────────────┐
 │      Vercel (Free)        │◄──────────────►│   Render.com (Free)          │
-│   Next.js Frontend        │                │   FastAPI Backend (Python)   │
-│   mediatruth.vercel.app   │                │   mediatruth.onrender.com    │
+│   Next.js Frontend        │                │   FastAPI Backend             │
+│   mediatruth.vercel.app   │                │   ~120MB RAM (models via API) │
 └──────────────────────────┘                └──────────────┬──────────────┘
+                                                            │ HF Inference API
+                                            ┌───────────────▼───────────────┐
+                                            │    HuggingFace.co (Free)       │
+                                            │    dima806 ViT (deepfake)      │
+                                            │    umm-maybe (GAN/AI detect)   │
+                                            └────────────────────────────────┘
                                                             │
-                                        ┌───────────────────▼───────────────┐
-                                        │         Supabase (Free)            │
-                                        │   PostgreSQL + Auth + File Storage │
-                                        │   yourproject.supabase.co          │
-                                        └────────────────────────────────────┘
+                                            ┌───────────────▼───────────────┐
+                                            │         Supabase (Free)        │
+                                            │   PostgreSQL + Auth + Storage  │
+                                            └────────────────────────────────┘
 ```
 
-| Service | Platform | Free Tier Limits | Cost |
+| Service | Platform | Free Tier | Cost |
 |---|---|---|---|
-| Frontend (Next.js) | Vercel | 100GB bandwidth/month, unlimited deployments | **$0** |
+| Frontend (Next.js) | Vercel | 100GB bandwidth/month | **$0** |
 | Backend (FastAPI) | Render.com | 750 hours/month, 512MB RAM | **$0** |
-| Database + Auth | Supabase | 500MB DB, 50k monthly active users | **$0** |
-| ML Model Weights | Hugging Face (cached in build) | Free public repos | **$0** |
-
-> ⚠️ **Important Limitations of Free Tiers:**
-> - **Render.com Free:** Server spins down after 15 minutes of inactivity. First request after sleep takes 30-60 seconds. Upgrade to $7/month Starter for always-on.
-> - **Render.com Free RAM:** 512MB RAM. PyTorch + 2 models ≈ 1.5GB. **The ML models will likely OOM on Render Free.** See workarounds in Step 2.
-> - **Supabase Free:** 500MB DB storage. At ~50KB per scan, this supports ~10,000 scans before hitting limits.
+| ML Inference | HuggingFace API | ~30,000 requests/month | **$0** |
+| Database + Auth | Supabase | 500MB DB, 50k users | **$0** |
+| **Total** | — | — | **$0/month** |
 
 ---
 
-## Step 0 — Prerequisites
+## How ML Models Work at $0
 
-Before deploying, ensure you have:
-- [ ] GitHub account (for connecting to Vercel and Render)
-- [ ] Supabase account (free at supabase.com)
-- [ ] The project pushed to a GitHub repository
+Instead of loading PyTorch models on the server (which would need 1.5GB RAM and crash Render Free), the backend calls **HuggingFace's free Inference API**:
 
-### Push to GitHub
-
-```bash
-cd d:\MediaTruth
-
-# Initialize git (if not already done)
-git init
-git add .
-git commit -m "Initial commit — MediaTruth v1.0"
-
-# Create a new repo on github.com then:
-git remote add origin https://github.com/YOUR_USERNAME/mediatruth.git
-git push -u origin main
+```
+Backend (120MB RAM) ──POST image bytes──► HuggingFace servers
+                    ◄──JSON scores──────── (runs the model for free)
 ```
 
-> ⚠️ **CRITICAL before pushing:** Make sure `.env.local` and `backend/.env` are NOT tracked.
-> Run: `git status` and verify neither file appears in the list.
-> If they do: `git rm --cached frontend/.env.local backend/.env` then commit again.
+- **Deepfake:** `dima806/deepfake_vs_real_image_detection` (ViT-base, ~99.27% accuracy)
+- **GAN/AI:** `umm-maybe/AI-image-detector` (AI-generated image detection)
+- **ELA + DCT + Metadata:** Runs locally, no model needed
+- Enabled by env var `USE_HF_API=true` (already set in `render.yaml`)
+
+---
+
+## Prerequisites
+
+Before starting, you need:
+- [ ] GitHub account (to connect to Vercel and Render)
+- [ ] Supabase account (free at supabase.com)
+- [ ] HuggingFace account (free at huggingface.co)
+- [ ] Code already pushed to GitHub: `AtharvS7/MediaTruth`
+
+---
+
+## Step 0 — Get a Free HuggingFace Token
+
+This is needed for ML inference on Render. Without it, models still work but may have slower cold-starts.
+
+1. Go to **https://huggingface.co** → Sign up (free, no credit card)
+2. Go to **Settings → Access Tokens → New token**
+3. Name: `mediatruth-render`, Role: `read`
+4. Copy the token (starts with `hf_`) — save it for Step 2
 
 ---
 
 ## Step 1 — Set Up Supabase (Database + Auth)
 
-Supabase is already integrated. You just need a production project.
-
 ### 1.1 Create a Supabase Project
 
 1. Go to **https://supabase.com** → Sign In → New Project
 2. Name: `mediatruth-prod`
-3. Region: Choose nearest to your users (e.g., `ap-south-1` for India)
+3. Region: Choose nearest (e.g., `ap-south-1` for India)
 4. Database Password: Generate a strong password and save it
 5. Wait 2-3 minutes for project to provision
 
 ### 1.2 Get Your API Keys
 
 Go to **Settings → API** in your Supabase project:
-- Copy `Project URL` → this is your `SUPABASE_URL`
-- Copy `anon public` key → this is your `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- Copy `service_role` key (secret) → this is your `SUPABASE_SERVICE_KEY`
+- `Project URL` → `SUPABASE_URL`
+- `anon public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `service_role` key (secret) → `SUPABASE_SERVICE_KEY`
 
-> ⚠️ The `service_role` key has full database access. Never expose it in frontend code.
+> ⚠️ The `service_role` key has full DB access. Never expose it in frontend code.
 
 ### 1.3 Create Database Tables
 
 Go to **SQL Editor** in Supabase and run:
 
 ```sql
--- Scans table: stores summary of each forensic analysis
+-- Scans table
 CREATE TABLE IF NOT EXISTS scans (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id         UUID REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -103,7 +111,7 @@ CREATE TABLE IF NOT EXISTS scans (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Analysis results: stores full JSON result per scan
+-- Analysis results (full JSON)
 CREATE TABLE IF NOT EXISTS analysis_results (
   id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   scan_id  UUID NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
@@ -111,7 +119,7 @@ CREATE TABLE IF NOT EXISTS analysis_results (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Indexes for common query patterns
+-- Indexes
 CREATE INDEX IF NOT EXISTS idx_scans_user_id ON scans(user_id);
 CREATE INDEX IF NOT EXISTS idx_scans_created_at ON scans(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_analysis_results_scan_id ON analysis_results(scan_id);
@@ -120,20 +128,15 @@ CREATE INDEX IF NOT EXISTS idx_analysis_results_scan_id ON analysis_results(scan
 ALTER TABLE scans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analysis_results ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies: users can only see their own scans
+-- RLS Policies
 CREATE POLICY "Users see own scans" ON scans
   FOR SELECT USING (auth.uid() = user_id OR user_id IS NULL);
-
 CREATE POLICY "Users insert own scans" ON scans
   FOR INSERT WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
-
 CREATE POLICY "Users delete own scans" ON scans
   FOR DELETE USING (auth.uid() = user_id);
-
--- Service role can do anything (backend uses service_role key)
 CREATE POLICY "Service role full access scans" ON scans
   FOR ALL TO service_role USING (true) WITH CHECK (true);
-
 CREATE POLICY "Service role full access results" ON analysis_results
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 ```
@@ -141,62 +144,50 @@ CREATE POLICY "Service role full access results" ON analysis_results
 ### 1.4 Configure Supabase Auth
 
 Go to **Authentication → Settings**:
-- Site URL: `https://your-app.vercel.app` (update after deploying frontend)
-- Redirect URLs: Add `https://your-app.vercel.app/**`
-- Email confirmations: Enable for production (disable for quick testing)
+- **Site URL:** `https://your-app.vercel.app` (update after frontend deploys)
+- **Redirect URLs:** Add `https://your-app.vercel.app/**`
 
 ---
 
 ## Step 2 — Deploy Backend to Render.com
 
-> ⚠️ **Memory Warning:** The ML models (EfficientNet-B5 + ResNet50) require ~1.5GB RAM. Render Free tier has 512MB. **Option A (workaround):** Run in lightweight mode where models return fallback scores. **Option B (recommended):** Use Render's $7/month Starter plan for always-on + 2GB RAM.
+> ✅ The `render.yaml` blueprint in the repo auto-configures everything.
 
-### Option A — Deploy Without Heavy ML (Works on Free Tier)
-
-This deploys the backend with graceful model degradation — metadata analysis and confidence aggregation work, but deepfake/GAN/manipulation scoring returns zero (models unavailable).
-
-### Option B — Deploy on Render Starter ($7/month)
-
-Gives you 2GB RAM, always-on server, and custom domains.
-
-### 2.1 Deploy to Render
+### 2.1 Deploy via Blueprint
 
 1. Go to **https://render.com** → Sign In with GitHub
-2. Click **New → Web Service**
-3. Connect your GitHub repository
-4. Configure:
-   - **Name:** `mediatruth-backend`
-   - **Root Directory:** `backend`
-   - **Environment:** `Python 3`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
-   - **Plan:** Free (or Starter for ML)
+2. Click **New → Blueprint**
+3. Connect repository `AtharvS7/MediaTruth`
+4. Render auto-detects `render.yaml` and shows the service config
 
-### 2.2 Set Environment Variables on Render
+### 2.2 Set Secret Environment Variables
 
-In your Render service → **Environment** tab, add:
+In your Render service → **Environment** tab, set these manually (they are marked `sync: false` for security):
 
-```
-ENV=production
-SUPABASE_URL=https://YOUR-PROJECT-ID.supabase.co
-SUPABASE_SERVICE_KEY=your-service-role-key-here
-JWT_SECRET=generate-a-strong-random-string-here
-ALLOWED_ORIGINS=https://your-app.vercel.app
-WORKERS=1
-```
+| Variable | Value | Where to get it |
+|---|---|---|
+| `HF_TOKEN` | `hf_xxxxxxxxxxxxxx` | HuggingFace Settings → Tokens (Step 0) |
+| `SUPABASE_URL` | `https://xxx.supabase.co` | Supabase Settings → API |
+| `SUPABASE_SERVICE_KEY` | `eyJhbGci...` | Supabase Settings → API (service_role key) |
+| `ALLOWED_ORIGINS` | `https://your-app.vercel.app` | Set after Vercel deploy in Step 3 |
 
-> Generate JWT_SECRET: `python -c "import secrets; print(secrets.token_hex(32))"`
+> `JWT_SECRET` is auto-generated by Render (already in render.yaml).
+> `USE_HF_API=true` is already set in render.yaml — do NOT change it.
 
-### 2.3 Note Your Backend URL
+### 2.3 Deploy
 
-After deployment, note the URL: `https://mediatruth-backend.onrender.com`
-(Replace `mediatruth-backend` with your actual service name)
+Click **Deploy**. Build takes ~3-5 minutes (pip install).
 
-### 2.4 Test Backend Health
+### 2.4 Note Your Backend URL
+
+After deployment: `https://mediatruth-backend.onrender.com`
+(Your actual URL will vary — check Render dashboard)
+
+### 2.5 Test Backend Health
 
 ```bash
 curl https://mediatruth-backend.onrender.com/health/
-# Expected: {"status": "ok", "models": {...}}
+# Expected: {"status": "ok", ...}
 ```
 
 ---
@@ -207,38 +198,24 @@ curl https://mediatruth-backend.onrender.com/health/
 
 1. Go to **https://vercel.com** → Sign In with GitHub
 2. Click **Add New → Project**
-3. Import your GitHub repository
+3. Import `AtharvS7/MediaTruth`
 4. Configure:
-   - **Framework:** Next.js (auto-detected)
    - **Root Directory:** `frontend`
-   - **Build Command:** `npm run build` (auto-detected)
-   - **Output Directory:** `.next` (auto-detected)
+   - **Framework:** Next.js (auto-detected)
 
 ### 3.2 Set Environment Variables on Vercel
 
-In your Vercel project → **Settings → Environment Variables**, add these for **Production, Preview, Development**:
+In Vercel project → **Settings → Environment Variables**:
 
-```
-NEXT_PUBLIC_SUPABASE_URL        = https://YOUR-PROJECT-ID.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY   = your-anon-key-here
-NEXT_PUBLIC_API_URL             = https://mediatruth-backend.onrender.com
-```
-
-> ⚠️ Do NOT copy from vercel.json — set these in the dashboard only.
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://xxx.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGci...` (anon key) |
+| `NEXT_PUBLIC_API_URL` | `https://mediatruth-backend.onrender.com` |
 
 ### 3.3 Deploy
 
-Click **Deploy**. Vercel will:
-1. Clone your repo
-2. Run `npm install` and `npm run build`
-3. Deploy to a global CDN
-
-Your frontend will be live at: `https://mediatruth-XXXXX.vercel.app`
-
-### 3.4 Add Custom Domain (Optional, Free)
-
-Vercel → Settings → Domains → Add domain
-You can add a free domain from Freenom (.tk, .ml) or use the vercel.app subdomain.
+Click **Deploy**. Your frontend will be live at: `https://mediatruth-XXXXX.vercel.app`
 
 ---
 
@@ -246,102 +223,99 @@ You can add a free domain from Freenom (.tk, .ml) or use the vercel.app subdomai
 
 ### 4.1 Update Supabase Auth URLs
 
-Go back to Supabase → Authentication → Settings:
+Supabase → Authentication → Settings:
 - **Site URL:** `https://mediatruth-XXXXX.vercel.app`
 - **Redirect URLs:** `https://mediatruth-XXXXX.vercel.app/**`
 
-### 4.2 Update Backend CORS
+### 4.2 Update Render CORS
 
-On Render → Environment:
+Render → Environment → update `ALLOWED_ORIGINS`:
 ```
 ALLOWED_ORIGINS=https://mediatruth-XXXXX.vercel.app
 ```
-Redeploy the service after updating.
+Click **Save Changes** — Render auto-redeploys.
 
-### 4.3 Smoke Test the Full Stack
+### 4.3 Smoke Test Checklist
 
-Visit your Vercel URL and:
-- [ ] Landing page loads
-- [ ] Sign Up with a new email
-- [ ] Check email for verification link
-- [ ] Sign In with your credentials
-- [ ] Upload a test image (any JPEG)
-- [ ] See the analysis result
-- [ ] Visit History page — scan appears
-- [ ] Click a scan — loads results from API (not sessionStorage)
+- [ ] Frontend loads at Vercel URL
+- [ ] Sign Up with email → receive verification
+- [ ] Sign In → redirected to upload page
+- [ ] Upload a JPEG photo → analysis completes (may take 20-30s on cold start)
+- [ ] Results page shows: verdict, confidence %, all 4 probability bars
+- [ ] Manipulation heatmap renders
+- [ ] Scan appears in History page
+- [ ] Click history entry → full results load
 
 ---
 
-## Step 5 — Keep Render Free Tier Alive (Optional)
+## Step 5 — Keep Render Free Tier Alive (Recommended)
 
-Render Free tier sleeps after 15 minutes of inactivity. First request after sleep takes 30-60 seconds (bad UX for users).
+Render Free spins down after 15 minutes of inactivity. First request after sleep takes 30-60s.
 
-**Free solution — use UptimeRobot:**
-1. Go to **https://uptimerobot.com** → Free plan
-2. Add Monitor → HTTP(S)
-3. URL: `https://mediatruth-backend.onrender.com/health/`
-4. Interval: Every 5 minutes
-5. UptimeRobot pings your backend every 5 minutes, preventing it from sleeping
+**Fix — UptimeRobot (free):**
+1. Go to **https://uptimerobot.com** → Free plan → Add Monitor
+2. Type: HTTP(S), URL: `https://mediatruth-backend.onrender.com/health/`
+3. Interval: Every 5 minutes
+4. This prevents Render from sleeping → fast response for users
 
 ---
 
 ## Environment Variables Reference
 
-### Backend (.env / Render Environment)
+### Backend (Render Dashboard)
 
 | Variable | Required | Description |
 |---|---|---|
-| `SUPABASE_URL` | ✅ Yes | Supabase project URL |
-| `SUPABASE_SERVICE_KEY` | ✅ Yes | Service role key (backend only, never expose) |
-| `JWT_SECRET` | ✅ Yes | Secret for JWT signing (generate random) |
-| `ALLOWED_ORIGINS` | ✅ Yes | Comma-separated frontend URLs for CORS |
-| `ENV` | No | `development` or `production` |
-| `PORT` | No | Port number (Render sets this automatically) |
-| `WORKERS` | No | Number of uvicorn workers (default: 1) |
+| `USE_HF_API` | ✅ | `true` — enables HuggingFace Inference API mode |
+| `HF_TOKEN` | ✅ | Free HuggingFace token for stable rate limits |
+| `SUPABASE_URL` | ✅ | Supabase project URL |
+| `SUPABASE_SERVICE_KEY` | ✅ | Service role key (backend only) |
+| `JWT_SECRET` | ✅ | Auto-generated by Render |
+| `ALLOWED_ORIGINS` | ✅ | Your Vercel frontend URL |
+| `ENV` | No | `production` (set by render.yaml) |
+| `WORKERS` | No | `1` (set by render.yaml) |
 
-### Frontend (.env.local / Vercel Dashboard)
+### Frontend (Vercel Dashboard)
 
 | Variable | Required | Description |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ Yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ Yes | Supabase anon/public key |
-| `NEXT_PUBLIC_API_URL` | ✅ Yes | Backend URL (e.g., https://mediatruth-backend.onrender.com) |
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase anon/public key |
+| `NEXT_PUBLIC_API_URL` | ✅ | Backend URL on Render |
 
 ---
 
-## Upgrading From Free to Paid (When Ready)
+## Troubleshooting
 
-| Need | Solution | Cost |
-|---|---|---|
-| Always-on backend + 2GB RAM | Render Starter | $7/month |
-| Custom domain | Vercel Pro | $20/month (or free with vercel.app) |
-| More DB storage | Supabase Pro | $25/month (8GB storage) |
-| GPU for faster ML inference | Render GPU instances | $0.50/hour |
+### "Analysis takes 30-60 seconds on first request"
+Normal. Two cold-starts happening simultaneously:
+1. Render service waking up (15s)
+2. HuggingFace model loading (15-20s)
 
----
-
-## Troubleshooting Common Deployment Issues
+After first request, subsequent ones take 2-5 seconds.
+Fix: Set up UptimeRobot (Step 5) to prevent Render sleep.
 
 ### "Network Error" on analysis
-- Backend is sleeping (Render free tier cold start) — wait 60 seconds and retry
-- `NEXT_PUBLIC_API_URL` not set in Vercel → check Vercel dashboard env vars
-- CORS error → check `ALLOWED_ORIGINS` on Render includes your Vercel URL
+- Backend sleeping → wait 60s and retry
+- `NEXT_PUBLIC_API_URL` missing/wrong in Vercel → check dashboard
+- CORS error → `ALLOWED_ORIGINS` on Render doesn't include your Vercel URL
 
 ### "Failed to load results"
-- `SUPABASE_URL` or `SUPABASE_SERVICE_KEY` wrong on Render
-- Database tables don't exist → re-run the SQL from Step 1.3
+- Wrong `SUPABASE_URL` or `SUPABASE_SERVICE_KEY` on Render
+- Database tables don't exist → re-run SQL from Step 1.3
 
 ### "Supabase environment variables missing"
-- `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_ANON_KEY` not set in Vercel
-- Set them in Vercel Dashboard → Settings → Environment Variables → Redeploy
+- Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel
+- Redeploy after setting them
 
-### Backend crashes on startup
-- Out of memory on Render Free (ML models need ~1.5GB) → upgrade to Starter
-- Missing env vars → check Render logs
+### Models return 0.0 scores / "Limited Mode" banner
+- `USE_HF_API` not set to `true` on Render
+- `HF_TOKEN` missing → API may rate-limit (but should still work)
+- HuggingFace Inference API temporary outage → try again in a few minutes
 
-### Models show all-zero scores
-- Model weights not found in `models/weights/` — this is expected without fine-tuned weights
-- The system runs in graceful degradation mode — metadata analysis still works
+### "413 Request Entity Too Large"
+- Image/video file too large for the plan
+- Resize image to under 10MB before uploading
 
 ---
 
@@ -349,34 +323,33 @@ Render Free tier sleeps after 15 minutes of inactivity. First request after slee
 
 ```
 Pre-Deployment:
-  [ ] git rm --cached frontend/.env.local (if committed)
-  [ ] Rotate Supabase anon key if it was exposed
-  [ ] Push code to GitHub
+  [ ] Push code to GitHub (AtharvS7/MediaTruth)
+  [ ] Get HuggingFace token (huggingface.co/settings/tokens)
+  [ ] Have Supabase URL, anon key, service_role key ready
 
 Supabase:
   [ ] Create production project
   [ ] Run SQL schema (Step 1.3)
-  [ ] Copy URL, anon key, service_role key
+  [ ] Copy 3 API keys
 
 Render (Backend):
-  [ ] Create Web Service from GitHub repo
-  [ ] Set Root Directory to backend/
-  [ ] Set all 6 environment variables
-  [ ] Note the backend URL
+  [ ] New Blueprint → connect AtharvS7/MediaTruth
+  [ ] Set: HF_TOKEN, SUPABASE_URL, SUPABASE_SERVICE_KEY, ALLOWED_ORIGINS
+  [ ] Deploy and note the backend URL
 
 Vercel (Frontend):
-  [ ] Import GitHub repo
-  [ ] Set Root Directory to frontend/
-  [ ] Set 3 NEXT_PUBLIC_ environment variables
+  [ ] New Project → import AtharvS7/MediaTruth
+  [ ] Root Directory: frontend
+  [ ] Set: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_API_URL
   [ ] Deploy and note the frontend URL
 
 Post-Deployment:
   [ ] Update Supabase Auth URLs with Vercel URL
   [ ] Update Render ALLOWED_ORIGINS with Vercel URL
-  [ ] Smoke test: upload → analyze → results → history
-  [ ] (Optional) Set up UptimeRobot to prevent Render sleep
+  [ ] Set up UptimeRobot (https://uptimerobot.com, free)
+  [ ] Run smoke test checklist (Step 4.3)
 ```
 
 ---
 
-*MediaTruth Deployment Guide | June 2026*
+*MediaTruth Deployment Guide — June 2026 | Zero-cost production deployment*
