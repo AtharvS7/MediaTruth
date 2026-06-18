@@ -24,10 +24,10 @@ import os
 from pathlib import Path
 from typing import Dict, Any, Optional, Set
 
-import torch
-import timm
+# torch, timm, tqdm are imported lazily inside _load_* methods.
+# In USE_HF_API=true mode those methods are never called,
+# so torch does NOT need to be installed on Render.
 import requests
-from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -75,9 +75,13 @@ class ModelLoader:
     """Singleton-style model registry loaded at startup."""
 
     def __init__(self) -> None:
-        self.device: torch.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
-        )
+        # Lazy device detection — only import torch when actually loading local models.
+        # In USE_HF_API=true mode, torch is never imported on Render (no PyTorch needed).
+        try:
+            import torch as _torch
+            self.device = _torch.device("cuda" if _torch.cuda.is_available() else "cpu")
+        except ImportError:
+            self.device = "cpu"  # type: ignore[assignment]  # HF API mode: device unused
         self.models: Dict[str, Any] = {}
         self._ready: bool = False
         self._warned_models: Set[str] = set()
@@ -173,6 +177,8 @@ class ModelLoader:
 
     def _load_efficientnet_deepfake(self) -> None:
         logger.info("Loading EfficientNet-B5 deepfake classifier...")
+        import torch
+        import timm
         model = timm.create_model(
             "efficientnet_b5",
             pretrained=True,
@@ -190,8 +196,6 @@ class ModelLoader:
                 )
                 state = torch.load(weights_path, map_location=self.device, weights_only=False)
             model.load_state_dict(state, strict=False)
-            # Mark that this model has fine-tuned task-specific weights.
-            # DeepfakeDetector.predict() checks this before running inference.
             self._weights_loaded.add("deepfake")
             logger.info("EfficientNet-B5: fine-tuned deepfake weights loaded.")
         else:
@@ -208,6 +212,7 @@ class ModelLoader:
 
     def _load_cnn_detect(self) -> None:
         logger.info("Loading CNNDetect GAN detector...")
+        import torch
         import torchvision.models as tv_models
 
         model = tv_models.resnet50(weights=tv_models.ResNet50_Weights.IMAGENET1K_V2)
@@ -229,7 +234,6 @@ class ModelLoader:
                 state = {k.replace("module.", "", 1): v for k, v in state.items()}
                 logger.info("CNNDetect: stripped DataParallel 'module.' prefix from state dict.")
             model.load_state_dict(state, strict=False)
-            # Mark that this model has fine-tuned task-specific weights.
             self._weights_loaded.add("gan_detect")
             logger.info("CNNDetect: fine-tuned GAN detector weights loaded.")
         else:
@@ -256,13 +260,13 @@ class ModelLoader:
         except ImportError:
             raise RuntimeError("transformers package not installed. Run: pip install transformers")
 
-        # HuggingFace caches models in ~/.cache/huggingface by default
+        # Use GPU if available, else CPU
+        device_id = 0 if (lambda: __import__('torch').cuda.is_available())() else -1
         pipe = hf_pipeline(
             "image-classification",
             model=HF_DEEPFAKE_MODEL_ID,
-            device=0 if torch.cuda.is_available() else -1,
+            device=device_id,
         )
-        # Wrap in a dict so get_model() returns a callable pipeline
         self.models["deepfake"] = {"type": "hf_pipeline", "pipe": pipe, "model_id": HF_DEEPFAKE_MODEL_ID}
         self._weights_loaded.add("deepfake")
         logger.info("HuggingFace deepfake pipeline ready: %s", HF_DEEPFAKE_MODEL_ID)
@@ -278,10 +282,11 @@ class ModelLoader:
         except ImportError:
             raise RuntimeError("transformers package not installed. Run: pip install transformers")
 
+        device_id = 0 if (lambda: __import__('torch').cuda.is_available())() else -1
         pipe = hf_pipeline(
             "image-classification",
             model=HF_GAN_MODEL_ID,
-            device=0 if torch.cuda.is_available() else -1,
+            device=device_id,
         )
         self.models["gan_detect"] = {"type": "hf_pipeline", "pipe": pipe, "model_id": HF_GAN_MODEL_ID}
         self._weights_loaded.add("gan_detect")

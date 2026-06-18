@@ -19,10 +19,7 @@ import time
 from typing import Any, Dict, Optional
 
 import requests
-import torch
-import torch.nn.functional as F
 from PIL import Image
-from torchvision import transforms
 
 logger = logging.getLogger(__name__)
 
@@ -31,13 +28,23 @@ _HF_DEEPFAKE_API = (
     "https://api-inference.huggingface.co/models/dima806/deepfake_vs_real_image_detection"
 )
 
-# EfficientNet-B5 preprocessing (local mode only)
-EFFICIENTNET_TRANSFORM = transforms.Compose([
-    transforms.Resize(480),
-    transforms.CenterCrop(456),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
+# EfficientNet-B5 preprocessing — only used in _predict_native (local .pth weights)
+# Defined lazily to avoid importing torchvision at module load time.
+_EFFICIENTNET_TRANSFORM = None
+
+
+def _get_efficientnet_transform():
+    """Lazy import of torchvision — only called when local .pth weights are used."""
+    global _EFFICIENTNET_TRANSFORM
+    if _EFFICIENTNET_TRANSFORM is None:
+        from torchvision import transforms
+        _EFFICIENTNET_TRANSFORM = transforms.Compose([
+            transforms.Resize(480),
+            transforms.CenterCrop(456),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+    return _EFFICIENTNET_TRANSFORM
 
 
 class DeepfakeDetector:
@@ -191,11 +198,14 @@ class DeepfakeDetector:
     def _predict_native(self, image_path: str) -> Dict[str, Any]:
         """Use locally-loaded PyTorch .pth weights."""
         try:
+            import torch
+            import torch.nn.functional as F
+            transform = _get_efficientnet_transform()
             img = Image.open(image_path).convert("RGB")
-            tensor = EFFICIENTNET_TRANSFORM(img).unsqueeze(0).to(self.device)
+            tensor = transform(img).unsqueeze(0).to(self.device)
             with torch.no_grad():
                 logits = self.model(tensor)
-                probs = F.softmax(logits, dim=1)
+                probs = torch.nn.functional.softmax(logits, dim=1)
                 fake_prob: float = probs[0, 1].item()
             return {
                 "score": round(float(fake_prob), 4),

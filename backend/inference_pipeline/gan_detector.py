@@ -19,9 +19,7 @@ import time
 from typing import Any, Dict, Optional
 
 import requests
-import torch
 from PIL import Image
-from torchvision import transforms
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +28,21 @@ _HF_GAN_API = (
     "https://api-inference.huggingface.co/models/umm-maybe/AI-image-detector"
 )
 
-# ResNet-50 preprocessing (local mode only)
-GAN_TRANSFORM = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
+# ResNet-50 preprocessing — only used in _predict_native (local .pth weights)
+_GAN_TRANSFORM = None
+
+
+def _get_gan_transform():
+    """Lazy import of torchvision — only called when local .pth weights are used."""
+    global _GAN_TRANSFORM
+    if _GAN_TRANSFORM is None:
+        from torchvision import transforms
+        _GAN_TRANSFORM = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+    return _GAN_TRANSFORM
 
 
 class GANDetector:
@@ -184,8 +191,10 @@ class GANDetector:
     def _predict_native(self, image_path: str) -> Dict[str, Any]:
         """Use locally-loaded CNNDetect ResNet-50 .pth weights."""
         try:
+            import torch
+            transform = _get_gan_transform()
             img = Image.open(image_path).convert("RGB")
-            tensor = GAN_TRANSFORM(img).unsqueeze(0).to(self.device)
+            tensor = transform(img).unsqueeze(0).to(self.device)
             with torch.no_grad():
                 logit = self.model(tensor)
                 prob: float = torch.sigmoid(logit).item()

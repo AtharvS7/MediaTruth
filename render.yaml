@@ -20,7 +20,7 @@ services:
     runtime: python
     plan: free              # ✅ Free tier works with USE_HF_API=true
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements-prod.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /health/
 
