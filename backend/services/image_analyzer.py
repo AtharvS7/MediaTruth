@@ -56,11 +56,14 @@ class ImageAnalyzer:
         )
 
         # Aggregate signals into final verdict
+        # Pass statistical AI score from manipulation localizer
+        statistical_score = manip_result.get("ai_likelihood_score", 0.0)
         verdict = self.aggregator.aggregate(
             deepfake=deepfake_result,
             gan=gan_result,
             manipulation=manip_result,
             metadata=metadata_result,
+            statistical=statistical_score,
         )
 
         # Encode heatmap as base64 PNG for frontend
@@ -80,11 +83,15 @@ class ImageAnalyzer:
             "final_verdict": verdict["verdict"],
             "confidence": verdict["confidence"],
             "limited_mode": verdict.get("limited_mode", False),
+            "ml_available": verdict.get("ml_available", True),
             "manipulation_heatmap": heatmap_b64,
             "detector_scores": {
                 "deepfake_score": deepfake_result.get("score", 0.0),
+                "deepfake_api_success": deepfake_result.get("api_success", False),
                 "gan_score": gan_result.get("score", 0.0),
+                "gan_api_success": gan_result.get("api_success", False),
                 "manipulation_score": manip_result.get("score", 0.0),
+                "statistical_ai_score": manip_result.get("ai_likelihood_score", 0.0),
                 "metadata_anomaly_score": metadata_result.get("anomaly_score", 0.0),
             },
             "metadata_findings": all_findings,

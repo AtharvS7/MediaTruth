@@ -21,6 +21,7 @@ import {
   CheckCircle,
   XCircle,
   Info,
+  HelpCircle,
   ChevronDown,
   ChevronUp,
   Link2,
@@ -54,13 +55,15 @@ const VERDICT_CONFIG: Record<
   "AI Edited":            { color: "violet", icon: AlertTriangle,  label: "AI Edited" },
   "Traditionally Edited": { color: "acid",   icon: AlertTriangle,  label: "Traditionally Edited" },
   "Authentic / Original": { color: "cyan",   icon: CheckCircle,   label: "Authentic" },
+  "Inconclusive":         { color: "amber",  icon: HelpCircle,    label: "Inconclusive" },
 };
 
 const COLOR_MAP: Record<string, string> = {
-  coral: "#ff4d6d",
+  coral:  "#ff4d6d",
   violet: "#8b5cf6",
-  acid: "#b8ff57",
-  cyan: "#00f5ff",
+  acid:   "#b8ff57",
+  cyan:   "#00f5ff",
+  amber:  "#f59e0b",
 };
 
 function formatDuration(seconds: number): string {

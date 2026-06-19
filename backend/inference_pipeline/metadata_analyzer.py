@@ -2,24 +2,26 @@
 MetadataAnalyzer — EXIF and file metadata forensics.
 
 Flags anomalies such as:
-  - Missing EXIF on a JPEG (suspicious)
+  - Missing EXIF on a JPEG (suspicious) — anomaly_score += 0.40
+  - Missing EXIF on PNG/WebP/lossless (strong AI indicator) — anomaly_score += 0.55
   - Software tag indicating AI generator (Midjourney, DALL-E, Stable Diffusion)
   - Inconsistent timestamps
   - Thumbnail / full-image software tag mismatch
 
-Uses precise AI software matching to avoid false positives from common
-software names (e.g. "Paint", "Canva").
+Scoring rationale:
+  - Real camera photos almost always have EXIF (make, model, GPS, timestamp).
+  - AI-generated images almost never have EXIF (no camera to embed it).
+  - PNG is the preferred format for AI art — PNG + no EXIF is a strong AI signal.
+  - JPEG + no EXIF is suspicious but less conclusive (could be stripped by tools).
 """
 
 import logging
 import os
 import re
-from datetime import datetime
 from typing import Any, Dict, List
 
 import exifread
 from PIL import Image
-from PIL.ExifTags import TAGS
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,7 @@ KNOWN_AI_SOFTWARE: List[str] = [
     "midjourney", "dall-e", "stable diffusion", "firefly",
     "leonardo", "bing image creator", "adobe firefly",
     "generative fill", "imagemagick ai", "openai", "stablediffusion",
+    "invoke ai", "comfyui", "automatic1111", "novelai",
 ]
 
 # Word-boundary regex for "neural" to avoid substring false positives
@@ -37,6 +40,9 @@ KNOWN_EDITOR_SOFTWARE: List[str] = [
     "photoshop", "lightroom", "gimp", "affinity", "capture one",
     "darktable", "pixelmator", "snapseed", "facetune",
 ]
+
+# Lossless digital formats — when combined with no EXIF, strongly suggest AI
+_LOSSLESS_FORMATS = frozenset({"PNG", "WEBP", "BMP", "TIFF"})
 
 
 def _is_ai_software(software: str) -> bool:
@@ -54,14 +60,36 @@ class MetadataAnalyzer:
         findings: List[str] = []
         anomaly_score: float = 0.0
         raw_meta: Dict[str, Any] = {}
+        img_format: str = "UNKNOWN"
+
+        # Detect format first (before reading EXIF)
+        try:
+            with Image.open(image_path) as img_probe:
+                img_format = img_probe.format or "UNKNOWN"
+        except Exception:
+            pass
 
         try:
             with open(image_path, "rb") as f:
                 tags = exifread.process_file(f, stop_tag="UNDEF", details=False)
 
             if not tags:
-                findings.append("⚠️ No EXIF data found — common in AI-generated images.")
-                anomaly_score += 0.25
+                # No EXIF at all — scoring depends on format
+                if img_format in _LOSSLESS_FORMATS:
+                    # PNG/WebP + no EXIF = very strong AI-generation signal
+                    findings.append(
+                        f"⚠️ No EXIF data on {img_format} file — "
+                        "strong AI-generation indicator. "
+                        "Real cameras save EXIF; AI tools output clean PNGs without it."
+                    )
+                    anomaly_score += 0.55
+                else:
+                    # JPEG or unknown + no EXIF — suspicious but less conclusive
+                    findings.append(
+                        "⚠️ No EXIF data found — suspicious for a camera photograph. "
+                        "May indicate AI generation or metadata stripping."
+                    )
+                    anomaly_score += 0.40
             else:
                 raw_meta = {str(k): str(v) for k, v in tags.items()}
 
@@ -87,8 +115,7 @@ class MetadataAnalyzer:
                     )
                     anomaly_score += 0.15
 
-                # Cross-check with PIL EXIF (use public .getexif() — Pillow 6+)
-                # _getexif() is a private method that raises AttributeError on PNG/WebP
+                # Cross-check with PIL EXIF
                 try:
                     img = Image.open(image_path)
                     exif_data = img.getexif() or {}
@@ -107,7 +134,8 @@ class MetadataAnalyzer:
             anomaly_score += 0.1
 
         return {
-            "anomaly_score": min(anomaly_score, 1.0),
+            "anomaly_score": round(min(anomaly_score, 1.0), 4),
             "findings": findings,
             "raw_metadata": raw_meta,
+            "image_format": img_format,
         }

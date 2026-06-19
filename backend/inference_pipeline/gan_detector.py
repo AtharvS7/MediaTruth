@@ -1,16 +1,17 @@
 """
-GANDetector — ResNet-50 / HuggingFace pipeline / HF Inference API.
+GANDetector — umm-maybe/AI-image-detector HF Inference API.
 
 WEIGHT PRIORITY ORDER:
   1. Local fine-tuned .pth weights (cnn_detect.pth) — best, local only
-  2. HuggingFace Transformers pipeline (umm-maybe/AI-image-detector) — local download
+  2. HuggingFace Transformers pipeline (local download)
   3. HuggingFace Inference API  — zero RAM, works on Render Free, $0 cost
-  4. Disabled — returns score=0.0, label='unavailable'
+  4. Disabled — returns score=0.0, api_success=False
 
-DEPLOYMENT MODE (USE_HF_API=true in env):
-  Routes all inference to HuggingFace Inference API.
-  Model: umm-maybe/AI-image-detector
-  Labels: "artificial" (GAN/AI) | "human" (real)
+API_SUCCESS FLAG:
+  Every return dict includes api_success: bool.
+  True  → model ran and returned a real inference score
+  False → timeout / cold-start / error / disabled
+  Aggregator uses this to switch to Mode B (metadata-dominant weights).
 """
 
 import logging
@@ -28,84 +29,83 @@ _HF_GAN_API = (
     "https://api-inference.huggingface.co/models/umm-maybe/AI-image-detector"
 )
 
-# ResNet-50 preprocessing — only used in _predict_native (local .pth weights)
-_GAN_TRANSFORM = None
-
-
-def _get_gan_transform():
-    """Lazy import of torchvision — only called when local .pth weights are used."""
-    global _GAN_TRANSFORM
-    if _GAN_TRANSFORM is None:
-        from torchvision import transforms
-        _GAN_TRANSFORM = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
-    return _GAN_TRANSFORM
+# Retry configuration
+_MAX_RETRIES = 2
+_RETRY_BACKOFF = [20, 35]   # seconds between retries (exponential)
 
 
 class GANDetector:
-    def __init__(self, model_loader: Any) -> None:
-        self.model: Optional[Any] = model_loader.get_model("gan_detect")
-        self.device: torch.device = model_loader.device
-        self.weights_available: bool = model_loader.has_weights("gan_detect")
+    """
+    GAN / AI-image detection using umm-maybe/AI-image-detector.
+    Labels: "artificial" (GAN/diffusion/AI) | "human" (real photograph).
+    Returns score in [0, 1] where 1.0 = definitely GAN/AI-generated.
+    """
 
-        # HF Inference API mode (USE_HF_API=true)
+    def __init__(self, model_loader: Any) -> None:
+        self.model_loader = model_loader
+        self.model = getattr(model_loader, "gan_model", None)
+        self.weights_available: bool = self.model is not None
+
         self._hf_api_mode: bool = getattr(model_loader, "_hf_api_mode", False)
         self._hf_token: Optional[str] = os.environ.get("HF_TOKEN", "").strip() or None
 
-        # HuggingFace local pipeline
         self._is_hf_pipeline: bool = (
             isinstance(self.model, dict) and self.model.get("type") == "hf_pipeline"
         )
 
         if self._hf_api_mode:
             logger.info(
-                "GANDetector: HF Inference API mode — no local model loaded. "
-                "Calls: %s", _HF_GAN_API
+                "GANDetector: HF Inference API mode — umm-maybe/AI-image-detector. "
+                "Calls: %s", _HF_GAN_API,
             )
         elif not self.weights_available:
-            logger.info("GANDetector: no weights — returning score=0.0 (disabled).")
-        elif self._is_hf_pipeline:
             logger.info(
-                "GANDetector: local HF pipeline (%s)",
-                self.model.get("model_id", "unknown")
+                "GANDetector: no weights — returning score=0.0, api_success=False."
             )
 
     def predict(self, image_path: str) -> Dict[str, Any]:
         """
+        Run GAN/AI detection on a single image.
+
         Returns:
-            score: float [0,1] — probability of being GAN/AI-generated (0.0 if unavailable)
-            label: 'real' | 'gan' | 'unavailable'
-            confidence: float
+            score:        float [0,1] — probability of being AI/GAN-generated
+            label:        'gan' | 'real' | 'unavailable'
+            confidence:   float
             weights_available: bool
+            api_success:  bool — True if model returned real inference data
         """
-        # ── HF Inference API mode ──────────────────────────────────────────────
         if self._hf_api_mode:
             return self._predict_via_hf_api(image_path)
 
-        # ── Disabled mode ─────────────────────────────────────────────────────
         if not self.weights_available:
             return {
                 "score": 0.0,
                 "label": "unavailable",
                 "confidence": 0.0,
                 "weights_available": False,
+                "api_success": False,
             }
 
         if self.model is None:
-            return {"score": 0.0, "label": "unknown", "confidence": 0.0, "weights_available": False}
+            return {
+                "score": 0.0,
+                "label": "unknown",
+                "confidence": 0.0,
+                "weights_available": False,
+                "api_success": False,
+            }
 
-        # ── Local HF pipeline ─────────────────────────────────────────────────
         if self._is_hf_pipeline:
             return self._predict_via_hf_pipeline(image_path)
 
-        # ── Native PyTorch .pth weights ───────────────────────────────────────
         return self._predict_native(image_path)
 
     def _predict_via_hf_api(self, image_path: str) -> Dict[str, Any]:
-        """Call HuggingFace Inference API — zero local RAM, free tier."""
+        """
+        Call HuggingFace Inference API (umm-maybe/AI-image-detector).
+        Labels: "artificial" (AI/GAN) | "human" (real photo).
+        Exponential-backoff retry for cold-start 503 responses.
+        """
         headers = {}
         if self._hf_token:
             headers["Authorization"] = f"Bearer {self._hf_token}"
@@ -114,26 +114,37 @@ class GANDetector:
             with open(image_path, "rb") as f:
                 image_bytes = f.read()
 
-            response = requests.post(
-                _HF_GAN_API,
-                headers=headers,
-                data=image_bytes,
-                timeout=90,
-            )
+            response = None
+            for attempt in range(_MAX_RETRIES + 1):
+                resp = requests.post(
+                    _HF_GAN_API,
+                    headers=headers,
+                    data=image_bytes,
+                    timeout=90,
+                )
 
-            # Model cold-start handling
-            if response.status_code == 503:
-                body = response.json() if response.content else {}
-                if "loading" in str(body).lower():
-                    wait = min(float(body.get("estimated_time", 30)), 35)
-                    logger.info("HF GAN model loading — waiting %.0fs...", wait)
-                    time.sleep(wait)
-                    response = requests.post(
-                        _HF_GAN_API,
-                        headers=headers,
-                        data=image_bytes,
-                        timeout=90,
-                    )
+                if resp.status_code == 503:
+                    body = resp.json() if resp.content else {}
+                    if "loading" in str(body).lower():
+                        if attempt < _MAX_RETRIES:
+                            wait = min(
+                                float(body.get("estimated_time", _RETRY_BACKOFF[attempt])),
+                                _RETRY_BACKOFF[attempt],
+                            )
+                            logger.info(
+                                "GANDetector: HF model cold-starting — "
+                                "waiting %.0fs (attempt %d/%d)...",
+                                wait, attempt + 1, _MAX_RETRIES,
+                            )
+                            time.sleep(wait)
+                            continue
+                    resp.raise_for_status()
+
+                response = resp
+                break
+
+            if response is None:
+                raise RuntimeError("All retry attempts failed")
 
             response.raise_for_status()
             results = response.json()
@@ -141,7 +152,7 @@ class GANDetector:
             # Parse: [{"label": "artificial", "score": 0.92}, {"label": "human", "score": 0.08}]
             fake_score = 0.0
             for r in results:
-                lbl = r["label"].upper()
+                lbl = r["label"].upper().strip()
                 if lbl in ("ARTIFICIAL", "FAKE", "AI", "GAN", "GENERATED", "1", "AI-GENERATED"):
                     fake_score = float(r["score"])
                 elif lbl in ("HUMAN", "REAL", "AUTHENTIC", "NATURAL", "0"):
@@ -151,18 +162,35 @@ class GANDetector:
             return {
                 "score": round(fake_score, 4),
                 "label": "gan" if fake_score > 0.5 else "real",
-                "confidence": round(max(fake_score, 1 - fake_score), 4),
+                "confidence": round(max(fake_score, 1.0 - fake_score), 4),
                 "weights_available": True,
+                "api_success": True,
                 "mode": "hf_api",
             }
 
         except requests.exceptions.Timeout:
-            # HF API configured but cold-starting — keep weights_available=True.
-            logger.warning("HF Inference API timeout for GAN detection — model cold-starting")
-            return {"score": 0.0, "label": "real", "confidence": 0.5, "weights_available": True, "mode": "hf_api_timeout"}
+            logger.warning(
+                "GANDetector: HF API timeout after 90s — model cold-starting. "
+                "api_success=False so aggregator uses metadata-only weights."
+            )
+            return {
+                "score": 0.0,
+                "label": "unavailable",
+                "confidence": 0.0,
+                "weights_available": True,
+                "api_success": False,
+                "mode": "hf_api_timeout",
+            }
         except Exception as e:
-            logger.warning("HF Inference API GAN failed: %s", e)
-            return {"score": 0.0, "label": "real", "confidence": 0.5, "weights_available": True, "mode": "hf_api_error"}
+            logger.warning("GANDetector: HF API error: %s", e)
+            return {
+                "score": 0.0,
+                "label": "unavailable",
+                "confidence": 0.0,
+                "weights_available": True,
+                "api_success": False,
+                "mode": "hf_api_error",
+            }
 
     def _predict_via_hf_pipeline(self, image_path: str) -> Dict[str, Any]:
         """Use locally-downloaded HuggingFace Transformers pipeline."""
@@ -175,37 +203,61 @@ class GANDetector:
                 lbl = r["label"].upper()
                 if lbl in ("ARTIFICIAL", "FAKE", "AI", "GAN", "GENERATED", "1"):
                     fake_score = float(r["score"])
-                elif lbl in ("HUMAN", "REAL", "AUTHENTIC", "0"):
+                elif lbl in ("HUMAN", "REAL", "0"):
                     if fake_score == 0.0:
                         fake_score = 1.0 - float(r["score"])
             return {
                 "score": round(fake_score, 4),
                 "label": "gan" if fake_score > 0.5 else "real",
-                "confidence": round(max(fake_score, 1 - fake_score), 4),
+                "confidence": round(max(fake_score, 1.0 - fake_score), 4),
                 "weights_available": True,
+                "api_success": True,
                 "mode": "hf_pipeline",
             }
         except Exception as e:
-            logger.warning("HF pipeline GAN failed: %s", e)
-            return {"score": 0.0, "label": "unknown", "confidence": 0.0, "weights_available": False}
+            logger.error("GANDetector: HF pipeline failed: %s", e)
+            return {
+                "score": 0.0,
+                "label": "unknown",
+                "confidence": 0.0,
+                "weights_available": False,
+                "api_success": False,
+            }
 
     def _predict_native(self, image_path: str) -> Dict[str, Any]:
-        """Use locally-loaded CNNDetect ResNet-50 .pth weights."""
+        """Run native ResNet-50 / custom .pth model."""
         try:
             import torch
-            transform = _get_gan_transform()
+            import torchvision.transforms as T
+
+            transform = T.Compose([
+                T.Resize((224, 224)),
+                T.ToTensor(),
+                T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+            ])
             img = Image.open(image_path).convert("RGB")
-            tensor = transform(img).unsqueeze(0).to(self.device)
+            tensor = transform(img).unsqueeze(0)
+
+            device = getattr(self.model_loader, "device", "cpu")
+            self.model.eval()
             with torch.no_grad():
-                logit = self.model(tensor)
-                prob: float = torch.sigmoid(logit).item()
+                output = self.model(tensor.to(device))
+                prob = torch.sigmoid(output).item()
+
             return {
-                "score": round(float(prob), 4),
+                "score": round(prob, 4),
                 "label": "gan" if prob > 0.5 else "real",
-                "confidence": round(float(max(prob, 1 - prob)), 4),
+                "confidence": round(max(prob, 1.0 - prob), 4),
                 "weights_available": True,
+                "api_success": True,
                 "mode": "native_pth",
             }
         except Exception as e:
-            logger.warning("Native GAN detection failed: %s", e)
-            return {"score": 0.0, "label": "unknown", "confidence": 0.0, "weights_available": False}
+            logger.error("GANDetector native predict failed: %s", e)
+            return {
+                "score": 0.0,
+                "label": "unknown",
+                "confidence": 0.0,
+                "weights_available": False,
+                "api_success": False,
+            }
