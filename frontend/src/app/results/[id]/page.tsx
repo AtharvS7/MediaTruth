@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -44,6 +44,7 @@ import HeatmapViewer from "@/components/charts/HeatmapViewer";
 import DetectorCard from "@/components/ui/DetectorCard";
 import VideoFrameTimeline from "@/components/charts/VideoFrameTimeline";
 import { getScanById } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 const VERDICT_CONFIG: Record<
   string,
@@ -70,10 +71,20 @@ function formatDuration(seconds: number): string {
 
 export default function ResultsPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showMeta, setShowMeta] = useState(false);
+
+  // Auth guard — redirect to /auth if not signed in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.replace(`/auth?redirect=/results/${id}`);
+      }
+    });
+  }, [router, id]);
 
   useEffect(() => {
     if (!id) return;
@@ -108,7 +119,9 @@ export default function ResultsPage() {
         if (controller.signal.aborted) return;
         const status = err?.response?.status;
         if (status === 401 || status === 403) {
-          setError("This scan belongs to an authenticated user. Sign in to view it.");
+          // Not authenticated — redirect to auth with return path
+          router.replace(`/auth?redirect=/results/${id}`);
+          return;
         } else if (status === 404) {
           setError("Scan not found. It may have been deleted.");
         } else {

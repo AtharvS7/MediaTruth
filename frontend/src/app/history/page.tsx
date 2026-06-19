@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Film,
   Image as ImageIcon,
@@ -26,6 +27,7 @@ import {
 } from "lucide-react";
 import Nav from "@/components/layout/Nav";
 import { getScanHistory, deleteScan } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
 const VERDICT_COLORS: Record<string, string> = {
@@ -61,6 +63,7 @@ interface Scan {
 }
 
 export default function HistoryPage() {
+  const router = useRouter();
   const [scans, setScans] = useState<Scan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +73,15 @@ export default function HistoryPage() {
   // Track which scan is in "confirm delete" state
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Auth guard — redirect to /auth if not signed in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.replace("/auth?redirect=/history");
+      }
+    });
+  }, [router]);
 
   useEffect(() => {
     const controller = new AbortController();
