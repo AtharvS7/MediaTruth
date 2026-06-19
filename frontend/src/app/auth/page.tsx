@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Loader2, Lock, Mail, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -10,8 +10,13 @@ import { supabase } from "@/lib/supabase";
 
 type Mode = "signin" | "signup" | "reset";
 
-export default function AuthPage() {
+/** Inner component that reads search params — must be inside Suspense */
+function AuthForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // Read the ?redirect= param set by middleware — fallback to /upload
+  const redirectTo = searchParams.get("redirect") || "/upload";
+
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,8 +49,7 @@ export default function AuthPage() {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
-        // UX-10: Detect already-registered email.
-        // Supabase returns success but identities=[] when the email already exists.
+        // Detect already-registered email — Supabase returns success but identities=[]
         if (data.user?.identities?.length === 0) {
           toast.error("This email is already registered. Try signing in instead.", {
             duration: 5000,
@@ -63,10 +67,10 @@ export default function AuthPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast.success("Signed in successfully.");
-      router.push("/upload");
+      // Redirect to the page the user originally tried to visit
+      router.push(redirectTo);
 
     } catch (err: any) {
-      // Map common Supabase error messages to user-friendly text
       const msg: string = err?.message || "";
       if (msg.includes("Invalid login credentials")) {
         toast.error("Incorrect email or password.");
@@ -142,7 +146,6 @@ export default function AuthPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email field */}
             <div className="relative">
               <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
               <input
@@ -157,7 +160,6 @@ export default function AuthPage() {
               />
             </div>
 
-            {/* Password field — hidden in reset mode */}
             {mode !== "reset" && (
               <div className="relative">
                 <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
@@ -175,7 +177,6 @@ export default function AuthPage() {
               </div>
             )}
 
-            {/* UX-09: Forgot password link — shown only in signin mode */}
             {mode === "signin" && (
               <div className="text-right -mt-1">
                 <button
@@ -217,5 +218,21 @@ export default function AuthPage() {
         </motion.div>
       </AnimatePresence>
     </div>
+  );
+}
+
+/**
+ * AuthPage — wraps AuthForm in Suspense.
+ * Next.js 14 requires this whenever a client component uses useSearchParams().
+ */
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-cyan/30 border-t-cyan animate-spin" />
+      </div>
+    }>
+      <AuthForm />
+    </Suspense>
   );
 }
