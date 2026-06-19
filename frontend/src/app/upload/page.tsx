@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { analyzeMedia } from "@/lib/api";
 import Nav from "@/components/layout/Nav";
+import { supabase } from "@/lib/supabase";
 
 type Stage = "idle" | "uploading" | "analyzing" | "done" | "error";
 
@@ -65,6 +66,15 @@ export default function UploadPage() {
 
   const isVideo = file?.type.startsWith("video/") ?? false;
   const ANALYSIS_STEPS = isVideo ? VIDEO_STEPS : IMAGE_STEPS;
+
+  // ── Auth guard (defence-in-depth: middleware is primary, this is backup) ────
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.replace("/auth?redirect=/upload");
+      }
+    });
+  }, [router]);
 
   // Cleanup on unmount
   useEffect(() => {

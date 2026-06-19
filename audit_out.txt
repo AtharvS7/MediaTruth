@@ -1,0 +1,134 @@
+﻿.\backend\venv\Scripts\python.exe : Using a slow image processor as `use_fast` is unset and a slow processor was saved 
+with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow 
+processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with 
+`use_fast=False`.
+At line:1 char:84
++ ... PI="false"; .\backend\venv\Scripts\python.exe audit_e2e.py 2>&1 | Out ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Using a slow im...se_fast=False`.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Device set to use cpu
+=================================================================
+  MediaTruth ÔÇö End-to-End Core Feature Audit
+  Mode: Local (HF pipeline / .pth weights)
+=================================================================
+
+[1] ModelLoader Initialisation
+  Ô£à PASS  ModelLoader.ready
+         ÔåÆ ready=True
+  Ô£à PASS  DeepfakeDetector weights_available
+         ÔåÆ has_weights=True
+  Ô£à PASS  GANDetector weights_available
+         ÔåÆ has_weights=True
+
+[2] DeepfakeDetector Inference
+  Ô£à PASS  DeepfakeDetector returns dict
+  Ô£à PASS  DeepfakeDetector weights_available
+         ÔåÆ weights_available=True
+  Ô£à PASS  DeepfakeDetector score is float in [0,1]
+         ÔåÆ score=0.1122
+  Ô£à PASS  DeepfakeDetector label is valid
+         ÔåÆ label=real
+  Ô£à PASS  DeepfakeDetector score != 0.0 (not random noise)
+         ÔåÆ score=0.1122, label=real
+  Ô£à PASS  DeepfakeDetector response time < 60s
+         ÔåÆ 3.7s
+
+[3] GANDetector Inference
+  Ô£à PASS  GANDetector returns dict
+  Ô£à PASS  GANDetector weights_available
+         ÔåÆ weights_available=True
+  Ô£à PASS  GANDetector score is float in [0,1]
+         ÔåÆ score=0.5349
+  Ô£à PASS  GANDetector label is valid
+         ÔåÆ label=gan
+  Ô£à PASS  GANDetector response time < 60s
+         ÔåÆ 0.7s
+
+[4] ManipulationLocalizer (ELA + DCT)
+  Ô£à PASS  ManipulationLocalizer returns dict
+  Ô£à PASS  ManipulationLocalizer heatmap not None
+         ÔåÆ heatmap shape=(256, 256, 3)
+  Ô£à PASS  ManipulationLocalizer heatmap is (H,W,3) uint8
+         ÔåÆ shape=(256, 256, 3)
+  Ô£à PASS  ManipulationLocalizer score in [0,1]
+         ÔåÆ score=0.1249
+  Ô£à PASS  ManipulationLocalizer label valid
+         ÔåÆ label=clean
+
+[5] MetadataAnalyzer
+  Ô£à PASS  MetadataAnalyzer returns dict
+  Ô£à PASS  MetadataAnalyzer anomaly_score in [0,1]
+         ÔåÆ anomaly_score=0.25
+  Ô£à PASS  MetadataAnalyzer findings is list
+         ÔåÆ findings count=1
+
+[6] ConfidenceAggregator
+  Ô£à PASS  Aggregator: NOT limited_mode when weights available
+         ÔåÆ limited_mode=False
+  Ô£à PASS  Aggregator: confidence <= 1.0
+         ÔåÆ confidence=0.71
+  Ô£à PASS  Aggregator: probabilities sum ~1.0
+         ÔåÆ sum=1.0000
+  Ô£à PASS  Aggregator: verdict is valid string
+         ÔåÆ verdict=Authentic / Original
+  Ô£à PASS  Aggregator: limited_mode=True when both unavailable
+         ÔåÆ limited_mode=True
+  Ô£à PASS  Aggregator: limited_mode caps confidence at 0.75
+         ÔåÆ confidence=0.72
+  Ô£à PASS  Aggregator: score=0.0 with weights_available=True ÔåÆ NOT limited_mode
+         ÔåÆ limited_mode=False (BUG if True ÔÇö fixed in this session)
+
+[7] Full ImageAnalyzer Pipeline
+  Ô£à PASS  ImageAnalyzer returns dict
+  Ô£à PASS  ImageAnalyzer: file_type='image'
+         ÔåÆ file_type=image
+  Ô£à PASS  ImageAnalyzer: probabilities present
+  Ô£à PASS  ImageAnalyzer: probabilities sum ~1.0
+         ÔåÆ sum=1.0000
+  Ô£à PASS  ImageAnalyzer: final_verdict is string
+         ÔåÆ verdict=Authentic / Original
+  Ô£à PASS  ImageAnalyzer: heatmap is base64 string
+         ÔåÆ heatmap_len=53424
+  Ô£à PASS  ImageAnalyzer: heatmap is valid base64
+         ÔåÆ base64 decode + PNG header check
+  Ô£à PASS  ImageAnalyzer: detector_scores present
+         ÔåÆ scores={'deepfake_score': 0.1316, 'gan_score': 0.537, 'manipulation_score': 0.12360147914425555, 'metadata_anomaly_score': 0.25}
+  Ô£à PASS  ImageAnalyzer: ML scores are non-zero
+         ÔåÆ deepfake=0.1316 gan=0.5370
+  Ô£à PASS  ImageAnalyzer: confidence > 0
+         ÔåÆ confidence=0.5474
+  Ô£à PASS  ImageAnalyzer total pipeline time < 90s
+         ÔåÆ 1.1s
+
+  Full result summary:
+    Verdict    : Authentic / Original
+    Confidence : 54.7%
+    AI Gen     : 27.8%
+    AI Edited  : 9.4%
+    Trad Edit  : 8.1%
+    Authentic  : 54.7%
+    Limited Mode: False
+    DF Score   : 0.1316
+    GAN Score  : 0.5370
+    Manip Score: 0.1236
+
+[8] Output Accuracy & Consistency
+  Ô£à PASS  DeepfakeDetector is deterministic (same image ÔåÆ same score)
+         ÔåÆ run1=0.1018 run2=0.1018
+  Ô£à PASS  GANDetector is deterministic (same image ÔåÆ same score)
+         ÔåÆ run1=0.5369 run2=0.5369
+  Ô£à PASS  No 'unavailable' labels when weights present
+         ÔåÆ verdict=Authentic / Original
+
+=================================================================
+  AUDIT SUMMARY
+=================================================================
+  Total checks : 43
+  Hard PASS    : 40
+  Warnings     : 0
+  FAIL         : 0
+
+  ­ƒÄë ALL HARD CHECKS PASSED ÔÇö project is production ready!
+=================================================================

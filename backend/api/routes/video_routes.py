@@ -3,7 +3,7 @@ Video analysis API routes.
 POST /video/analyze — Upload and analyze a video file (up to 180 seconds).
 
 Rate limited to 3 requests/minute per IP via slowapi.
-Supports anonymous uploads via get_optional_user.
+Requires a valid Supabase JWT (Bearer token) — anonymous access is rejected.
 """
 
 import uuid
@@ -18,7 +18,7 @@ from slowapi.util import get_remote_address
 from services.video_analyzer import VideoAnalyzer
 from services.supabase_service import SupabaseService
 from utils.file_utils import validate_video_file, save_temp_file, cleanup_temp_file
-from utils.auth import get_optional_user
+from utils.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -32,7 +32,7 @@ async def analyze_video(
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    user: Optional[dict] = Depends(get_optional_user),
+    user: dict = Depends(get_current_user),
 ) -> JSONResponse:
     """
     Analyze an uploaded video for authenticity.
@@ -59,7 +59,7 @@ async def analyze_video(
         db = SupabaseService()
         await db.save_scan(
             scan_id=scan_id,
-            user_id=user["id"] if user else None,
+            user_id=user["id"],
             file_type="video",
             filename=file.filename,
             result=result,
