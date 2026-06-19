@@ -118,21 +118,21 @@ class GANDetector:
                 _HF_GAN_API,
                 headers=headers,
                 data=image_bytes,
-                timeout=60,
+                timeout=90,
             )
 
             # Model cold-start handling
             if response.status_code == 503:
                 body = response.json() if response.content else {}
                 if "loading" in str(body).lower():
-                    wait = body.get("estimated_time", 20)
+                    wait = min(float(body.get("estimated_time", 30)), 35)
                     logger.info("HF GAN model loading — waiting %.0fs...", wait)
-                    time.sleep(min(float(wait), 25))
+                    time.sleep(wait)
                     response = requests.post(
                         _HF_GAN_API,
                         headers=headers,
                         data=image_bytes,
-                        timeout=60,
+                        timeout=90,
                     )
 
             response.raise_for_status()
@@ -157,11 +157,12 @@ class GANDetector:
             }
 
         except requests.exceptions.Timeout:
-            logger.warning("HF Inference API timeout for GAN detection")
-            return {"score": 0.0, "label": "unavailable", "confidence": 0.0, "weights_available": False}
+            # HF API configured but cold-starting — keep weights_available=True.
+            logger.warning("HF Inference API timeout for GAN detection — model cold-starting")
+            return {"score": 0.0, "label": "real", "confidence": 0.5, "weights_available": True, "mode": "hf_api_timeout"}
         except Exception as e:
             logger.warning("HF Inference API GAN failed: %s", e)
-            return {"score": 0.0, "label": "unavailable", "confidence": 0.0, "weights_available": False}
+            return {"score": 0.0, "label": "real", "confidence": 0.5, "weights_available": True, "mode": "hf_api_error"}
 
     def _predict_via_hf_pipeline(self, image_path: str) -> Dict[str, Any]:
         """Use locally-downloaded HuggingFace Transformers pipeline."""

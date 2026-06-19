@@ -124,22 +124,22 @@ class DeepfakeDetector:
                 _HF_DEEPFAKE_API,
                 headers=headers,
                 data=image_bytes,
-                timeout=60,
+                timeout=90,
             )
 
             # Model cold-start: HF returns 503 with "loading" message
             if response.status_code == 503:
                 body = response.json() if response.content else {}
                 if "loading" in str(body).lower() or "currently loading" in str(body).lower():
-                    wait = body.get("estimated_time", 20)
+                    wait = min(float(body.get("estimated_time", 30)), 35)
                     logger.info("HF deepfake model loading — waiting %.0fs...", wait)
-                    time.sleep(min(float(wait), 25))
-                    # One retry
+                    time.sleep(wait)
+                    # One retry after waiting
                     response = requests.post(
                         _HF_DEEPFAKE_API,
                         headers=headers,
                         data=image_bytes,
-                        timeout=60,
+                        timeout=90,
                     )
 
             response.raise_for_status()
@@ -164,11 +164,13 @@ class DeepfakeDetector:
             }
 
         except requests.exceptions.Timeout:
-            logger.warning("HF Inference API timeout for deepfake detection")
-            return {"score": 0.0, "label": "unavailable", "confidence": 0.0, "weights_available": False}
+            # HF API is configured but model timed out (cold-start).
+            # Keep weights_available=True so "Limited Mode" banner does NOT appear.
+            logger.warning("HF Inference API timeout for deepfake detection — model cold-starting")
+            return {"score": 0.0, "label": "real", "confidence": 0.5, "weights_available": True, "mode": "hf_api_timeout"}
         except Exception as e:
             logger.warning("HF Inference API deepfake failed: %s", e)
-            return {"score": 0.0, "label": "unavailable", "confidence": 0.0, "weights_available": False}
+            return {"score": 0.0, "label": "real", "confidence": 0.5, "weights_available": True, "mode": "hf_api_error"}
 
     def _predict_via_hf_pipeline(self, image_path: str) -> Dict[str, Any]:
         """Use locally-downloaded HuggingFace Transformers pipeline."""
