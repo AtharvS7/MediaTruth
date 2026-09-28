@@ -87,3 +87,11 @@ export async function getScanHistory(
 export async function deleteScan(id: string): Promise<void> {
   await API.delete(`/scan/${id}`);
 }
+
+/** Download a newly encoded PNG without source metadata. */
+export async function cleanImageMetadata(file: File): Promise<Blob> {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await API.post("/image/clean-metadata", form, { responseType: "blob" });
+  return data;
+}

@@ -31,6 +31,7 @@ import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
 const VERDICT_COLORS: Record<string, string> = {
+  "Inconclusive":         "#f59e0b",
   "AI Generated":         "#ff4d6d",
   "AI Edited":            "#8b5cf6",
   "Traditionally Edited": "#b8ff57",

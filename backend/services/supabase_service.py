@@ -140,12 +140,33 @@ class SupabaseService:
                 ),
                 timeout=self.DB_TIMEOUT,
             )
-        except asyncio.TimeoutError:
-            logger.error(f"Timeout saving analysis_results for {scan_id}")
-            raise  # BUG-01 fix: don't silently swallow — caller must know DB failed
         except Exception as e:
+            # D1: the scans row above is already committed. Roll it back with a
+            # compensating delete so we never leave a scan with no analysis_results,
+            # then propagate so the route returns 500 (BUG-01).
             logger.error(f"Failed to save analysis_results for {scan_id}: {e}")
-            raise  # BUG-01 fix: propagate so the route returns 500, not a dangling scan row
+            await self._delete_scan_row_best_effort(scan_id)
+            raise
+
+    async def _delete_scan_row_best_effort(self, scan_id: str) -> None:
+        """D1 compensating delete: remove an orphaned scans row after a failed
+        analysis_results insert. Best-effort — never raises, so a cleanup failure
+        cannot mask the original error that triggered it."""
+        loop = asyncio.get_running_loop()
+        try:
+            await asyncio.wait_for(
+                loop.run_in_executor(
+                    None,
+                    lambda: self.client.table("scans").delete().eq("id", scan_id).execute(),
+                ),
+                timeout=self.DB_TIMEOUT,
+            )
+            logger.info(f"Rolled back orphaned scan row {scan_id} after result-insert failure")
+        except Exception as cleanup_err:
+            logger.error(
+                f"Compensating delete failed for scan {scan_id}; manual cleanup may be "
+                f"needed: {cleanup_err}"
+            )
 
     async def get_scan_by_id(self, scan_id: str) -> Optional[Dict[str, Any]]:
         """Fetch a scan and its full result by scan ID."""

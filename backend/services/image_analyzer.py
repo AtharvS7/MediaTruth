@@ -76,6 +76,7 @@ class ImageAnalyzer:
 
         return {
             "file_type": "image",
+            "score_semantics": "uncalibrated_heuristic",
             "ai_generated_probability": verdict["ai_generated"],
             "ai_edited_probability": verdict["ai_edited"],
             "traditional_edit_probability": verdict["traditional_edit"],

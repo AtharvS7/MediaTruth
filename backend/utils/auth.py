@@ -9,11 +9,13 @@ Uses Supabase RS256 token verification via network call.
 """
 
 import asyncio
+import hashlib
 import logging
 from typing import Optional
 
 from fastapi import Request, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from slowapi.util import get_remote_address
 
 from services.supabase_service import get_supabase_client
 
@@ -21,6 +23,22 @@ logger = logging.getLogger(__name__)
 
 security = HTTPBearer(auto_error=True)
 optional_security = HTTPBearer(auto_error=False)
+
+
+def rate_limit_key(request: Request) -> str:
+    """slowapi key function (S4): rate-limit per authenticated session when a
+    Bearer token is present, otherwise per client IP.
+
+    Keying on a hash of the token (never the raw value) gives each user behind a
+    shared NAT / corporate IP an independent quota, while anonymous traffic still
+    falls back to the remote address. The token is not verified here — only valid
+    tokens get past get_current_user, so this cannot be used to evade the limit."""
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        token = auth.removeprefix("Bearer ").strip()
+        if token:
+            return "user:" + hashlib.sha256(token.encode()).hexdigest()[:32]
+    return "ip:" + get_remote_address(request)
 
 
 async def get_current_user(

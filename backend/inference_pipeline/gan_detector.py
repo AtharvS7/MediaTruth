@@ -21,6 +21,7 @@ from typing import Any, Dict, Optional
 
 import requests
 from PIL import Image
+from inference_pipeline.model_scores import parse_ai_score
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +44,8 @@ class GANDetector:
 
     def __init__(self, model_loader: Any) -> None:
         self.model_loader = model_loader
-        self.model = getattr(model_loader, "gan_model", None)
-        self.weights_available: bool = self.model is not None
+        self.model = model_loader.get_model("gan_detect")
+        self.weights_available: bool = model_loader.has_weights("gan_detect") and self.model is not None
 
         self._hf_api_mode: bool = getattr(model_loader, "_hf_api_mode", False)
         self._hf_token: Optional[str] = os.environ.get("HF_TOKEN", "").strip() or None
@@ -150,15 +151,7 @@ class GANDetector:
             results = response.json()
 
             # Parse: [{"label": "artificial", "score": 0.92}, {"label": "human", "score": 0.08}]
-            fake_score = 0.0
-            for r in results:
-                lbl = r["label"].upper().strip()
-                if lbl in ("ARTIFICIAL", "FAKE", "AI", "GAN", "GENERATED", "1", "AI-GENERATED"):
-                    fake_score = float(r["score"])
-                elif lbl in ("HUMAN", "REAL", "AUTHENTIC", "NATURAL", "0"):
-                    if fake_score == 0.0:
-                        fake_score = 1.0 - float(r["score"])
-
+            fake_score = parse_ai_score(results)
             return {
                 "score": round(fake_score, 4),
                 "label": "gan" if fake_score > 0.5 else "real",
@@ -198,14 +191,7 @@ class GANDetector:
             pipe = self.model["pipe"]
             img = Image.open(image_path).convert("RGB")
             results = pipe(img)
-            fake_score = 0.0
-            for r in results:
-                lbl = r["label"].upper()
-                if lbl in ("ARTIFICIAL", "FAKE", "AI", "GAN", "GENERATED", "1"):
-                    fake_score = float(r["score"])
-                elif lbl in ("HUMAN", "REAL", "0"):
-                    if fake_score == 0.0:
-                        fake_score = 1.0 - float(r["score"])
+            fake_score = parse_ai_score(results)
             return {
                 "score": round(fake_score, 4),
                 "label": "gan" if fake_score > 0.5 else "real",

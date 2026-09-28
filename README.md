@@ -1,5 +1,8 @@
 # MediaTruth — AI Media Forensics Platform
 
+> **Current upgrade status (2026-09-29):** See [codebase audit](AUDIT_2026-09-29.md) and [INR 0 upgrade plan/task ledger](UPGRADE_PLAN.md). Detection scores are experimental, not validated probabilities. New `/metadata` page exports still images without ordinary metadata; it does not guarantee removal of invisible watermarks or all AI traces. Enterprise release remains blocked by the items in the audit.
+
+
 > **Detect AI-generated, AI-edited, deepfaked, and traditionally manipulated images and videos using a multi-model forensics pipeline.**
 
 ---
@@ -247,7 +250,7 @@ docker push your-registry/mediatruth-backend
 Set these environment variables in your hosting provider:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_KEY`
-- `JWT_SECRET`
+- `JWT_SECRET` *(reserved — not read by app code; token verification uses Supabase)*
 - `ALLOWED_ORIGINS`
 
 ### Frontend — Vercel

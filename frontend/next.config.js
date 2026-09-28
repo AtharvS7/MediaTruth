@@ -30,6 +30,8 @@ const nextConfig = {
   // Security headers
   async headers() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    // SEC (S2): keep 'unsafe-eval' only in dev — React Fast Refresh/HMR needs it.
+    const isDev = process.env.NODE_ENV !== "production";
     return [
       {
         source: "/(.*)",
@@ -41,15 +43,25 @@ const nextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          // SEC (S3): force HTTPS (2 years, incl. subdomains).
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              // 'unsafe-inline' stays: Next.js injects inline hydration/runtime scripts
+              // and isn't set up with CSP nonces. 'unsafe-eval' is dev-only (S2).
+              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+              // 'unsafe-inline' required: Framer Motion sets inline element styles.
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob:",
               `connect-src 'self' ${apiUrl} https://*.supabase.co wss://*.supabase.co`,
+              "object-src 'none'",
+              "base-uri 'self'",
               "frame-ancestors 'none'",
             ].join("; "),
           },

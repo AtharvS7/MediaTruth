@@ -27,4 +27,4 @@ async def readiness(request: Request) -> Dict[str, bool]:
     Intended for internal/ops use (e.g., Kubernetes readiness probe).
     """
     loader = getattr(request.app.state, "model_loader", None)
-    return {"ready": loader.is_ready() if loader else False}
+    return {"ready": bool(loader.ready) if loader else False}

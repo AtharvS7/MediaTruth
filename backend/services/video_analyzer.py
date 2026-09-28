@@ -70,6 +70,7 @@ class VideoAnalyzer:
 
         return {
             "file_type": "video",
+            "score_semantics": "uncalibrated_heuristic",
             "duration_seconds": duration,
             "frames_analyzed": len(frames),
             "ai_generated_probability": video_verdict["ai_generated"],
@@ -78,6 +79,8 @@ class VideoAnalyzer:
             "authentic_probability": video_verdict["authentic"],
             "final_verdict": video_verdict["verdict"],
             "confidence": video_verdict["confidence"],
+            "limited_mode": video_verdict["limited_mode"],
+            "ml_available": video_verdict["ml_available"],
             "per_frame_results": per_frame_results,
             "metadata_findings": meta.get("findings", []),
             "explanation": video_verdict.get("explanation", ""),

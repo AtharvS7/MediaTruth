@@ -115,7 +115,10 @@ export default function ResultsPage() {
     getScanById(id)
       .then((data) => {
         if (controller.signal.aborted) return;
-        setResult(data?.full_result || data);
+        // BUG-11 fix: merge scan metadata (id, filename, created_at, verdict columns)
+        // WITH the full analysis result, so API-loaded results (shared links, hard
+        // refresh) aren't missing fields the sessionStorage path includes.
+        setResult({ ...data, ...(data?.full_result || {}) });
         setLoading(false);
       })
       .catch((err) => {
@@ -173,8 +176,8 @@ export default function ResultsPage() {
     );
   }
 
-  const verdict = result.final_verdict || "Authentic / Original";
-  const cfg = VERDICT_CONFIG[verdict] || VERDICT_CONFIG["Authentic / Original"];
+  const verdict = result.final_verdict || "Inconclusive";
+  const cfg = VERDICT_CONFIG[verdict] || VERDICT_CONFIG["Inconclusive"];
   const Icon = cfg.icon;
   const accentColor = COLOR_MAP[cfg.color];
   const isVideo = result.file_type === "video";
@@ -249,7 +252,7 @@ export default function ResultsPage() {
                   {verdict}
                 </p>
                 <p className="font-mono text-xs text-white/40 mt-1">
-                  {Math.round((result.confidence || 0) * 100)}% confidence
+                  {Math.round((result.confidence || 0) * 100)}% analysis score
                 </p>
               </div>
             </motion.div>
@@ -335,7 +338,7 @@ export default function ResultsPage() {
             transition={{ delay: 0.3 }}
           >
             <h2 className="font-display font-semibold text-lg mb-6">
-              Probability Matrix
+              Experimental Analysis Scores
             </h2>
             <ProbabilityMatrix
               aiGenerated={result.ai_generated_probability || 0}
@@ -343,6 +346,10 @@ export default function ResultsPage() {
               traditionalEdit={result.traditional_edit_probability || 0}
               authentic={result.authentic_probability || 0}
             />
+            <p className="text-sm text-white/60 mt-4">
+              These scores are not calibrated probabilities or proof of origin.
+              AI editing and conventional editing can produce similar signals.
+            </p>
           </motion.div>
 
           <motion.div

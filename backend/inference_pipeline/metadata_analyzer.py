@@ -1,141 +1,77 @@
-"""
-MetadataAnalyzer — EXIF and file metadata forensics.
-
-Flags anomalies such as:
-  - Missing EXIF on a JPEG (suspicious) — anomaly_score += 0.40
-  - Missing EXIF on PNG/WebP/lossless (strong AI indicator) — anomaly_score += 0.55
-  - Software tag indicating AI generator (Midjourney, DALL-E, Stable Diffusion)
-  - Inconsistent timestamps
-  - Thumbnail / full-image software tag mismatch
-
-Scoring rationale:
-  - Real camera photos almost always have EXIF (make, model, GPS, timestamp).
-  - AI-generated images almost never have EXIF (no camera to embed it).
-  - PNG is the preferred format for AI art — PNG + no EXIF is a strong AI signal.
-  - JPEG + no EXIF is suspicious but less conclusive (could be stripped by tools).
-"""
-
+"""Read editable metadata claims; missing metadata is not evidence of AI."""
 import logging
-import os
 import re
 from typing import Any, Dict, List
-
 import exifread
 from PIL import Image
 
 logger = logging.getLogger(__name__)
-
-# Specific AI tool names — no short substrings that match everyday software
-KNOWN_AI_SOFTWARE: List[str] = [
-    "midjourney", "dall-e", "stable diffusion", "firefly",
-    "leonardo", "bing image creator", "adobe firefly",
-    "generative fill", "imagemagick ai", "openai", "stablediffusion",
+KNOWN_AI_SOFTWARE = [
+    "midjourney", "dall-e", "stable diffusion", "firefly", "leonardo",
+    "bing image creator", "generative fill", "openai", "stablediffusion",
     "invoke ai", "comfyui", "automatic1111", "novelai",
 ]
-
-# Word-boundary regex for "neural" to avoid substring false positives
-_NEURAL_RE = re.compile(r"\bneural\b", re.IGNORECASE)
-
-KNOWN_EDITOR_SOFTWARE: List[str] = [
+KNOWN_EDITOR_SOFTWARE = [
     "photoshop", "lightroom", "gimp", "affinity", "capture one",
     "darktable", "pixelmator", "snapseed", "facetune",
 ]
-
-# Lossless digital formats — when combined with no EXIF, strongly suggest AI
-_LOSSLESS_FORMATS = frozenset({"PNG", "WEBP", "BMP", "TIFF"})
+_NEURAL_RE = re.compile(r"\bneural\b", re.IGNORECASE)
 
 
 def _is_ai_software(software: str) -> bool:
-    """Check if the software string indicates AI generation."""
-    sw_lower: str = software.lower()
-    if any(ai_name in sw_lower for ai_name in KNOWN_AI_SOFTWARE):
-        return True
-    if _NEURAL_RE.search(sw_lower):
-        return True
-    return False
+    return any(name in software.lower() for name in KNOWN_AI_SOFTWARE) or bool(
+        _NEURAL_RE.search(software)
+    )
 
 
 class MetadataAnalyzer:
     def analyze(self, image_path: str) -> Dict[str, Any]:
         findings: List[str] = []
-        anomaly_score: float = 0.0
         raw_meta: Dict[str, Any] = {}
-        img_format: str = "UNKNOWN"
-
-        # Detect format first (before reading EXIF)
+        image_format = "UNKNOWN"
+        software_values = set()
+        status = "read"
         try:
-            with Image.open(image_path) as img_probe:
-                img_format = img_probe.format or "UNKNOWN"
-        except Exception:
-            pass
-
-        try:
-            with open(image_path, "rb") as f:
-                tags = exifread.process_file(f, stop_tag="UNDEF", details=False)
-
+            with Image.open(image_path) as img:
+                image_format = img.format or "UNKNOWN"
+                software = img.getexif().get(305)
+                if software:
+                    software_values.add(str(software))
+                for key, value in img.info.items():
+                    if key.lower() == "software" and isinstance(value, str):
+                        software_values.add(value)
+            with open(image_path, "rb") as stream:
+                tags = exifread.process_file(stream, details=False)
+            raw_meta = {str(k): str(v) for k, v in tags.items()}
+            if tags.get("Image Software"):
+                software_values.add(str(tags["Image Software"]))
             if not tags:
-                # No EXIF at all — scoring depends on format
-                if img_format in _LOSSLESS_FORMATS:
-                    # PNG/WebP + no EXIF = very strong AI-generation signal
-                    findings.append(
-                        f"⚠️ No EXIF data on {img_format} file — "
-                        "strong AI-generation indicator. "
-                        "Real cameras save EXIF; AI tools output clean PNGs without it."
-                    )
-                    anomaly_score += 0.55
-                else:
-                    # JPEG or unknown + no EXIF — suspicious but less conclusive
-                    findings.append(
-                        "⚠️ No EXIF data found — suspicious for a camera photograph. "
-                        "May indicate AI generation or metadata stripping."
-                    )
-                    anomaly_score += 0.40
-            else:
-                raw_meta = {str(k): str(v) for k, v in tags.items()}
+                findings.append("No EXIF metadata found. This does not establish AI generation, editing, or authenticity.")
+            original = tags.get("EXIF DateTimeOriginal")
+            digitized = tags.get("EXIF DateTimeDigitized")
+            if original and digitized and str(original) != str(digitized):
+                findings.append("Capture and digitization timestamps differ; this alone does not prove editing.")
+        except Exception:
+            logger.warning("Could not read image metadata")
+            status = "unreadable"
+            findings.append("Could not read file metadata; no conclusion can be drawn from its absence.")
 
-                # Software tag analysis
-                software: str = str(tags.get("Image Software", "")).lower()
-                if _is_ai_software(software):
-                    findings.append(
-                        f"🤖 AI generation software detected in metadata: {software!r}"
-                    )
-                    anomaly_score += 0.6
-                elif any(ed in software for ed in KNOWN_EDITOR_SOFTWARE):
-                    findings.append(
-                        f"✏️ Image editing software detected: {software!r}"
-                    )
-                    anomaly_score += 0.2
-
-                # Timestamp consistency
-                orig_ts = tags.get("EXIF DateTimeOriginal")
-                digi_ts = tags.get("EXIF DateTimeDigitized")
-                if orig_ts and digi_ts and str(orig_ts) != str(digi_ts):
-                    findings.append(
-                        "⚠️ Timestamp mismatch between DateTimeOriginal and DateTimeDigitized."
-                    )
-                    anomaly_score += 0.15
-
-                # Cross-check with PIL EXIF
-                try:
-                    img = Image.open(image_path)
-                    exif_data = img.getexif() or {}
-                    img_software: str = exif_data.get(305, "")
-                    if img_software and _is_ai_software(img_software):
-                        findings.append(
-                            f"🤖 PIL EXIF confirms AI software: {img_software}"
-                        )
-                        anomaly_score = min(anomaly_score + 0.3, 1.0)
-                except Exception:
-                    pass
-
-        except Exception as e:
-            logger.warning(f"Metadata analysis failed: {e}")
-            findings.append("⚠️ Could not read file metadata.")
-            anomaly_score += 0.1
-
+        ai_claim = False
+        editor_claim = False
+        for software in sorted(software_values):
+            if _is_ai_software(software):
+                ai_claim = True
+                findings.append(f"Unverified AI software claim in metadata: {software[:200]!r}.")
+            elif any(name in software.lower() for name in KNOWN_EDITOR_SOFTWARE):
+                editor_claim = True
+                findings.append(
+                    f"Editing software named in metadata: {software[:200]!r}. "
+                    "This does not distinguish AI tools from conventional edits."
+                )
         return {
-            "anomaly_score": round(min(anomaly_score, 1.0), 4),
-            "findings": findings,
-            "raw_metadata": raw_meta,
-            "image_format": img_format,
+            "anomaly_score": 0.6 if ai_claim else 0.0,
+            "findings": findings, "raw_metadata": raw_meta,
+            "image_format": image_format, "metadata_status": status,
+            "ai_software_claim": ai_claim, "editor_software_claim": editor_claim,
+            "provenance_verified": False,
         }

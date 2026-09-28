@@ -62,6 +62,7 @@ MODEL_REGISTRY: Dict[str, Dict[str, Any]] = {
 def _download_file(url: str, dest: Path) -> None:
     """Download a file with a progress bar."""
     logger.info(f"Downloading {url} → {dest}")
+    from tqdm import tqdm
     response = requests.get(url, stream=True, timeout=120)
     response.raise_for_status()
     total: int = int(response.headers.get("content-length", 0))
@@ -181,7 +182,7 @@ class ModelLoader:
         import timm
         model = timm.create_model(
             "efficientnet_b5",
-            pretrained=True,
+            pretrained=False,
             num_classes=2,
         )
         weights_path: Path = WEIGHTS_DIR / "efficientnet_b5_deepfake.pth"
@@ -192,10 +193,10 @@ class ModelLoader:
             except Exception:
                 logger.warning(
                     "weights_only=True failed for EfficientNet-B5 weights — "
-                    "falling back to weights_only=False. Ensure file is from a trusted source."
+                    "rejecting unsafe checkpoint deserialization."
                 )
-                state = torch.load(weights_path, map_location=self.device, weights_only=False)
-            model.load_state_dict(state, strict=False)
+                raise ValueError("Checkpoint cannot be loaded safely; convert it to a plain state dictionary.")
+            model.load_state_dict(state, strict=True)
             self._weights_loaded.add("deepfake")
             logger.info("EfficientNet-B5: fine-tuned deepfake weights loaded.")
         else:
@@ -211,11 +212,13 @@ class ModelLoader:
                     "fine-tuned" if "deepfake" in self._weights_loaded else "disabled/random-head")
 
     def _load_cnn_detect(self) -> None:
+        if not (WEIGHTS_DIR / "cnn_detect.pth").exists():
+            raise FileNotFoundError("No trained CNNDetect checkpoint; use the configured fallback.")
         logger.info("Loading CNNDetect GAN detector...")
         import torch
         import torchvision.models as tv_models
 
-        model = tv_models.resnet50(weights=tv_models.ResNet50_Weights.IMAGENET1K_V2)
+        model = tv_models.resnet50(weights=None)
         model.fc = torch.nn.Linear(model.fc.in_features, 1)
 
         weights_path: Path = WEIGHTS_DIR / "cnn_detect.pth"
@@ -226,14 +229,14 @@ class ModelLoader:
             except Exception:
                 logger.warning(
                     "weights_only=True failed for CNNDetect weights — "
-                    "falling back to weights_only=False. Ensure file is from a trusted source."
+                    "rejecting unsafe checkpoint deserialization."
                 )
-                state = torch.load(weights_path, map_location=self.device, weights_only=False)
+                raise ValueError("Checkpoint cannot be loaded safely; convert it to a plain state dictionary.")
             # CNNDetect was trained with DataParallel — strip 'module.' prefix
             if any(k.startswith("module.") for k in state.keys()):
                 state = {k.replace("module.", "", 1): v for k, v in state.items()}
                 logger.info("CNNDetect: stripped DataParallel 'module.' prefix from state dict.")
-            model.load_state_dict(state, strict=False)
+            model.load_state_dict(state, strict=True)
             self._weights_loaded.add("gan_detect")
             logger.info("CNNDetect: fine-tuned GAN detector weights loaded.")
         else:

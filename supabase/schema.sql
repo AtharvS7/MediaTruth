@@ -42,19 +42,24 @@ create index if not exists idx_results_scan_id on public.analysis_results(scan_i
 -- ─── Row-level security ──────────────────────────────────────────────────────
 alter table public.scans           enable row level security;
 alter table public.analysis_results enable row level security;
+alter table public.users enable row level security;
+
+create policy "users_read_own_profile"
+  on public.users for select to authenticated
+  using (id = auth.uid());
 
 -- ─── SELECT policies ─────────────────────────────────────────────────────────
--- Users can read their own scans; anonymous scans (user_id IS NULL) are public
+-- Users can read only their own scans; ownerless scans remain private
 create policy "users_read_own_scans"
-  on public.scans for select
-  using (user_id = auth.uid() or user_id is null);
+  on public.scans for select to authenticated
+  using (user_id = auth.uid());
 
 create policy "users_read_own_results"
-  on public.analysis_results for select
+  on public.analysis_results for select to authenticated
   using (
     scan_id in (
       select id from public.scans
-      where user_id = auth.uid() or user_id is null
+      where user_id = auth.uid()
     )
   );
 
@@ -63,13 +68,8 @@ create policy "users_read_own_results"
 -- service_role bypasses RLS entirely, but these policies provide defense-in-depth
 -- if the anon key is ever accidentally used server-side.
 
-create policy "service_insert_scans"
-  on public.scans for insert
-  with check (true);
-
-create policy "service_insert_results"
-  on public.analysis_results for insert
-  with check (true);
+-- Backend service role bypasses RLS. Browser clients cannot create forged results.
+revoke insert, update on public.users, public.scans, public.analysis_results from anon, authenticated;
 
 -- ─── UPDATE policies (REMAINING-006) ────────────────────────────────────────
 -- Scans and results are immutable — nobody can modify them after creation.
@@ -91,7 +91,7 @@ create policy "users_delete_own_scans"
 
 -- ─── Auto-create user profile on signup ─────────────────────────────────────
 create or replace function public.handle_new_user()
-returns trigger language plpgsql security definer as $$
+returns trigger language plpgsql security definer set search_path = '' as $$
 begin
   insert into public.users (id, email)
   values (new.id, new.email)

@@ -47,6 +47,7 @@ export default function Nav() {
   const links = [
     { href: "/upload",  label: "Analyze" },
     { href: "/history", label: "History" },
+    { href: "/metadata", label: "Metadata" },
   ];
 
   return (

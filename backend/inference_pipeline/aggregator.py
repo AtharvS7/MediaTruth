@@ -1,31 +1,7 @@
-"""
-ConfidenceAggregator — Fuses signals from all detectors into a final verdict.
+"""Experimental score fusion, not calibrated probabilities.
 
-TWO-MODE WEIGHT SYSTEM
-======================
-
-Mode A — ML Available (api_success=True for at least one ML detector):
-  ai_generated = 0.35×deepfake + 0.30×gan + 0.20×metadata + 0.15×statistical
-  ai_edited    = 0.30×manipulation + 0.15×deepfake + 0.10×metadata
-  traditional  = 0.40×manipulation + 0.10×metadata
-  authentic    = complement (normalised)
-
-Mode B — ML Unavailable (both api_success=False or both detectors disabled):
-  ai_generated = 0.55×metadata + 0.30×statistical + 0.15×manipulation
-  ai_edited    = 0.25×manipulation + 0.20×metadata
-  traditional  = 0.35×manipulation + 0.10×metadata
-  authentic    = complement, capped at 0.65 max
-  ALL verdict confidence capped at 0.65
-
-Inconclusive Verdict (M1 — Mandatory):
-  Triggered when: Mode B AND metadata_anomaly_score < 0.35
-  Returns verdict="Inconclusive" — system declines to guess rather than
-  falsely report "Authentic / Original" when evidence is insufficient.
-
-Root cause this fixes:
-  Previous: deepfake=0, gan=0 (API failed/face-only model) → authentic=77%
-  Fixed:    api_success=False detected → Mode B → metadata dominates →
-            "Inconclusive" if signals too weak, else uses metadata score
+Missing ML evidence produces an inconclusive result. Metadata and visual
+heuristics alone cannot establish image origin or distinguish editing methods.
 """
 
 import logging
@@ -60,9 +36,9 @@ EXPLANATIONS: Dict[str, str] = {
     ),
     "inconclusive": (
         "Insufficient data to determine authenticity. The AI detection models were "
-        "unavailable during this analysis and the metadata signals are too weak to "
-        "reach a reliable verdict. Try again in a few moments or upload a JPEG "
-        "photograph with camera EXIF data for a fuller analysis."
+        "unavailable during this analysis. Metadata and visual heuristics cannot "
+        "establish origin on their own. Retry when the models are available. "
+        "Missing metadata does not indicate AI generation."
     ),
 }
 
@@ -81,7 +57,7 @@ class ConfidenceAggregator:
         statistical: Optional[float] = None,
     ) -> Dict[str, Any]:
         """
-        Aggregate all detector signals into a final probability matrix.
+        Aggregate available signals into experimental category scores.
 
         Parameters
         ----------
@@ -96,7 +72,7 @@ class ConfidenceAggregator:
         gan_score:  float = _clamp(gan.get("score", 0.0))
         manip_score: float = _clamp(manipulation.get("score", 0.0))
         meta_score:  float = _clamp(metadata.get("anomaly_score", 0.0))
-        stat_score:  float = _clamp(statistical or manipulation.get("ai_likelihood_score", 0.0))
+        stat_score:  float = _clamp(statistical if statistical is not None else manipulation.get("ai_likelihood_score", 0.0))
 
         # ── Determine ML availability ─────────────────────────────────────────
         # api_success=True  → model ran and returned a genuine score
@@ -106,16 +82,18 @@ class ConfidenceAggregator:
         ml_available    = api_success_df or api_success_gan
 
         # Legacy: detectors without api_success field — fall back to weights_available
-        if not deepfake.get("api_success") and deepfake.get("weights_available") and df_score > 0:
+        if "api_success" not in deepfake and deepfake.get("weights_available"):
             ml_available = True
             api_success_df = True
-        if not gan.get("api_success") and gan.get("weights_available") and gan_score > 0:
+        if "api_success" not in gan and gan.get("weights_available"):
             ml_available = True
             api_success_gan = True
 
         # ── M1: Inconclusive verdict ──────────────────────────────────────────
-        # When no ML data AND metadata is too weak to make a determination.
-        if not ml_available and meta_score < 0.35 and stat_score < 0.30:
+        # Heuristics and editable metadata alone cannot establish origin.
+        df_score = df_score if api_success_df else 0.0
+        gan_score = gan_score if api_success_gan else 0.0
+        if not ml_available:
             return {
                 "ai_generated":    0.0,
                 "ai_edited":       0.0,
@@ -130,30 +108,16 @@ class ConfidenceAggregator:
             }
 
         # ── Mode A: ML signals available ──────────────────────────────────────
-        if ml_available:
-            ai_generated    = 0.35 * df_score + 0.30 * gan_score + 0.20 * meta_score + 0.15 * stat_score
-            ai_edited       = 0.30 * manip_score + 0.15 * df_score + 0.10 * meta_score
-            traditional_edit = 0.40 * manip_score + 0.10 * meta_score
-            mode_label = "ml_available"
-            confidence_cap  = 0.97   # allow high confidence when ML ran
-        else:
-            # ── Mode B: No ML signals — metadata + statistical dominant ───────
-            ai_generated    = 0.55 * meta_score + 0.30 * stat_score + 0.15 * manip_score
-            ai_edited       = 0.25 * manip_score + 0.20 * meta_score
-            traditional_edit = 0.35 * manip_score + 0.10 * meta_score
-            mode_label = "metadata_only"
-            confidence_cap  = 0.65   # cap ALL verdicts — insufficient data
+        ai_generated = 0.35 * df_score + 0.30 * gan_score + 0.20 * meta_score + 0.15 * stat_score
+        ai_edited = 0.30 * manip_score + 0.15 * df_score + 0.10 * meta_score
+        traditional_edit = 0.40 * manip_score + 0.10 * meta_score
+        confidence_cap = 0.97
 
-        # ── Clamp, compute authentic, normalise ───────────────────────────────
         ai_generated    = _clamp(ai_generated)
         ai_edited       = _clamp(ai_edited)
         traditional_edit = _clamp(traditional_edit)
 
-        # Mode B: authentic is capped — we don't let "no signal" → "definitely authentic"
-        if not ml_available:
-            authentic = _clamp(1.0 - (ai_generated + ai_edited + traditional_edit), 0.0, 0.65)
-        else:
-            authentic = _clamp(1.0 - (ai_generated + ai_edited + traditional_edit))
+        authentic = _clamp(1.0 - (ai_generated + ai_edited + traditional_edit))
 
         # Normalise to sum = 1.0
         total = ai_generated + ai_edited + traditional_edit + authentic + 1e-8
@@ -177,12 +141,6 @@ class ConfidenceAggregator:
         limited_mode = not ml_available
 
         explanation = EXPLANATIONS[verdict_key]
-        if limited_mode:
-            explanation = (
-                f"{explanation} "
-                "[Note: AI/GAN detectors were unavailable — result is based on "
-                "metadata forensics and statistical image analysis only.]"
-            )
 
         return {
             "ai_generated":    round(ai_generated, 4),
@@ -202,6 +160,15 @@ class ConfidenceAggregator:
         if not frame_results:
             return self.aggregate({}, {}, {}, {})
 
+        usable_frames = [
+            frame for frame in frame_results
+            if frame.get("ml_available") is True
+            and frame.get("final_verdict") != VERDICT_LABELS["inconclusive"]
+        ]
+        if not usable_frames:
+            return self.aggregate({}, {}, {}, {})
+        partial = len(usable_frames) != len(frame_results)
+
         keys: List[str] = [
             "ai_generated_probability",
             "ai_edited_probability",
@@ -211,10 +178,12 @@ class ConfidenceAggregator:
 
         averages: Dict[str, float] = {}
         for k in keys:
-            vals: List[float] = [f.get(k, 0.0) for f in frame_results]
+            vals: List[float] = [f.get(k, 0.0) for f in usable_frames]
             averages[k] = sum(vals) / len(vals)
 
-        total: float = sum(averages.values()) + 1e-8
+        total: float = sum(averages.values())
+        if total <= 0:
+            return self.aggregate({}, {}, {}, {})
         ai_gen  = averages["ai_generated_probability"] / total
         ai_edit = averages["ai_edited_probability"] / total
         trad    = averages["traditional_edit_probability"] / total
@@ -235,8 +204,11 @@ class ConfidenceAggregator:
             "authentic":       round(auth, 4),
             "verdict":         VERDICT_LABELS[verdict_key],
             "verdict_key":     verdict_key,
-            "confidence":      round(scores[verdict_key], 4),
-            "explanation":     EXPLANATIONS[verdict_key],
-            "limited_mode":    False,
+            "confidence":      round(min(scores[verdict_key], 0.65 if partial else 0.97), 4),
+            "explanation":     EXPLANATIONS[verdict_key] + (
+                " Some sampled frames were inconclusive; this result covers only usable frames."
+                if partial else ""
+            ),
+            "limited_mode":    partial,
             "ml_available":    True,
         }

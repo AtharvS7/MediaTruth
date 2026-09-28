@@ -6,6 +6,7 @@ Rate limited to 3 requests/minute per IP via slowapi.
 Requires a valid Supabase JWT (Bearer token) — anonymous access is rejected.
 """
 
+import asyncio
 import uuid
 import logging
 from typing import Optional
@@ -13,17 +14,19 @@ from typing import Optional
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request, BackgroundTasks, Depends
 from fastapi.responses import JSONResponse
 from slowapi import Limiter
-from slowapi.util import get_remote_address
 
 from services.video_analyzer import VideoAnalyzer
 from services.supabase_service import SupabaseService
 from utils.file_utils import validate_video_file, save_temp_file, cleanup_temp_file
-from utils.auth import get_current_user
+from utils.auth import get_current_user, rate_limit_key
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=rate_limit_key)
+
+# R1: cap server-side video analysis below the client's 180s timeout.
+VIDEO_ANALYSIS_TIMEOUT = 170.0  # seconds
 
 
 @router.post("/analyze")
@@ -54,7 +57,19 @@ async def analyze_video(
         temp_path = await save_temp_file(file, scan_id)
 
         analyzer = VideoAnalyzer(model_loader=request.app.state.model_loader)
-        result = await analyzer.analyze(temp_path, scan_id)
+        # R1: bound analysis time so a stuck pipeline returns a clean 504
+        # instead of hanging the worker past the client's 180s budget.
+        try:
+            result = await asyncio.wait_for(
+                analyzer.analyze(temp_path, scan_id),
+                timeout=VIDEO_ANALYSIS_TIMEOUT,
+            )
+        except asyncio.TimeoutError:
+            logger.warning(f"Video analysis timed out for scan {scan_id}")
+            raise HTTPException(
+                status_code=504,
+                detail="Video analysis timed out. Try a shorter clip.",
+            )
 
         db = SupabaseService()
         await db.save_scan(
@@ -69,6 +84,8 @@ async def analyze_video(
 
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
+    except HTTPException:
+        raise  # deliberate status (e.g. 504 timeout) — don't mask it as a 500
     except Exception as e:
         logger.error(f"Video analysis failed for scan {scan_id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Video analysis pipeline failed.")

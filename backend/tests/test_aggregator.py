@@ -198,8 +198,8 @@ class TestModeB:
             manipulation=make_manip(0.0),
             metadata=make_meta(0.90),  # Very high metadata
         )
-        assert result_high_meta["ai_generated"] > result_med_meta["ai_generated"]
-        assert result_high_meta["authentic"] < result_med_meta["authentic"]
+        assert result_high_meta["verdict"] == "Inconclusive"
+        assert result_med_meta["verdict"] == "Inconclusive"
 
     def test_mode_b_statistical_score_contributes(self, agg):
         """Mode B: statistical AI score has 0.30 weight — second highest after metadata."""
@@ -217,7 +217,7 @@ class TestModeB:
             metadata=make_meta(0.5),
             statistical=0.85,
         )
-        assert result_high["ai_generated"] > result_low["ai_generated"]
+        assert result_high["verdict"] == result_low["verdict"] == "Inconclusive"
 
     def test_ai_logo_case_no_longer_authentic_77(self, agg):
         """
@@ -264,7 +264,8 @@ class TestModeB:
             + result["traditional_edit"]
             + result["authentic"]
         )
-        assert abs(total - 1.0) < 0.001, f"Probabilities sum={total}, expected 1.0"
+        assert total == 0.0  # No invented probabilities when all models are unavailable.
+        assert result["verdict"] == "Inconclusive"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -288,8 +289,8 @@ class TestInconclusiveVerdict:
         assert result["verdict_key"] == "inconclusive"
         assert result["confidence"] == 0.0
 
-    def test_not_inconclusive_when_metadata_strong(self, agg):
-        """M1: When metadata is strong enough, we CAN give a verdict."""
+    def test_inconclusive_when_only_metadata_strong(self, agg):
+        """Editable metadata cannot replace an unavailable model."""
         result = agg.aggregate(
             deepfake=make_df(0.0, api_success=False),
             gan=make_gan(0.0, api_success=False),
@@ -297,9 +298,7 @@ class TestInconclusiveVerdict:
             metadata=make_meta(0.55),   # PNG + no EXIF → 0.55 → sufficient
             statistical=0.0,
         )
-        assert result["verdict"] != "Inconclusive", (
-            f"Strong metadata should not give Inconclusive, got {result['verdict']}"
-        )
+        assert result["verdict"] == "Inconclusive"
 
     def test_not_inconclusive_when_ml_available(self, agg):
         """M1: Inconclusive only triggers when ML is unavailable."""
@@ -312,16 +311,16 @@ class TestInconclusiveVerdict:
         # ML ran and gave 0 — this IS a genuine authentic signal
         assert result["verdict"] != "Inconclusive"
 
-    def test_not_inconclusive_when_stat_score_high(self, agg):
-        """M1: High statistical score can prevent Inconclusive even with weak metadata."""
+    def test_inconclusive_when_only_stat_score_high(self, agg):
+        """Image smoothness alone does not establish AI generation."""
         result = agg.aggregate(
             deepfake=make_df(0.0, api_success=False),
             gan=make_gan(0.0, api_success=False),
             manipulation=make_manip(0.0),
             metadata=make_meta(0.10),
-            statistical=0.75,   # High statistical score → not inconclusive
+            statistical=0.75,
         )
-        assert result["verdict"] != "Inconclusive"
+        assert result["verdict"] == "Inconclusive"
 
     def test_inconclusive_explanation_is_informative(self, agg):
         """M1: Inconclusive verdict must have a non-empty, meaningful explanation."""
@@ -402,6 +401,7 @@ class TestInvariants:
 
     def test_aggregate_video_single_frame(self, agg):
         single_frame = {
+            "ml_available": True,
             "ai_generated_probability": 0.7,
             "ai_edited_probability": 0.1,
             "traditional_edit_probability": 0.1,

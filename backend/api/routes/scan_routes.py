@@ -1,13 +1,4 @@
-"""
-Scan history and retrieval routes.
-GET /scan/history  — List all scans for the current user (or anonymous scans).
-GET /scan/{id}     — Get a specific scan result by ID.
-
-Access control:
-  - Both endpoints use get_optional_user (supports anonymous access).
-  - IDOR check: anonymous scans (user_id=None) are accessible to anyone;
-    owned scans require matching authenticated user.
-"""
+"""Private scan history and retrieval. Ownerless records are not public."""
 
 import logging
 from typing import Optional
@@ -31,8 +22,10 @@ async def get_scan_history(
     """Return paginated scan history.
 
     If authenticated, returns scans owned by the user.
-    If anonymous, returns scans with no owner (user_id IS NULL).
+    Anonymous requests are rejected.
     """
+    if not user:
+        raise HTTPException(status_code=401, detail="Authentication required.")
     try:
         db = SupabaseService()
         user_id: Optional[str] = user["id"] if user else None
@@ -55,7 +48,7 @@ async def get_scan(
     """Return a specific scan result by scan ID.
 
     Access rules:
-      - Anonymous scans (user_id=None): accessible to anyone.
+      - Ownerless scans (user_id=None): private; no user access.
       - Owned scans: only accessible by the owner.
     """
     try:
@@ -67,11 +60,10 @@ async def get_scan(
 
         # IDOR protection: owned scans require matching user
         owner_id: Optional[str] = scan.get("user_id")
-        if owner_id is not None:
-            if not user or user["id"] != owner_id:
-                raise HTTPException(
-                    status_code=403, detail="Forbidden. You do not own this scan."
-                )
+        if not user or owner_id is None or user["id"] != owner_id:
+            raise HTTPException(
+                status_code=403, detail="Forbidden. You do not own this scan."
+            )
 
         return JSONResponse(content=scan)
     except HTTPException:
@@ -123,4 +115,3 @@ async def delete_scan(
     except Exception as e:
         logger.error(f"Failed to delete scan {scan_id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to delete scan.")
-

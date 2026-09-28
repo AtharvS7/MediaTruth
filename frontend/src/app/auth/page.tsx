@@ -14,8 +14,15 @@ type Mode = "signin" | "signup" | "reset";
 function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  // Read the ?redirect= param set by middleware — fallback to /upload
-  const redirectTo = searchParams.get("redirect") || "/upload";
+  // Read the ?redirect= param — fall back to /upload.
+  // SEC (S1): only allow same-origin relative paths to prevent open-redirect phishing.
+  // Reject absolute URLs (https://evil.com) and protocol-relative URLs (//evil.com).
+  const rawRedirect = searchParams.get("redirect");
+  const redirectTo =
+    rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+      && !/[\\\x00-\x20]/.test(rawRedirect)
+      ? rawRedirect
+      : "/upload";
 
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");

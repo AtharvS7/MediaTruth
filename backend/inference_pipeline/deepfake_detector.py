@@ -29,6 +29,7 @@ from typing import Any, Dict, Optional
 
 import requests
 from PIL import Image
+from inference_pipeline.model_scores import parse_ai_score
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +53,8 @@ class DeepfakeDetector:
 
     def __init__(self, model_loader: Any) -> None:
         self.model_loader = model_loader
-        self.model = getattr(model_loader, "deepfake_model", None)
-        self.weights_available: bool = self.model is not None
+        self.model = model_loader.get_model("deepfake")
+        self.weights_available: bool = model_loader.has_weights("deepfake") and self.model is not None
 
         # HF Inference API mode (USE_HF_API=true) — no local model needed
         self._hf_api_mode: bool = getattr(model_loader, "_hf_api_mode", False)
@@ -168,16 +169,7 @@ class DeepfakeDetector:
 
             # Parse: [{"label": "ai", "score": 0.97}, {"label": "real", "score": 0.03}]
             # OR:    [{"label": "real", "score": 0.95}, {"label": "ai", "score": 0.05}]
-            ai_score = 0.0
-            for r in results:
-                lbl = r["label"].upper().strip()
-                if lbl in ("AI", "AI-GENERATED", "ARTIFICIAL", "FAKE", "1"):
-                    ai_score = float(r["score"])
-                elif lbl in ("REAL", "HUMAN", "AUTHENTIC", "NATURAL", "0"):
-                    # If we see the "real" label first, infer ai_score = 1 - real
-                    if ai_score == 0.0:
-                        ai_score = 1.0 - float(r["score"])
-
+            ai_score = parse_ai_score(results)
             return {
                 "score": round(ai_score, 4),
                 "label": "ai" if ai_score > 0.5 else "real",
@@ -218,14 +210,7 @@ class DeepfakeDetector:
             pipe = self.model["pipe"]
             img = Image.open(image_path).convert("RGB")
             results = pipe(img)
-            ai_score = 0.0
-            for r in results:
-                lbl = r["label"].upper()
-                if lbl in ("AI", "FAKE", "1", "AI-GENERATED", "ARTIFICIAL"):
-                    ai_score = float(r["score"])
-                elif lbl in ("REAL", "HUMAN", "0"):
-                    if ai_score == 0.0:
-                        ai_score = 1.0 - float(r["score"])
+            ai_score = parse_ai_score(results)
             return {
                 "score": round(ai_score, 4),
                 "label": "ai" if ai_score > 0.5 else "real",
@@ -262,7 +247,7 @@ class DeepfakeDetector:
             self.model.eval()
             with torch.no_grad():
                 output = self.model(tensor.to(device))
-                prob = torch.sigmoid(output).item()
+                prob = torch.softmax(output, dim=-1)[0, 1].item()
 
             return {
                 "score": round(prob, 4),
