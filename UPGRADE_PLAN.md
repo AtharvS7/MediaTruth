@@ -40,7 +40,7 @@ Supabase must be provisioned in a **Free organization with available free projec
 | V1 | P1 Pending model/evaluation baseline | Real video forensics | Adaptive bounded sampling, face tracks, temporal consistency, scene changes, original-container provenance and sampled-coverage reporting. Audio analysis is separately scoped. |
 | U1 | P1 Next | Frontend truthfulness and accessibility | Per-detector unavailable states, inconclusive scores shown as unavailable, verified provenance panel, real job progress, unified upload limits, keyboard/mobile tests. |
 | O1 | P1 Next | Free-tier operations | Owner quotas, retention, redacted structured logs, error counters, schema backup/restore rehearsal, documented redeploy and rollback. No paid dependency or availability promise. |
-| R1 | P0 In progress | Verify and push first milestone | Backend regression suite, TypeScript/production build, diff/secrets checks, push review branch to requested GitHub repository. Database/live accuracy not included in “verified”. |
+| R1 | P0 Done | Verify and push first milestone | 113 backend tests passed; 53 focused tests passed after final cleanup; TypeScript and production build passed; diff/staged secret-pattern checks passed. Pushed `upgrade/forensics-audit-metadata-export` to the requested GitHub repository. Database/live accuracy not included in “verified”. |
 
 ## Data acquisition plan
 
@@ -74,3 +74,5 @@ Publish the first milestone on a review branch because `render.yaml` auto-deploy
 - Expanded backend suite: **113 passed**, Python 3.12.2, existing local environment. Relevant tests rerun after final aggregation cleanup.
 - Frontend `npm run build`: **passed**, including `/metadata`; used non-secret placeholder service settings for build validation. This is not a live login check. Only outdated Browserslist data warnings were emitted.
 - Not executed: live Supabase migration/RLS checks, hosted inference, browser E2E, fresh dependency install, dataset accuracy or load benchmark.
+
+First implementation commit: `8d491e0`. Branch: [upgrade/forensics-audit-metadata-export](https://github.com/AtharvS7/MediaTruth/tree/upgrade/forensics-audit-metadata-export). Main was not changed. Existing unrelated audit documents and generated TypeScript build information were preserved locally without adding them to this release.
