@@ -21,6 +21,16 @@ dev = ["pytest>=9,<10", "pytest-asyncio>=1.4,<2", "ruff>=0.16,<1", "pip-audit>=2
 [tool.uv]
 package = false
 
+# CPU-only wheels avoid multi-gigabyte CUDA dependencies on the zero-budget host.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+
 [tool.ruff]
 target-version = "py312"
 line-length = 100

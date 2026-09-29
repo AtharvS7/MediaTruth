@@ -1,26 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Syne, JetBrains_Mono, DM_Sans } from "next/font/google";
+import "@fontsource-variable/syne";
+import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/dm-sans";
 import { Toaster } from "react-hot-toast";
 import Background3D from "@/components/ui/Background3D";
 import "./globals.css";
-
-const syne = Syne({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["400", "500", "600", "700", "800"],
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["300", "400", "500"],
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["300", "400", "500", "600"],
-});
 
 // Next.js 14: themeColor and viewport MUST be in generateViewport(), not metadata.
 // Putting them in metadata causes "Unsupported metadata" warnings and they are ignored.
@@ -63,7 +47,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${jetbrains.variable} ${dmSans.variable}`}
     >
       <body className="bg-obsidian-950 text-white font-body antialiased">
         <Background3D />

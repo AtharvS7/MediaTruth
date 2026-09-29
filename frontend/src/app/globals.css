@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 :root {
+  --font-display: 'Syne Variable', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', monospace;
+  --font-body: 'DM Sans Variable', sans-serif;
   --cyan: #00f5ff;
   --acid: #b8ff57;
   --coral: #ff4d6d;
