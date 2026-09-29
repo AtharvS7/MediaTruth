@@ -12,19 +12,17 @@
  *   https://your-domain.com/auth/callback  (production)
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-let exchangedCode: string | null = null;
-let exchange: ReturnType<typeof supabase.auth.exchangeCodeForSession> | undefined;
-
 type Status = "verifying" | "success" | "error";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const exchange = useRef<ReturnType<typeof supabase.auth.exchangeCodeForSession> | undefined>(undefined);
   const [status, setStatus] = useState<Status>("verifying");
   const [message, setMessage] = useState("Verifying your account…");
 
@@ -32,13 +30,12 @@ export default function AuthCallbackPage() {
     const handleCallback = async () => {
       try {
         const code = new URL(window.location.href).searchParams.get("code");
-        if (!exchange || (code && code !== exchangedCode)) {
+        if (!exchange.current) {
           if (!code) throw new Error("Missing verification code");
-          exchangedCode = code;
-          exchange = supabase.auth.exchangeCodeForSession(code);
+          exchange.current = supabase.auth.exchangeCodeForSession(code);
           window.history.replaceState(null, "", window.location.pathname);
         }
-        const { error } = await exchange;
+        const { error } = await exchange.current;
 
         if (error) {
           console.error("Auth callback error:", error.message);

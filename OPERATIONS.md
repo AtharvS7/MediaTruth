@@ -1,6 +1,17 @@
 # Local operations and release gates
 
-This is an experimental media-forensics application. Run on existing hardware with one API process. The Supabase project is on the Free plan; no paid compute, remote inference or automatic deployment is enabled. Full enterprise availability and detector accuracy are not established.
+This is an experimental media-forensics application, updated 30 September 2026. The public frontend runs on Vercel, the API on Render Free, and private jobs/reports on Supabase Free. Inference runs on the user's temporarily approved PC worker. No paid compute was purchased. Full enterprise availability and detector accuracy are not established.
+
+## Hosted service and PC worker
+
+- Frontend: https://mediatruth-atharv-sawanes-projects.vercel.app
+- API: https://mediatruth-api.onrender.com
+- Supabase project: `yiqpqgxlujqcfeagsfff`
+- Source branch: `upgrade/forensics-audit-metadata-export`
+
+From `D:\MediaTruth\backend`, start `../.venv-upgrade/Scripts/python.exe -u -m services.remote_worker`. Stop a foreground worker with Ctrl+C. `worker.env.local` must contain only `MEDIATRUTH_API_URL` and the shared `WORKER_SECRET`; keep it outside Git. Do not give the worker a Supabase service key. Do not start a second operator process if one already runs. The current hidden session records its PID in `.tools/worker.local.json` and logs in `.tools/worker.out.log` and `.tools/worker.err.log`; verify its process command before stopping that PID, which may be reused after a restart. No automatic startup task is installed.
+
+The PC needs to remain on and connected for processing. It polls every 60 seconds; new jobs can wait up to a polling interval plus cold start. `/capabilities` reports worker availability, and new cloud reservations are rejected when the worker is offline. Polling uses the workspace's shared Render free hours. Admission limits reduce resource use but do not guarantee zero overage or uninterrupted service; monitor provider dashboards and keep paid upgrades disabled.
 
 ## Start locally
 
@@ -11,28 +22,30 @@ This is an experimental media-forensics application. Run on existing hardware wi
 
 Local checkpoint files under `backend/models/weights` are not committed. The existing CNNDetect checkpoint loads and produces scores; its training source/license and generalization still need review. Without trained weights, relevant detectors abstain. Workers disable automatic model downloads and remote inference.
 
-## Authentication setup still required
+## Authentication configuration
 
-In [Supabase Auth URL Configuration](https://supabase.com/dashboard/project/yiqpqgxlujqcfeagsfff/auth/url-configuration), set the local Site URL to `http://localhost:3000` and allow exactly:
+The user configured [Supabase Auth URL Configuration](https://supabase.com/dashboard/project/yiqpqgxlujqcfeagsfff/auth/url-configuration). Site URL should be `https://mediatruth-atharv-sawanes-projects.vercel.app`, with these exact redirects:
 
 - `http://localhost:3000/auth/callback`
 - `http://localhost:3000/auth/update-password`
+- `https://mediatruth-atharv-sawanes-projects.vercel.app/auth/callback`
+- `https://mediatruth-atharv-sawanes-projects.vercel.app/auth/update-password`
 
-Add exact HTTPS counterparts only when a real production hostname exists. Open email links in the browser that requested them because PKCE needs its verifier. Test signup, verification, login, recovery, password update and logout before release. Public access to the Supabase account does not replace the backend secret. Email delivery and provider limits have not been tested.
+Open email links in the browser that requested them because PKCE needs its verifier. Password sign-in passed hosted browser tests using a temporary confirmed account. Actual confirmation/recovery email delivery and password replacement through an emailed PKCE link remain unverified.
 
 ## Request lifecycle
 
-`POST /jobs` accepts an authenticated image/video upload and returns 202 with an ID. Poll `GET /jobs/{id}` for queued/loading/analyzing/saving/completed/failed/cancelled. `DELETE /jobs/{id}` stops queued/running work; saving cannot be cancelled because the database transaction may already commit. Completed responses include the scan result. Job IDs are owner-scoped. A 404 after restart means check history before resubmitting.
+Cloud mode uses `POST /uploads` to reserve an owner-scoped job, upload to a private signed URL, then finalize it. Poll `GET /jobs/{id}`; use `DELETE /jobs/{id}` to request cancellation. A running cancellation remains pending until acknowledged by the worker. The Supabase queue survives API/worker restarts; expired leases permit one retry. Completion saves reports atomically. Local mode retains multipart `POST /jobs` and its in-memory queue.
 
 There is one inference slot and space for two waiting jobs. Metadata export shares the slot. Server timeout is 300 seconds for analysis and 60 seconds for export. Queue overload returns 503. Synchronous `/image/analyze` and `/video/analyze` are retired (410); `ENABLE_LEGACY_ANALYSIS=true` is for isolated compatibility tests only and bypasses process isolation.
 
-Inputs are removed after successful, failed or cancelled work. A machine crash can leave files in the operating system's `mediatruth_uploads`/`mediatruth_worker_*` temporary directories. With the server stopped, review and remove only these application-owned temporary files. Do not run cleanup against original-media directories. Pending jobs are not durable; run **one** Uvicorn worker, with no multi-instance deployment.
+Cloud terminal inputs are deleted on cleanup passes and exports expire after 24 hours. Cleanup retries on real job traffic; while services sleep, objects can remain longer. A second sweep handles late uploads through still-valid signed URLs. A machine crash can leave application temporary files; review only `mediatruth_uploads`/`mediatruth_worker_*` directories with the worker stopped. Local-mode pending jobs are not durable. Run one API process under this deployment configuration.
 
 Stored reports omit heatmaps. The database allows 50 saved reports per owner in a rolling day and a 512KiB report payload. This limits saved reports, not failed-analysis attempts. Request/queue bounds also apply. Monitor database usage; these limits do not guarantee staying within provider capacity indefinitely.
 
 ## Database and retention
 
-Applied migrations: initial private schema, atomic reports, restricted profile trigger. Live checks passed for owner isolation, anonymous reads, transactional failure, RPC permissions and same-ID retries. No test accounts or reports were retained. Supabase security advisor returned no findings after remediation of [trigger function access](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable).
+Applied migrations include the initial private schema, atomic reports, restricted profile trigger, durable jobs, job budget, and worker health. Live checks passed for owner isolation, anonymous denial, transactional failure, RPC permissions, lease fencing and same-ID retries. The private queue intentionally has no client read/write policy; access is server-only. Temporary fixture users, jobs and reports are removed after checks. Add forward migrations for further changes; do not edit applied migrations.
 
 Retention is **manual**, never an unattended deletion. The service-role-only `prune_expired_reports(p_before)` rejects cutoffs newer than 30 days. Back up and review the cutoff before invoking it. Owner account deletion leaves ownerless reports private; a retention decision is needed for these records.
 
@@ -44,8 +57,10 @@ Rehearse restore into an empty local PostgreSQL/Supabase environment, never the 
 
 Run backend tests with `python -m pytest tests -q`, then `ruff check .` and `pip-audit`. Frontend checks: `npx tsc --noEmit --incremental false`, `npm run build`, `npm audit`. CI uses locked dependencies and blocks lint/security failures. The test client emits one upstream httpx deprecation warning.
 
-Observed locally: backend tests, actual worker inference, subprocess timeout/cancellation, metadata export, frontend production build and type checking pass. Both dependency audits found no known vulnerabilities. Docker build, browser E2E, live email auth and server-key-backed API flow remain unverified.
+Observed: 131 backend tests passed, real isolated worker inference and metadata export passed, and the frontend builds and type-checks. Hosted Chromium tests passed mobile keyboard sign-in, private upload/export download, image-job completion with an Inconclusive result, and saved history. Live Supabase integration passed; Docker runtime, email delivery and backup/restore remain unverified.
+
+Browser checks: install Chromium with `npx playwright install chromium` in frontend, run the app, then run `npx playwright test auth.spec.ts`. Set `E2E_BASE_URL` to test a deployed frontend. The separate hosted fixture suite requires explicit `E2E_LIVE=1`, backend server credentials locally, and an online PC worker; it creates and removes an isolated confirmed test user without sending email. Browser traces/screenshots are disabled to avoid saving credentials.
 
 C2PA inspection uses [the official SDK's offline configuration](https://github.com/contentauth/c2pa-python/blob/main/docs/context-settings.md). Trust is evaluated against SDK anchors with no live revocation lookup. Signed provenance is not proof that the depicted scene is truthful. Absence of credentials is not proof of authenticity. Export removes ordinary metadata; it does not guarantee removal of invisible watermarks, pixel-level AI signals or external copies.
 
-The four legacy score fields remain uncalibrated heuristics. Do not use them as authentication, legal evidence, fraud decisions or proof of a particular editing tool. The remaining scientific gates are representative licensed data, generator/original-level splits, independent metrics, calibration, mixed edits and real video temporal/localization evaluation.
+Public schema-v2 verdicts are withheld as Inconclusive until validation passes. Legacy score fields are zero placeholders, not probabilities. The remaining scientific gates are representative licensed data, generator/original-level splits, independent metrics, calibration, mixed edits and real video temporal/localization evaluation.

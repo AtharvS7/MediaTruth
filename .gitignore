@@ -92,3 +92,5 @@ docker-compose.override.yml
 .tools/
 evaluation/data/
 evaluation/reports/
+frontend/test-results/
+frontend/playwright-report/

@@ -1,10 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-let recoveryCode: string | null = null;
-let recoveryExchange: ReturnType<typeof supabase.auth.exchangeCodeForSession> | undefined;
 export default function UpdatePassword() {
+  const recoveryExchange = useRef<ReturnType<typeof supabase.auth.exchangeCodeForSession> | undefined>(undefined);
   const [ready, setReady] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -12,13 +11,12 @@ export default function UpdatePassword() {
   const [message, setMessage] = useState("Checking your recovery link?");
   useEffect(() => {
     const code = new URL(window.location.href).searchParams.get("code");
-    if (code && (!recoveryExchange || code !== recoveryCode)) {
-      recoveryCode = code;
-      recoveryExchange = supabase.auth.exchangeCodeForSession(code);
+    if (code && !recoveryExchange.current) {
+      recoveryExchange.current = supabase.auth.exchangeCodeForSession(code);
       window.history.replaceState(null, "", window.location.pathname);
     }
-    if (!recoveryExchange) { setMessage("Request a new recovery link and open it in the same browser."); return; }
-    recoveryExchange.then(({ error }) => {
+    if (!recoveryExchange.current) { setMessage("Request a new recovery link and open it in the same browser."); return; }
+    recoveryExchange.current.then(({ error }) => {
       setReady(!error);
       setMessage(error ? "Recovery link expired. Request a new one." : "Choose a new password.");
     }).catch(() => setMessage("Recovery failed. Request a new link."));

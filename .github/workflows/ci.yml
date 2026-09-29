@@ -83,6 +83,12 @@ jobs:
           NEXT_PUBLIC_API_URL: https://dummy-api.onrender.com
           NODE_ENV: production
 
+      - name: Install browser for auth regression checks
+        run: npx playwright install --with-deps chromium
+
+      - name: Auth browser regression checks (no live fixtures or mail)
+        run: npx playwright test auth.spec.ts
+
   # ── Security: Check for Secrets in Code ─────────────────────────────────────
   secrets-scan:
     name: Secrets Scan

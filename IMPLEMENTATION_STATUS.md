@@ -1,6 +1,6 @@
 # Approved completion plan: implementation record
 
-Updated 29 September 2026. Budget INR 0; non-commercial research release.
+Updated 30 September 2026. Budget INR 0; non-commercial research release.
 
 ## Implemented and verified
 
@@ -29,8 +29,8 @@ Current checks: **131 backend tests passed**, signed-URL live smoke passed, Ruff
 
 ## Remaining acceptance gates
 
-1. Worker host eligibility or user-approved temporary PC worker; end-to-end hosted deployment.
-2. Real email confirmation/recovery, deployed auth redirects, browser/mobile/keyboard journeys.
+1. Replace the working, user-approved temporary PC worker with eligible free cloud compute. Vercel/Render deployment and hosted upload-to-report/export journeys passed.
+2. Real email confirmation/recovery. The user corrected deployed auth redirects; mobile keyboard password login, export download and saved-history browser journeys passed.
 3. Licensed representative datasets and actual benchmark runs; calibrated model selection and license review. No measured accuracy is claimed.
 4. Validated AI-edit/conventional-edit/mixed classification, actual localization models and temporal/face video models. These capabilities remain withheld.
 5. Container runtime tests, backup/restore rehearsal, operational metrics and provider capacity monitoring. Pending jobs survive process restarts; recovery still needs an available worker and a real request to wake it.
@@ -49,9 +49,9 @@ SQL fixture: run supabase/tests/durable_jobs.sql inside BEGIN/ROLLBACK against a
 
 ## Operation and rollback
 
-JOB_BACKEND defaults to local for compatibility. Set it to supabase only with the applied migration, private bucket, WORKER_SECRET and worker URL. WORKER_SECRET is a new random secret stored in ignored backend/.env, distinct from all provider keys. Worker needs only MEDIATRUTH_API_URL and WORKER_SECRET; never supply a Supabase service key.
+JOB_BACKEND defaults to local for compatibility. Set it to supabase only with the applied migrations, private bucket and WORKER_SECRET. A worker URL is optional for the polling PC worker. WORKER_SECRET is a new random secret stored in ignored backend/.env, distinct from all provider keys. Worker needs only MEDIATRUTH_API_URL and WORKER_SECRET; never supply a Supabase service key.
 
-`uvicorn services.remote_worker:app --host 127.0.0.1 --port 7860` runs the worker endpoint on a suitable host. For a PC without inbound routing, an operator can invoke the drain coroutine to process currently queued work. No automatic startup or background scheduling is installed.
+`uvicorn services.remote_worker:app --host 127.0.0.1 --port 7860` runs the worker endpoint on a suitable host. For a PC without inbound routing, use `python -m services.remote_worker` from backend. No automatic startup or background scheduling is installed. See OPERATIONS.md for deployed URLs, worker lifecycle and verified versus pending checks.
 
 Terminal inputs are deleted on the next cleanup pass. Export downloads expire after 24 hours; signed upload URL lifetime requires a second sweep for late abandoned uploads. Cleanup retries on actual job traffic; no always-on scheduler or keep-alive pings are used. Original media can remain past 24 hours while all services are asleep; the next pass removes it.
 
