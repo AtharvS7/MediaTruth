@@ -22,7 +22,7 @@ async def health(request: Request) -> Dict[str, str]:
 
 @router.get("/ready")
 async def readiness(request: Request) -> Dict[str, bool]:
-    """Readiness probe — indicates whether models have finished loading.
+    """Readiness probe — indicates whether the local job manager is initialized.
 
     Intended for internal/ops use (e.g., Kubernetes readiness probe).
     """

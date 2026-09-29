@@ -54,6 +54,7 @@ def _error_level_analysis(img_path: str, quality: int = 90) -> np.ndarray:
         width, height = img.size
         return np.zeros((height, width), dtype=np.float32)
 
+    img.thumbnail((1024, 1024))
     img = img.convert("RGB")
     buf = io.BytesIO()
     img.save(buf, format="JPEG", quality=quality)

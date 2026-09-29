@@ -8,6 +8,7 @@ Features:
 """
 
 import asyncio
+import hashlib
 import logging
 import os
 import tempfile
@@ -67,22 +68,19 @@ def _check_image_magic(file_path: str, declared_type: str) -> None:
     with open(file_path, "rb") as f:
         header: bytes = f.read(12)
 
-    # Check WebP (RIFF....WEBP)
-    if header[:4] == b"RIFF" and header[8:12] == b"WEBP":
-        return
-
-    for magic, mime in _IMAGE_MAGIC.items():
-        if header[: len(magic)] == magic:
-            return
-
-    # TIFF has two possible byte orders
-    if header[:2] in (b"II", b"MM"):
-        return
-
-    raise ValueError(
-        f"File content does not match any known image format. "
-        f"Declared type: {declared_type}"
-    )
+    from PIL import Image, UnidentifiedImageError
+    expected = {"image/jpeg": "JPEG", "image/png": "PNG", "image/webp": "WEBP", "image/bmp": "BMP"}
+    try:
+        with Image.open(file_path) as image:
+            if image.format != expected.get(declared_type):
+                raise ValueError("Image format does not match declared Content-Type.")
+            if image.width * image.height > 16_000_000:
+                raise ValueError("Image exceeds the 16 megapixel limit.")
+            if getattr(image, "n_frames", 1) != 1:
+                raise ValueError("Animated images are not supported.")
+            image.verify()
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
+        raise ValueError("Invalid or oversized image.") from exc
 
 
 def _check_video_magic(file_path: str, declared_type: str) -> None:
@@ -108,7 +106,7 @@ def _check_video_magic(file_path: str, declared_type: str) -> None:
         return
 
     # RIFF container (AVI, WebM-RIFF)
-    if header[:4] == b"RIFF":
+    if header[:4] == b"RIFF" and header[8:12] == b"AVI ":
         return
 
     # MP4 / MOV / M4V: 'ftyp' or 'moov' or 'free' at offset 4
@@ -155,49 +153,58 @@ async def save_temp_file(file: UploadFile, scan_id: str) -> str:
     """
     suffix: str = Path(file.filename or "upload").suffix or ".tmp"
     dest: Path = TEMP_DIR / f"{scan_id}{suffix}"
-    content_type: str = file.content_type or ""
+    completed = False
+    try:
+        content_type: str = file.content_type or ""
 
-    # Determine size limit
-    if content_type in ALLOWED_IMAGE_TYPES:
-        size_limit: int = MAX_IMAGE_SIZE_MB * 1024 * 1024
-    elif content_type in ALLOWED_VIDEO_TYPES:
-        size_limit = MAX_VIDEO_SIZE_MB * 1024 * 1024
-    else:
-        size_limit = MAX_VIDEO_SIZE_MB * 1024 * 1024
+        # Determine size limit
+        if content_type in ALLOWED_IMAGE_TYPES:
+            size_limit: int = MAX_IMAGE_SIZE_MB * 1024 * 1024
+        elif content_type in ALLOWED_VIDEO_TYPES:
+            size_limit = MAX_VIDEO_SIZE_MB * 1024 * 1024
+        else:
+            size_limit = MAX_VIDEO_SIZE_MB * 1024 * 1024
 
-    # Stream with size enforcement
-    bytes_written: int = 0
-    async with aiofiles.open(dest, "wb") as out:
-        while chunk := await file.read(1024 * 1024):
-            bytes_written += len(chunk)
-            if bytes_written > size_limit:
-                await out.close()
+        # Stream with size enforcement
+        bytes_written: int = 0
+        async with aiofiles.open(dest, "wb") as out:
+            while chunk := await file.read(1024 * 1024):
+                bytes_written += len(chunk)
+                if bytes_written > size_limit:
+                    await out.close()
+                    if dest.exists():
+                        os.unlink(dest)
+                    raise ValueError("File exceeds size limit")
+                await out.write(chunk)
+
+        # Validate magic bytes for image uploads
+        if content_type in ALLOWED_IMAGE_TYPES:
+            try:
+                _check_image_magic(str(dest), content_type)
+            except ValueError:
                 if dest.exists():
                     os.unlink(dest)
-                raise ValueError("File exceeds size limit")
-            await out.write(chunk)
+                raise
 
-    # Validate magic bytes for image uploads
-    if content_type in ALLOWED_IMAGE_TYPES:
-        try:
-            _check_image_magic(str(dest), content_type)
-        except ValueError:
-            if dest.exists():
-                os.unlink(dest)
-            raise
+        # SEC-03: Validate magic bytes for video uploads too
+        # Prevents disguised executables from being passed to OpenCV
+        elif content_type in ALLOWED_VIDEO_TYPES:
+            try:
+                _check_video_magic(str(dest), content_type)
+            except ValueError:
+                if dest.exists():
+                    os.unlink(dest)
+                raise
 
-    # SEC-03: Validate magic bytes for video uploads too
-    # Prevents disguised executables from being passed to OpenCV
-    elif content_type in ALLOWED_VIDEO_TYPES:
-        try:
-            _check_video_magic(str(dest), content_type)
-        except ValueError:
-            if dest.exists():
-                os.unlink(dest)
-            raise
-
-    logger.debug(f"Saved temp file: {dest} ({bytes_written} bytes)")
-    return str(dest)
+        logger.debug(f"Saved temp file: {dest} ({bytes_written} bytes)")
+        completed = True
+        return str(dest)
+    finally:
+        if not completed:
+            try:
+                dest.unlink(missing_ok=True)
+            except OSError:
+                logger.warning("Could not remove interrupted upload")
 
 
 async def cleanup_temp_file(path: str) -> None:
@@ -207,3 +214,9 @@ async def cleanup_temp_file(path: str) -> None:
             logger.debug(f"Cleaned up temp file: {path}")
     except OSError as e:
         logger.warning(f"Failed to clean up {path}: {e}")
+
+
+def file_sha256(path: str) -> str:
+    """Hash media in bounded chunks for report identity."""
+    with open(path, "rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()

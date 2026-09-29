@@ -8,6 +8,7 @@ Features:
 """
 
 import logging
+import math
 from typing import Dict, List, Tuple, Any
 
 import cv2
@@ -22,9 +23,9 @@ _DEFAULT_FPS: float = 25.0
 def _safe_fps(cap: cv2.VideoCapture, video_path: str) -> float:
     """Return FPS from capture, falling back to 25 if invalid."""
     fps = cap.get(cv2.CAP_PROP_FPS)
-    if fps is None or fps <= 0:
-        logger.warning(f"Could not read FPS for {video_path}, assuming {_DEFAULT_FPS}fps")
-        return _DEFAULT_FPS
+    if fps is None or not math.isfinite(fps) or fps <= 0:
+        cap.release()
+        raise ValueError("Cannot determine video frame rate safely.")
     return fps
 
 
@@ -40,6 +41,9 @@ def get_video_metadata(video_path: str) -> Dict[str, Any]:
     height: int = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     duration: float = frame_count / fps if fps > 0 else 0.0
     cap.release()
+
+    if width <= 0 or height <= 0 or width * height > 8_294_400:
+        raise ValueError("Video dimensions exceed the 8 megapixel limit or are invalid.")
 
     findings: List[str] = []
     if duration == 0:
@@ -112,6 +116,13 @@ def extract_frames(
         ret, frame = cap.read()
         attempts += 1
         if ret:
+            height, width = frame.shape[:2]
+            if width * height > 8_294_400:
+                cap.release()
+                raise ValueError("Video frame exceeds pixel limit.")
+            if max(width, height) > 1024:
+                scale = 1024 / max(width, height)
+                frame = cv2.resize(frame, (max(1, round(width * scale)), max(1, round(height * scale))))
             frames.append(frame)
             timestamps.append(idx / fps)
 

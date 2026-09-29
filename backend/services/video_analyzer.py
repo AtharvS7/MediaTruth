@@ -18,12 +18,13 @@ import cv2
 import numpy as np
 
 from services.image_analyzer import ImageAnalyzer
+from inference_pipeline.provenance import inspect_provenance
 from inference_pipeline.aggregator import ConfidenceAggregator
 from utils.video_utils import extract_frames, get_video_metadata
 
 logger = logging.getLogger(__name__)
 
-MAX_FRAMES: int = 60
+MAX_FRAMES: int = 20
 TARGET_FPS_SAMPLE: float = 1 / 3  # 1 frame every 3 seconds
 
 
@@ -70,6 +71,9 @@ class VideoAnalyzer:
 
         return {
             "file_type": "video",
+            "provenance": await asyncio.to_thread(inspect_provenance, video_path),
+            "sampled_frame_fraction": len(frames) / meta["frame_count"] if meta.get("frame_count", 0) > 0 else None,
+            "coverage_note": "Sampled frames only; audio, face tracking and temporal manipulation models are not analyzed.",
             "score_semantics": "uncalibrated_heuristic",
             "duration_seconds": duration,
             "frames_analyzed": len(frames),
@@ -91,7 +95,7 @@ class VideoAnalyzer:
         frames: List[np.ndarray],
         timestamps: List[float],
         scan_id: str,
-        batch_size: int = 8,
+        batch_size: int = 1,
     ) -> List[Dict[str, Any]]:
         """Analyze frames in batches to avoid memory exhaustion."""
         results: List[Dict[str, Any]] = []
@@ -123,6 +127,7 @@ class VideoAnalyzer:
             result: Dict[str, Any] = await self.image_analyzer.analyze(
                 tmp_path, f"{scan_id}_frame{idx}"
             )
+            result.pop("manipulation_heatmap", None)
             result["timestamp"] = timestamp
             result["frame_index"] = idx
             return result

@@ -81,6 +81,8 @@ def test_animation_and_pixel_limit_rejected(tmp_path, monkeypatch):
 
 def test_export_route_auth_download_validation_and_cleanup(tmp_path, monkeypatch):
     app = FastAPI()
+    from services.jobs import JobManager
+    app.state.jobs = JobManager()
     app.state.limiter = image_routes.limiter
     app.include_router(image_routes.router, prefix="/image")
     client = TestClient(app)

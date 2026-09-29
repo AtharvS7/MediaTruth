@@ -7,6 +7,8 @@ Requires a valid Supabase JWT (Bearer token) — anonymous access is rejected.
 """
 
 import asyncio
+import os
+from utils.file_utils import file_sha256
 import uuid
 import logging
 from typing import Optional
@@ -16,7 +18,7 @@ from fastapi.responses import JSONResponse, Response
 from slowapi import Limiter
 
 from services.image_analyzer import ImageAnalyzer
-from services.metadata_cleaner import clean_image_metadata
+from services.jobs import Job, run_isolated
 from services.supabase_service import SupabaseService
 from utils.file_utils import validate_image_file, save_temp_file, cleanup_temp_file
 from utils.auth import get_current_user, rate_limit_key
@@ -42,12 +44,12 @@ async def export_without_metadata(
     try:
         await validate_image_file(file)
         temp_path = await save_temp_file(file, str(uuid.uuid4()))
-        worker = asyncio.create_task(asyncio.to_thread(clean_image_metadata, temp_path))
-        try:
-            data = await asyncio.shield(worker)
-        except asyncio.CancelledError:
-            await worker
-            raise
+        jobs = request.app.state.jobs
+        if jobs.slot.locked():
+            raise HTTPException(503, "Worker busy. Try again shortly.")
+        async with jobs.slot:
+            data = await run_isolated(Job(str(uuid.uuid4()), user["id"], "clean", temp_path,
+                                          file.filename or "upload"), timeout=60)
         return Response(data, media_type="image/png", headers={
             "Content-Disposition": 'attachment; filename="metadata-removed.png"',
             "Cache-Control": "no-store",
@@ -55,6 +57,8 @@ async def export_without_metadata(
         })
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except TimeoutError:
+        raise HTTPException(504, "Metadata export timed out.")
     finally:
         if temp_path:
             await cleanup_temp_file(temp_path)
@@ -82,6 +86,8 @@ async def analyze_image(
         - metadata_findings
         - confidence_scores per detector
     """
+    if os.getenv("ENABLE_LEGACY_ANALYSIS", "false").lower() != "true":
+        raise HTTPException(410, "Use POST /jobs and poll GET /jobs/{id} for bounded analysis.")
     scan_id: str = str(uuid.uuid4())
     temp_path: Optional[str] = None
 
@@ -99,6 +105,7 @@ async def analyze_image(
             file_type="image",
             filename=file.filename,
             result=result,
+            input_sha256=await asyncio.to_thread(file_sha256, temp_path),
         )
 
         return JSONResponse(content={"scan_id": scan_id, **result})

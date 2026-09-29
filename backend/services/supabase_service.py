@@ -85,88 +85,20 @@ class SupabaseService:
         self.client: Client = get_supabase_client()
 
     async def save_scan(
-        self,
-        scan_id: str,
-        user_id: Optional[str],
-        file_type: str,
-        filename: Optional[str],
-        result: Dict[str, Any],
+        self, scan_id: str, user_id: str, file_type: str,
+        filename: Optional[str], result: Dict[str, Any], input_sha256: str,
     ) -> None:
-        """Persist a scan record and its full analysis result."""
-        loop = asyncio.get_running_loop()
-
-        # Insert scan summary row
-        scan_row = {
-            "id": scan_id,
-            "user_id": user_id,
-            "file_type": file_type,
-            "filename": filename,
-            "verdict": result.get("final_verdict"),
-            "ai_generated_probability": result.get("ai_generated_probability"),
-            "ai_edited_probability": result.get("ai_edited_probability"),
-            "traditional_edit_probability": result.get("traditional_edit_probability"),
-            "authentic_probability": result.get("authentic_probability"),
-            "confidence": result.get("confidence"),
+        """One server-side transaction; same owner/id/digest is safe to retry."""
+        cleaned = _strip_frame_heatmaps(result)
+        cleaned = {key: value for key, value in cleaned.items() if key != "manipulation_heatmap"}
+        params = {
+            "p_scan_id": scan_id, "p_user_id": user_id, "p_file_type": file_type,
+            "p_filename": filename, "p_result": cleaned, "p_input_sha256": input_sha256,
         }
-        try:
-            await asyncio.wait_for(
-                loop.run_in_executor(
-                    None,
-                    lambda: self.client.table("scans").insert(scan_row).execute(),
-                ),
-                timeout=self.DB_TIMEOUT,
-            )
-        except asyncio.TimeoutError:
-            logger.error(f"Timeout saving scan {scan_id}")
-            raise
-        except Exception as e:
-            logger.error(f"Failed to save scan {scan_id}: {e}")
-            raise
-
-        # Insert full result JSON
-        # BUG-04 fix: strip per-frame heatmaps before DB storage.
-        # Each heatmap is 50–200KB base64. For 60 frames = up to 12MB per record.
-        # This would exceed sessionStorage limits and make fetches very slow.
-        result_to_store = _strip_frame_heatmaps(result)
-        result_row = {
-            "scan_id": scan_id,
-            "result_json": result_to_store,
-        }
-        try:
-            await asyncio.wait_for(
-                loop.run_in_executor(
-                    None,
-                    lambda: self.client.table("analysis_results").insert(result_row).execute(),
-                ),
-                timeout=self.DB_TIMEOUT,
-            )
-        except Exception as e:
-            # D1: the scans row above is already committed. Roll it back with a
-            # compensating delete so we never leave a scan with no analysis_results,
-            # then propagate so the route returns 500 (BUG-01).
-            logger.error(f"Failed to save analysis_results for {scan_id}: {e}")
-            await self._delete_scan_row_best_effort(scan_id)
-            raise
-
-    async def _delete_scan_row_best_effort(self, scan_id: str) -> None:
-        """D1 compensating delete: remove an orphaned scans row after a failed
-        analysis_results insert. Best-effort — never raises, so a cleanup failure
-        cannot mask the original error that triggered it."""
-        loop = asyncio.get_running_loop()
-        try:
-            await asyncio.wait_for(
-                loop.run_in_executor(
-                    None,
-                    lambda: self.client.table("scans").delete().eq("id", scan_id).execute(),
-                ),
-                timeout=self.DB_TIMEOUT,
-            )
-            logger.info(f"Rolled back orphaned scan row {scan_id} after result-insert failure")
-        except Exception as cleanup_err:
-            logger.error(
-                f"Compensating delete failed for scan {scan_id}; manual cleanup may be "
-                f"needed: {cleanup_err}"
-            )
+        await asyncio.wait_for(
+            asyncio.to_thread(lambda: self.client.rpc("save_scan_atomic", params).execute()),
+            timeout=self.DB_TIMEOUT,
+        )
 
     async def get_scan_by_id(self, scan_id: str) -> Optional[Dict[str, Any]]:
         """Fetch a scan and its full result by scan ID."""

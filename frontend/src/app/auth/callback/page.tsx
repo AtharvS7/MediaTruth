@@ -18,6 +18,9 @@ import { motion } from "framer-motion";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+let exchangedCode: string | null = null;
+let exchange: ReturnType<typeof supabase.auth.exchangeCodeForSession> | undefined;
+
 type Status = "verifying" | "success" | "error";
 
 export default function AuthCallbackPage() {
@@ -28,10 +31,14 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // exchangeCodeForSession reads the ?code= param from the full URL
-        const { error } = await supabase.auth.exchangeCodeForSession(
-          window.location.href
-        );
+        const code = new URL(window.location.href).searchParams.get("code");
+        if (!exchange || (code && code !== exchangedCode)) {
+          if (!code) throw new Error("Missing verification code");
+          exchangedCode = code;
+          exchange = supabase.auth.exchangeCodeForSession(code);
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+        const { error } = await exchange;
 
         if (error) {
           console.error("Auth callback error:", error.message);

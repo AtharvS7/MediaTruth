@@ -1,16 +1,6 @@
 "use client";
 
-/**
- * Upload page — drag-and-drop media upload with real forensic analysis pipeline.
- *
- * Fixes applied:
- *  - Progress simulation now completes only after the API resolves (not on a timer alone)
- *  - AbortController wired up for video cancellation (X button)
- *  - Retry resets ALL state (stepIdx, progress, stage)
- *  - Video-specific UX: warning message + cancel button + extended timeout
- *  - File type-specific step labels
- *  - sessionStorage keyed by scan_id to prevent race condition on results page
- */
+/** Upload media and show server-reported job stages. */
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
@@ -32,25 +22,9 @@ import { supabase } from "@/lib/supabase";
 
 type Stage = "idle" | "uploading" | "analyzing" | "done" | "error";
 
-const IMAGE_STEPS = [
-  "Extracting image features…",
-  "Running EfficientNet-B5 deepfake classifier…",
-  "CNNDetect GAN fingerprint detection…",
-  "Localizing manipulation regions (ELA + DCT)…",
-  "Parsing EXIF metadata…",
-  "Aggregating confidence matrix…",
-  "Generating forensic verdict…",
-];
-
-const VIDEO_STEPS = [
-  "Extracting video frames (OpenCV)…",
-  "Running deepfake classifier on frames…",
-  "GAN fingerprint detection per frame…",
-  "ELA + DCT manipulation localization…",
-  "Parsing video metadata…",
-  "Aggregating per-frame temporal signals…",
-  "Generating forensic verdict…",
-];
+const IMAGE_STEPS = ["Uploading media", "Queued", "Loading available models", "Analyzing media", "Saving report", "Complete"];
+const VIDEO_STEPS = IMAGE_STEPS;
+const STAGE_INDEX: Record<string, number> = { uploading: 0, queued: 1, loading_models: 2, analyzing: 3, saving: 4, completed: 5 };
 
 export default function UploadPage() {
   const router = useRouter();
@@ -81,6 +55,7 @@ export default function UploadPage() {
     return () => {
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       if (stepIntervalRef.current) clearInterval(stepIntervalRef.current);
+      abortControllerRef.current?.abort();
     };
   }, []);
 
@@ -112,6 +87,9 @@ export default function UploadPage() {
       "video/*": [".mp4", ".mov", ".avi", ".webm", ".mkv"],
     },
     maxSize: 500 * 1024 * 1024,
+    validator: f => f.type.startsWith("image/") && f.size > 50 * 1024 * 1024
+      ? { code: "file-too-large", message: "Images must be under 50MB." } : null,
+    onDropRejected: () => toast.error("Use an image under 50MB or video under 500MB."),
     multiple: false,
     disabled: stage !== "idle",
   });
@@ -133,7 +111,6 @@ export default function UploadPage() {
 
   function handleCancel() {
     abortControllerRef.current?.abort();
-    resetToIdle();
   }
 
   function handleClear() {
@@ -156,21 +133,15 @@ export default function UploadPage() {
 
     abortControllerRef.current = new AbortController();
 
-    // Advance steps every ~900ms up to 90% — final 100% fires only on success
     const totalSteps = ANALYSIS_STEPS.length;
-    let currentStep = 0;
-    stepIntervalRef.current = setInterval(() => {
-      if (currentStep < totalSteps - 2) {
-        currentStep++;
-        setStepIdx(currentStep);
-        // Map steps to 0–90% range, keeping the last 10% for the API response
-        setProgress(Math.round((currentStep / (totalSteps - 1)) * 90));
-      }
-    }, 900);
 
     try {
       setStage("analyzing");
-      const rawResult = await analyzeMedia(file, abortControllerRef.current.signal);
+      const rawResult = await analyzeMedia(file, abortControllerRef.current.signal, stageName => {
+        const index = STAGE_INDEX[stageName] ?? 1;
+        setStepIdx(index);
+        setProgress(Math.round(index / (totalSteps - 1) * 100));
+      });
 
       // BUG-11 fix: merge parent scan metadata with full_result analysis data.
       const result = rawResult?.full_result
@@ -212,7 +183,7 @@ export default function UploadPage() {
       } else if (status === 401 || status === 403) {
         toast.error("Please sign in to analyze media.");
       } else {
-        toast.error("Analysis failed. Please try again.");
+        toast.error(err?.message || "Analysis failed. Please try again.");
       }
     }
   }

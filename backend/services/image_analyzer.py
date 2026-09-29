@@ -19,6 +19,7 @@ from inference_pipeline.gan_detector import GANDetector
 from inference_pipeline.manipulation_localizer import ManipulationLocalizer
 from inference_pipeline.metadata_analyzer import MetadataAnalyzer
 from inference_pipeline.aggregator import ConfidenceAggregator
+from inference_pipeline.provenance import inspect_provenance
 
 logger = logging.getLogger(__name__)
 
@@ -48,11 +49,13 @@ class ImageAnalyzer:
             gan_result,
             manip_result,
             metadata_result,
+            provenance,
         ) = await asyncio.gather(
             loop.run_in_executor(None, self.deepfake_detector.predict, image_path),
             loop.run_in_executor(None, self.gan_detector.predict, image_path),
             loop.run_in_executor(None, self.manipulation_localizer.predict, image_path),
             loop.run_in_executor(None, self.metadata_analyzer.analyze, image_path),
+            loop.run_in_executor(None, inspect_provenance, image_path),
         )
 
         # Aggregate signals into final verdict
@@ -76,6 +79,14 @@ class ImageAnalyzer:
 
         return {
             "file_type": "image",
+            "processing_version": "1.1.0",
+            "model_weights_sha256": getattr(self.model_loader, "weight_fingerprints", {}),
+            "native_input_transform": "RGB; resize 224x224; ImageNet mean/std normalization",
+            "provenance": provenance,
+            "editing_assessment": {
+                "status": "not_validated",
+                "note": "Compression and metadata clues do not reliably distinguish AI edits from conventional edits.",
+            },
             "score_semantics": "uncalibrated_heuristic",
             "ai_generated_probability": verdict["ai_generated"],
             "ai_edited_probability": verdict["ai_edited"],

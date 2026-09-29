@@ -1,58 +1,29 @@
-# render.yaml — Render.com Infrastructure Blueprint
-# Deploy: https://render.com → New → Blueprint → connect this repo
-#
-# This deploys:
-#   - mediatruth-backend: FastAPI/Python web service (FREE TIER compatible)
-#
-# Frontend is deployed separately on Vercel (see deployment.md)
-# Database is on Supabase (see deployment.md Step 1)
-#
-# ML MODEL STRATEGY ($0 cost):
-#   USE_HF_API=true routes ALL ML inference to HuggingFace Inference API.
-#   No local models loaded → RAM stays ~120MB (within Render Free 512MB limit).
-#   HuggingFace runs the exact same models on their infrastructure for free.
-#   Rate limit: ~30,000 requests/month on free tier (plenty for portfolio use).
-#   Requires HF_TOKEN (free at huggingface.co/settings/tokens, no credit card).
-
+# Optional metadata-only demonstration service; not a production inference host.
+# Full local-model analysis requires an existing machine with sufficient memory.
+# No third-party inference or automatic deployments are enabled.
 services:
   - type: web
     name: mediatruth-backend
     runtime: python
-    plan: free              # ✅ Free tier works with USE_HF_API=true
+    plan: free
     rootDir: backend
-    buildCommand: pip install -r requirements-prod.txt
+    buildCommand: pip install --require-hashes -r requirements-prod.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /health/
-
-    # Auto-deploy on push to main branch
-    autoDeploy: true
+    autoDeploy: false
     branch: main
-
     envVars:
       - key: ENV
         value: production
-
-      # ── ML Inference Mode ───────────────────────────────────────────────────
-      # USE_HF_API=true: routes ML to HuggingFace API (zero RAM, $0 cost)
       - key: USE_HF_API
-        value: "true"
-      # HF_TOKEN: free token from huggingface.co/settings/tokens
-      # Required for stable rate limits. Without it, API still works but slower.
-      - key: HF_TOKEN
-        sync: false         # Set manually in Render dashboard (keep private)
-
-      # ── Database / Auth ─────────────────────────────────────────────────────
+        value: "false"
+      - key: ALLOW_MODEL_DOWNLOADS
+        value: "false"
       - key: SUPABASE_URL
-        sync: false         # Set manually in Render dashboard
+        sync: false
       - key: SUPABASE_SERVICE_KEY
-        sync: false         # Set manually in Render dashboard (secret key)
-      - key: JWT_SECRET
-        generateValue: true # Render auto-generates a secure random value
-
-      # ── CORS ────────────────────────────────────────────────────────────────
+        sync: false
       - key: ALLOWED_ORIGINS
-        sync: false         # Set to your Vercel URL after frontend deploys
-                            # Example: https://mediatruth.vercel.app
-
+        sync: false
       - key: WORKERS
         value: "1"

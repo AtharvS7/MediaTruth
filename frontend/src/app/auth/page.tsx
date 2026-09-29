@@ -37,7 +37,7 @@ function AuthForm() {
       // ── Password Reset ──────────────────────────────────────────────────────
       if (mode === "reset") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: `${window.location.origin}/auth/update-password`,
         });
         if (error) throw error;
         toast.success("Password reset email sent! Check your inbox.", { duration: 6000 });
@@ -53,19 +53,10 @@ function AuthForm() {
           setLoading(false);
           return;
         }
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/auth/callback` } });
         if (error) throw error;
 
-        // Detect already-registered email — Supabase returns success but identities=[]
-        if (data.user?.identities?.length === 0) {
-          toast.error("This email is already registered. Try signing in instead.", {
-            duration: 5000,
-          });
-          setMode("signin");
-          setLoading(false);
-          return;
-        }
-        toast.success("Account created! Check your email to verify.", { duration: 6000 });
+        toast.success("Check your inbox for the next steps if this address can be registered.", { duration: 6000 });
         setLoading(false);
         return;
       }

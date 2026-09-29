@@ -26,22 +26,13 @@ optional_security = HTTPBearer(auto_error=False)
 
 
 def rate_limit_key(request: Request) -> str:
-    """slowapi key function (S4): rate-limit per authenticated session when a
-    Bearer token is present, otherwise per client IP.
-
-    Keying on a hash of the token (never the raw value) gives each user behind a
-    shared NAT / corporate IP an independent quota, while anonymous traffic still
-    falls back to the remote address. The token is not verified here — only valid
-    tokens get past get_current_user, so this cannot be used to evade the limit."""
-    auth = request.headers.get("Authorization", "")
-    if auth.startswith("Bearer "):
-        token = auth.removeprefix("Bearer ").strip()
-        if token:
-            return "user:" + hashlib.sha256(token.encode()).hexdigest()[:32]
-    return "ip:" + get_remote_address(request)
+    """Use verified identity; rotating or forged tokens cannot create new quotas."""
+    owner = getattr(request.state, "user_id", None)
+    return "user:" + owner if owner else "ip:" + get_remote_address(request)
 
 
 async def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> dict:
     """Strict auth dependency — raises HTTP 401 if token is invalid."""
@@ -50,19 +41,20 @@ async def get_current_user(
         supabase = get_supabase_client()
 
         loop = asyncio.get_running_loop()
-        user_response = await loop.run_in_executor(
+        user_response = await asyncio.wait_for(loop.run_in_executor(
             None, supabase.auth.get_user, token
-        )
+        ), timeout=10)
         user = user_response.user
 
         if not user:
             raise HTTPException(status_code=401, detail="Invalid token payload")
 
+        request.state.user_id = user.id
         return {"id": user.id, "email": user.email}
     except HTTPException:
         raise
     except Exception as e:
-        logger.warning(f"JWT verification failed: {e}")
+        logger.warning("JWT verification failed")
         raise HTTPException(
             status_code=401, detail="Invalid or expired authorization token"
         )
@@ -86,9 +78,9 @@ async def get_optional_user(request: Request) -> Optional[dict]:
     try:
         supabase = get_supabase_client()
         loop = asyncio.get_running_loop()
-        user_response = await loop.run_in_executor(
+        user_response = await asyncio.wait_for(loop.run_in_executor(
             None, supabase.auth.get_user, token
-        )
+        ), timeout=10)
         user = user_response.user
         if user:
             return {"id": user.id, "email": user.email}

@@ -7,6 +7,8 @@ Requires a valid Supabase JWT (Bearer token) — anonymous access is rejected.
 """
 
 import asyncio
+import os
+from utils.file_utils import file_sha256
 import uuid
 import logging
 from typing import Optional
@@ -49,6 +51,8 @@ async def analyze_video(
         4. Aggregate per-frame probabilities
         5. Produce final video-level verdict
     """
+    if os.getenv("ENABLE_LEGACY_ANALYSIS", "false").lower() != "true":
+        raise HTTPException(410, "Use POST /jobs and poll GET /jobs/{id} for bounded analysis.")
     scan_id: str = str(uuid.uuid4())
     temp_path: Optional[str] = None
 
@@ -78,6 +82,7 @@ async def analyze_video(
             file_type="video",
             filename=file.filename,
             result=result,
+            input_sha256=await asyncio.to_thread(file_sha256, temp_path),
         )
 
         return JSONResponse(content={"scan_id": scan_id, **result})

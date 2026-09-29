@@ -32,8 +32,17 @@ video_routes = pytest.importorskip("api.routes.video_routes")
 from utils.auth import get_current_user  # noqa: E402
 
 # Minimal valid JPEG (magic bytes 0xFFD8FF) and MP4 ('ftyp' box at offset 4).
-JPEG = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xff\xd9"
+import io
+from PIL import Image
+_image_bytes = io.BytesIO()
+Image.new("RGB", (8, 8)).save(_image_bytes, format="JPEG")
+JPEG = _image_bytes.getvalue()
 MP4 = b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 16
+
+
+@pytest.fixture(autouse=True)
+def enable_legacy_route_unit_tests(monkeypatch):
+    monkeypatch.setenv("ENABLE_LEGACY_ANALYSIS", "true")
 
 
 def _build_app(router, limiter, authed=True):

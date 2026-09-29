@@ -434,6 +434,7 @@ export default function ResultsPage() {
           </motion.div>
         )}
 
+        <p className="text-sm text-white/60 mb-6">These experimental scores are not calibrated probabilities. Reliable separation of AI edits and conventional edits has not yet been validated.</p>
         {/* Detector cards */}
         <motion.div
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
@@ -443,20 +444,30 @@ export default function ResultsPage() {
         >
           <DetectorCard
             label="Deepfake"
-            score={limitedMode ? undefined : result.detector_scores?.deepfake_score}
-            disabled={limitedMode}
-            disabledLabel="No weights"
+            score={result.detector_scores?.deepfake_api_success ? result.detector_scores.deepfake_score : undefined}
+            disabled={!result.detector_scores?.deepfake_api_success}
+            disabledLabel="Unavailable"
           />
           <DetectorCard
             label="GAN Detect"
-            score={limitedMode ? undefined : result.detector_scores?.gan_score}
-            disabled={limitedMode}
-            disabledLabel="No weights"
+            score={result.detector_scores?.gan_api_success ? result.detector_scores.gan_score : undefined}
+            disabled={!result.detector_scores?.gan_api_success}
+            disabledLabel="Unavailable"
           />
-          <DetectorCard label="Manipulation" score={result.detector_scores?.manipulation_score} />
+          <DetectorCard label="Compression clues" score={result.detector_scores?.manipulation_score} />
           <DetectorCard label="Metadata" score={result.detector_scores?.metadata_anomaly_score} />
         </motion.div>
 
+        {result.provenance && <section className="glass rounded-2xl p-6 mb-6">
+          <h2 className="font-display font-semibold mb-2">Content credentials</h2>
+          <p>C2PA status: {result.provenance.status.replaceAll("_", " ")}</p>
+          <p className="text-sm text-white/60 mt-2">Checked offline. A valid signature supports the recorded history, not the truth of the pictured scene. Missing credentials do not prove authenticity. Invisible watermarks have not been checked.</p>
+          {result.provenance.actions?.length > 0 && <ul className="mt-3 text-sm">
+            {result.provenance.actions.map((entry: any, index: number) => <li key={index}>
+              {entry.action}{entry.digital_source_type ? `: ${entry.digital_source_type}` : ""}
+            </li>)}
+          </ul>}
+        </section>}
         {/* Metadata / findings */}
         {result.metadata_findings?.length > 0 && (
           <motion.div

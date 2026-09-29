@@ -51,19 +51,32 @@ API.interceptors.response.use(
  */
 export async function analyzeMedia(
   file: File,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  onStage?: (stage: string) => void
 ): Promise<any> {
   const form = new FormData();
   form.append("file", file);
-  const endpoint = file.type.startsWith("video/")
-    ? "/video/analyze"
-    : "/image/analyze";
-  // CODE-13 fix: Do NOT set Content-Type manually for FormData.
-  // Axios sets it automatically WITH the required multipart boundary parameter.
-  // Manual override removes the boundary, breaking multipart parsing on FastAPI.
-  const { data } = await API.post(endpoint, form, { signal });
-
-  return data;
+  onStage?.("uploading");
+  const { data: job } = await API.post("/jobs", form, { signal });
+  try {
+    for (;;) {
+      if (signal?.aborted) throw new DOMException("Cancelled", "AbortError");
+      const { data } = await API.get(`/jobs/${job.id}`, { signal });
+      onStage?.(data.stage);
+      if (data.status === "completed") return data.result;
+      if (data.status === "failed") throw new Error(data.error || "Analysis failed");
+      if (data.status === "cancelled") throw new DOMException("Cancelled", "AbortError");
+      await new Promise(resolve => setTimeout(resolve, 750));
+    }
+  } catch (error) {
+    if (signal?.aborted) {
+      // Wait for the server to terminate the worker before declaring cancellation.
+      try { await API.delete(`/jobs/${job.id}`); }
+      catch { throw new Error("Could not confirm cancellation. Check your saved history before retrying."); }
+      throw new DOMException("Cancelled", "AbortError");
+    }
+    throw error;
+  }
 }
 
 /** Fetch a single scan result by ID. */

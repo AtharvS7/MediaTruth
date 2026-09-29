@@ -3,6 +3,7 @@ import logging
 import re
 from typing import Any, Dict, List
 import exifread
+from defusedxml import ElementTree
 from PIL import Image
 
 logger = logging.getLogger(__name__)
@@ -40,6 +41,18 @@ class MetadataAnalyzer:
                 for key, value in img.info.items():
                     if key.lower() == "software" and isinstance(value, str):
                         software_values.add(value)
+                    if "xmp" in key.lower() and isinstance(value, (bytes, str)):
+                        if len(value) <= 256 * 1024:
+                            try:
+                                root = ElementTree.fromstring(value)
+                                for element in root.iter():
+                                    if element.tag.rsplit("}", 1)[-1] in {"CreatorTool", "Software"} and element.text:
+                                        software_values.add(element.text[:200])
+                                    for name, text in element.attrib.items():
+                                        if name.rsplit("}", 1)[-1] in {"CreatorTool", "Software"}:
+                                            software_values.add(text[:200])
+                            except Exception:
+                                findings.append("XMP metadata could not be safely parsed; its claims were ignored.")
             with open(image_path, "rb") as stream:
                 tags = exifread.process_file(stream, details=False)
             raw_meta = {str(k): str(v) for k, v in tags.items()}

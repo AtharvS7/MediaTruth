@@ -19,6 +19,7 @@ Features:
 """
 
 import asyncio
+import hashlib
 import logging
 import os
 from pathlib import Path
@@ -87,6 +88,7 @@ class ModelLoader:
         self._ready: bool = False
         self._warned_models: Set[str] = set()
         self._weights_loaded: Set[str] = set()
+        self.weight_fingerprints = {}
 
         # ─── HuggingFace Inference API mode ─────────────────────────────────────
         # When USE_HF_API=true, no local PyTorch models are loaded.
@@ -199,6 +201,8 @@ class ModelLoader:
             model.load_state_dict(state, strict=True)
             self._weights_loaded.add("deepfake")
             logger.info("EfficientNet-B5: fine-tuned deepfake weights loaded.")
+            with weights_path.open("rb") as stream:
+                self.weight_fingerprints["deepfake"] = hashlib.file_digest(stream, "sha256").hexdigest()
         else:
             logger.warning(
                 "EfficientNet-B5: NO fine-tuned weights found at %s. "
@@ -232,6 +236,15 @@ class ModelLoader:
                     "rejecting unsafe checkpoint deserialization."
                 )
                 raise ValueError("Checkpoint cannot be loaded safely; convert it to a plain state dictionary.")
+            # Upstream training checkpoints wrap weights alongside optimizer state.
+            # Deserialization above remains weights_only=True; only tensors reach the model.
+            if isinstance(state, dict) and "model" in state:
+                state = state["model"]
+            if not isinstance(state, dict) or not state or not all(
+                isinstance(key, str) and isinstance(value, torch.Tensor)
+                for key, value in state.items()
+            ):
+                raise ValueError("CNNDetect checkpoint has no tensor state dictionary.")
             # CNNDetect was trained with DataParallel — strip 'module.' prefix
             if any(k.startswith("module.") for k in state.keys()):
                 state = {k.replace("module.", "", 1): v for k, v in state.items()}
@@ -239,6 +252,8 @@ class ModelLoader:
             model.load_state_dict(state, strict=True)
             self._weights_loaded.add("gan_detect")
             logger.info("CNNDetect: fine-tuned GAN detector weights loaded.")
+            with weights_path.open("rb") as stream:
+                self.weight_fingerprints["gan_detect"] = hashlib.file_digest(stream, "sha256").hexdigest()
         else:
             logger.warning(
                 "CNNDetect: NO fine-tuned weights found at %s. "
@@ -257,6 +272,8 @@ class ModelLoader:
         Uses dima806/deepfake-vs-real-image-detection — a ViT model trained on
         CIFAKE achieving ~98.25% accuracy. Falls back gracefully if network unavailable.
         """
+        if os.getenv("ALLOW_MODEL_DOWNLOADS", "false").lower() != "true":
+            raise RuntimeError("Model downloads disabled; prepare reviewed local weights first.")
         logger.info("Loading HuggingFace pre-trained deepfake detector: %s", HF_DEEPFAKE_MODEL_ID)
         try:
             from transformers import pipeline as hf_pipeline
@@ -279,6 +296,8 @@ class ModelLoader:
 
         Uses umm-maybe/AI-image-detector — trained to detect GAN/AI-generated images.
         """
+        if os.getenv("ALLOW_MODEL_DOWNLOADS", "false").lower() != "true":
+            raise RuntimeError("Model downloads disabled; prepare reviewed local weights first.")
         logger.info("Loading HuggingFace pre-trained AI image detector: %s", HF_GAN_MODEL_ID)
         try:
             from transformers import pipeline as hf_pipeline

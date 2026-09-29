@@ -17,6 +17,7 @@ import logging
 import os
 import traceback
 from contextlib import asynccontextmanager
+from types import SimpleNamespace
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
@@ -27,7 +28,9 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from utils.logger import setup_logger
-from services.model_loader import ModelLoader
+from utils.intake import MediaIntakeMiddleware
+from services.jobs import JobManager
+from api.routes import job_routes
 from api.routes import image_routes, video_routes, scan_routes, health_routes
 
 load_dotenv()
@@ -51,11 +54,13 @@ limiter = Limiter(key_func=get_remote_address)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: load ML models
-    loader = ModelLoader()
-    await loader.load_all_models()
+    # Model loading belongs to killable worker processes, not the API process.
+    loader = SimpleNamespace(ready=True, models={}, has_weights=lambda name: False)
     app.state.model_loader = loader
+    app.state.jobs = JobManager()
     logger.info("MediaTruth backend ready.")
     yield
+    await app.state.jobs.close()
     # Shutdown: cleanup
     logger.info("Shutting down MediaTruth backend.")
 
@@ -71,6 +76,7 @@ app = FastAPI(
 )
 
 app.state.limiter = limiter
+app.add_middleware(MediaIntakeMiddleware)
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ── Global exception handler ─────────────────────────────────────────────────
@@ -100,6 +106,7 @@ app.include_router(health_routes.router, prefix="/health", tags=["Health"])
 app.include_router(image_routes.router, prefix="/image", tags=["Image Analysis"])
 app.include_router(video_routes.router, prefix="/video", tags=["Video Analysis"])
 app.include_router(scan_routes.router, prefix="/scan", tags=["Scan History"])
+app.include_router(job_routes.router, prefix="/jobs", tags=["Analysis Jobs"])
 
 
 if __name__ == "__main__":

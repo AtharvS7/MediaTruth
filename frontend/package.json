@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=22.14.0",
     "npm": ">=9.0.0"
   },
   "scripts": {
@@ -13,14 +13,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
-    "@supabase/supabase-js": "^2.43.1",
-    "axios": "^1.7.2",
+    "@supabase/supabase-js": "2.117.2",
+    "axios": "1.20.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.383.0",
-    "next": "^14.2.35",
+    "next": "15.5.26",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.3",
@@ -34,12 +33,13 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10",
     "eslint": "^8",
-    "eslint-config-next": "^14.2.35",
-    "postcss": "^8",
+    "eslint-config-next": "15.5.26",
+    "postcss": "^8.5.23",
     "tailwindcss": "^3.4.4",
     "typescript": "^5"
   },
   "overrides": {
-    "glob": "^10.4.5"
+    "glob": "^10.4.5",
+    "postcss": "^8.5.23"
   }
 }

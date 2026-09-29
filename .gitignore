@@ -86,3 +86,9 @@ desktop.ini
 # ── Docker ────────────────────────────────────────────────────
 # Keep docker-compose but ignore override files with real secrets
 docker-compose.override.yml
+
+.venv-upgrade/
+*.local.json
+.tools/
+evaluation/data/
+evaluation/reports/
