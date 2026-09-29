@@ -44,6 +44,9 @@ jobs:
       - name: Python dependency audit
         run: uv run --frozen --extra ml pip-audit --progress-spinner off
 
+      - name: CPU wheel upstream advisory check
+        run: uv run --frozen --extra ml python audit_cpu_wheels.py
+
   # ── Frontend: TypeScript & Build ────────────────────────────────────────────
   frontend:
     name: Frontend (Node 22)

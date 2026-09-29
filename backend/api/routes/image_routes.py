@@ -40,6 +40,8 @@ async def export_without_metadata(
     user: dict = Depends(get_current_user),
 ) -> Response:
     """Return a PNG copy without source metadata; AI signals may remain."""
+    if os.getenv('JOB_BACKEND') == 'supabase':
+        raise HTTPException(410, 'Use POST /uploads with kind=clean for cloud exports')
     temp_path = None
     try:
         await validate_image_file(file)

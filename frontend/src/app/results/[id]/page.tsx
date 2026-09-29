@@ -301,15 +301,10 @@ export default function ResultsPage() {
                 Limited Analysis Mode
               </p>
               <p className="font-body text-xs text-white/50 leading-relaxed">
-                Deepfake and GAN ML detectors require fine-tuned model weights to produce
-                meaningful results. They are currently{" "}
-                <strong className="text-white/70">disabled</strong>. This analysis
-                is based on{" "}
-                <strong className="text-white/70">Error Level Analysis (ELA)</strong>{" "}
-                and{" "}
-                <strong className="text-white/70">EXIF metadata forensics</strong>{" "}
-                only — both of which are fully functional.
-              </p>
+                Detection verdicts are withheld until independent evaluation passes.
+                  Metadata and provenance findings remain available. Compression clues
+                  cannot prove AI generation or identify a particular editing tool.
+                </p>
             </div>
           </motion.div>
         )}

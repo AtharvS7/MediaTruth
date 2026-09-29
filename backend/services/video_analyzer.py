@@ -77,6 +77,8 @@ class VideoAnalyzer:
             "score_semantics": "uncalibrated_heuristic",
             "duration_seconds": duration,
             "frames_analyzed": len(frames),
+            "sampling_method": "bounded_uniform_and_histogram_scene_changes",
+            "sampled_timestamps_seconds": timestamps,
             "ai_generated_probability": video_verdict["ai_generated"],
             "ai_edited_probability": video_verdict["ai_edited"],
             "traditional_edit_probability": video_verdict["traditional_edit"],

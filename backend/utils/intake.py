@@ -11,11 +11,14 @@ class MediaIntakeMiddleware:
 
     async def __call__(self, scope, receive, send):
         path = scope.get("path", "")
-        if scope["type"] != "http" or scope.get("method") != "POST" or path not in {
+        json_request = path.startswith('/worker/') or path.startswith('/uploads')
+        if scope["type"] != "http" or scope.get("method") != "POST" or (not json_request and path not in {
             "/image/analyze", "/image/clean-metadata", "/video/analyze", "/jobs"
-        }:
+        }):
             return await self.app(scope, receive, send)
         limit = (500 if path in {"/video/analyze", "/jobs"} else 50) * 1024 * 1024 + 65536
+        if json_request:
+            limit = 600_000 if path.startswith('/worker/') else 16_384
         headers = dict(scope.get("headers", []))
         try:
             declared = int(headers.get(b"content-length", b"0"))

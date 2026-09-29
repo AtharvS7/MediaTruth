@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { analyzeMedia } from "@/lib/api";
+import { analyzeMedia, getCapabilities } from "@/lib/api";
 import Nav from "@/components/layout/Nav";
 import { supabase } from "@/lib/supabase";
 
@@ -28,6 +28,8 @@ const STAGE_INDEX: Record<string, number> = { uploading: 0, queued: 1, loading_m
 
 export default function UploadPage() {
   const router = useRouter();
+  const [limits, setLimits] = useState({max_image_bytes: 50_000_000, max_video_bytes: 50_000_000});
+  useEffect(() => { getCapabilities().then(setLimits).catch(() => {}); }, []);
   const [stage, setStage] = useState<Stage>("idle");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -86,10 +88,10 @@ export default function UploadPage() {
       "image/*": [".jpg", ".jpeg", ".png", ".webp", ".bmp"],
       "video/*": [".mp4", ".mov", ".avi", ".webm", ".mkv"],
     },
-    maxSize: 500 * 1024 * 1024,
-    validator: f => f.type.startsWith("image/") && f.size > 50 * 1024 * 1024
+    maxSize: limits.max_video_bytes,
+    validator: f => f.type.startsWith("image/") && f.size > limits.max_image_bytes
       ? { code: "file-too-large", message: "Images must be under 50MB." } : null,
-    onDropRejected: () => toast.error("Use an image under 50MB or video under 500MB."),
+    onDropRejected: () => toast.error(`Images: ${limits.max_image_bytes / 1_000_000} MB; videos: ${limits.max_video_bytes / 1_000_000} MB.`),
     multiple: false,
     disabled: stage !== "idle",
   });

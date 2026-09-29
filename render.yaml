@@ -1,5 +1,4 @@
-# Optional metadata-only demonstration service; not a production inference host.
-# Full local-model analysis requires an existing machine with sufficient memory.
+# API coordinator only. Inference runs on a separately provisioned worker.
 # No third-party inference or automatic deployments are enabled.
 services:
   - type: web
@@ -11,7 +10,7 @@ services:
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /health/
     autoDeploy: false
-    branch: main
+    branch: upgrade/forensics-audit-metadata-export
     envVars:
       - key: ENV
         value: production
@@ -27,3 +26,9 @@ services:
         sync: false
       - key: WORKERS
         value: "1"
+      - key: JOB_BACKEND
+        value: supabase
+      - key: WORKER_SECRET
+        sync: false
+      - key: WORKER_URL
+        sync: false

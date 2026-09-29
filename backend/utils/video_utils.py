@@ -94,12 +94,15 @@ def extract_frames(
             f"{MAX_VIDEO_DURATION_SECONDS}s."
         )
 
-    # Calculate frame indices to sample
-    if total_frames <= max_frames:
+    if total_frames <= 0:
+        cap.release()
+        raise ValueError('Cannot determine video frame count safely.')
+    # Probe at most 80 positions; keep temporal coverage plus strongest scene changes.
+    probe_count = min(total_frames, max_frames * 4, 80)
+    if total_frames <= probe_count:
         sample_indices = list(range(total_frames))
     else:
-        step = total_frames / max_frames
-        sample_indices = [int(i * step) for i in range(max_frames)]
+        sample_indices = np.linspace(0, total_frames - 1, probe_count, dtype=int).tolist()
 
     frames: List[np.ndarray] = []
     timestamps: List[float] = []
@@ -127,5 +130,23 @@ def extract_frames(
             timestamps.append(idx / fps)
 
     cap.release()
+    if len(frames) > max_frames:
+        # Half of the slots preserve uniform temporal coverage. The remainder
+        # prefer histogram transitions; these are scene boundaries, not edits.
+        histograms = []
+        for frame in frames:
+            small = cv2.resize(frame, (64, 64))
+            hist = cv2.calcHist([cv2.cvtColor(small, cv2.COLOR_BGR2HSV)], [0, 2],
+                               None, [16, 16], [0, 180, 0, 256])
+            histograms.append(cv2.normalize(hist, hist).flatten())
+        changes = [(cv2.compareHist(histograms[i-1], histograms[i], cv2.HISTCMP_BHATTACHARYYA), i)
+                   for i in range(1, len(frames))]
+        selected = set(np.linspace(0, len(frames)-1, max(1, max_frames//2), dtype=int).tolist())
+        for _, index in sorted(changes, reverse=True):
+            if len(selected) >= max_frames:
+                break
+            selected.add(index)
+        indices = sorted(selected)
+        frames, timestamps = [frames[i] for i in indices], [timestamps[i] for i in indices]
     logger.info(f"Extracted {len(frames)} frames from {video_path}")
     return frames, timestamps

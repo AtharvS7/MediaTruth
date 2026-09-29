@@ -1,4 +1,5 @@
 import uuid
+import os
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from services.jobs import QueueFull
 from utils.auth import get_current_user, rate_limit_key
@@ -24,6 +25,8 @@ def owned_job(request, job_id, user):
 @router.post("", status_code=202)
 @limiter.limit("5/minute")
 async def submit(request: Request, file: UploadFile = File(...), user=Depends(get_current_user)):
+    if os.getenv('JOB_BACKEND') == 'supabase':
+        raise HTTPException(410, 'Use private POST /uploads and finalize for cloud jobs')
     path = None
     try:
         kind = "video" if (file.content_type or "").startswith("video/") else "image"
@@ -43,11 +46,22 @@ async def submit(request: Request, file: UploadFile = File(...), user=Depends(ge
 
 @router.get("/{job_id}")
 async def status(job_id: str, request: Request, user=Depends(get_current_user)):
+    if os.getenv('JOB_BACKEND') == 'supabase':
+        from services.durable_jobs import DurableJobs, public_job as durable_public, wake_worker
+        from api.routes.durable_routes import action
+        job = await action(DurableJobs(), 'get', id=job_id, owner=user['id'])
+        if job['status'] in ('queued', 'running'):
+            await wake_worker()
+        return durable_public(job)
     return public_job(owned_job(request, job_id, user))
 
 
 @router.delete("/{job_id}")
 async def cancel(job_id: str, request: Request, user=Depends(get_current_user)):
+    if os.getenv('JOB_BACKEND') == 'supabase':
+        from services.durable_jobs import DurableJobs, public_job as durable_public
+        from api.routes.durable_routes import action
+        return durable_public(await action(DurableJobs(), 'cancel', id=job_id, owner=user['id']))
     job = owned_job(request, job_id, user)
     if not await request.app.state.jobs.cancel(job):
         raise HTTPException(409, "Report saving has started; wait for completion.")

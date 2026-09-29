@@ -21,6 +21,8 @@ async def run(args):
     stage("analyzing")
     analyzer = ImageAnalyzer(loader) if args.kind == "image" else VideoAnalyzer(loader)
     result = await analyzer.analyze(args.input, args.id)
+    from services.evidence import public_report
+    result = public_report(result)
     Path(args.output).write_text(json.dumps(result, allow_nan=False), encoding="utf-8")
 
 

@@ -8,9 +8,58 @@ import argparse
 from collections import Counter
 import hashlib
 import json
+import math
 from pathlib import Path
 
 LABELS = {"original", "ai_generated", "ai_edited", "traditional_edit", "mixed"}
+
+
+def wilson(successes: int, total: int) -> list[float] | None:
+    """95% Wilson interval. Undefined denominators never pass a release gate."""
+    if not total:
+        return None
+    z = 1.959963984540054
+    p = successes / total
+    denominator = 1 + z*z/total
+    center = (p + z*z/(2*total)) / denominator
+    radius = z * math.sqrt(p*(1-p)/total + z*z/(4*total*total)) / denominator
+    return [max(0.0, center-radius), min(1.0, center+radius)]
+
+
+def release_gates(rows, predictions, minimum_support=200):
+    """Descriptive acceptance checks; never auto-approve a model for deployment.
+
+    For binomial intervals select one independent observation per parent group.
+    Robustness variants must be evaluated separately, not treated as new originals.
+    """
+    metrics = evaluate(rows, predictions)
+    samples = [row for row in rows if row['split'] == 'test']
+    groups = [row.get('group_id') for row in samples]
+    independent = all(groups) and len(groups) == len(set(groups))
+    confusion = {(item['truth'], item['prediction']): item['count'] for item in metrics['confusion']}
+    original_count = metrics['per_class']['original']['support']
+    false_flags = sum(n for (truth, guess), n in confusion.items()
+                      if truth == 'original' and guess not in {'original', 'inconclusive'})
+    fpr_ci = wilson(false_flags, original_count)
+    gates = {}
+    for label, value in metrics['per_class'].items():
+        tp = confusion.get((label, label), 0)
+        predicted = sum(n for (_, guess), n in confusion.items() if guess == label)
+        precision_ci = wilson(tp, predicted)
+        checks = {
+            'independent_groups': independent,
+            'category_support': value['support'] >= minimum_support,
+            'original_support': original_count >= minimum_support,
+            'precision': value['precision'] is not None and value['precision'] >= .90,
+            'precision_lower_95': precision_ci is not None and precision_ci[0] >= .85,
+            'original_fpr_upper_95': fpr_ci is not None and fpr_ci[1] <= .05,
+            'recall': value['recall'] is not None and value['recall'] >= .50,
+        }
+        gates[label] = {'passed': all(checks.values()), 'checks': checks,
+                        'precision_95': precision_ci,
+                        'recall_95': wilson(tp, value['support'])}
+    return {**metrics, 'original_fpr_95': fpr_ci, 'release_gates': gates,
+            'approval_note': 'Metrics alone do not approve licensing, holdouts or deployment.'}
 
 
 def read_manifest(path: Path) -> list[dict]:
@@ -74,4 +123,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     predictions = [json.loads(line) for line in args.predictions.read_text(encoding="utf-8").splitlines()
                    if line.strip()]
-    print(json.dumps(evaluate(read_manifest(args.manifest), predictions), indent=2))
+    print(json.dumps(release_gates(read_manifest(args.manifest), predictions), indent=2))

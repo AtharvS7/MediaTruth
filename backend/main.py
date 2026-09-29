@@ -29,11 +29,14 @@ from slowapi.util import get_remote_address
 
 from utils.logger import setup_logger
 from utils.intake import MediaIntakeMiddleware
+from utils.configuration import validate_configuration
 from services.jobs import JobManager
 from api.routes import job_routes
+from api.routes import durable_routes
 from api.routes import image_routes, video_routes, scan_routes, health_routes
 
 load_dotenv()
+validate_configuration()
 setup_logger()
 logger = logging.getLogger(__name__)
 
@@ -83,7 +86,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Catch unhandled exceptions and return a generic 500 without leaking stack traces."""
-    logger.error(f"Unhandled error on {request.url.path}: {exc}", exc_info=True)
+    logger.error('Unhandled request error: %s', type(exc).__name__)
     return JSONResponse(
         status_code=500,
         content={"detail": "An internal error occurred. Please try again later."},
@@ -107,6 +110,25 @@ app.include_router(image_routes.router, prefix="/image", tags=["Image Analysis"]
 app.include_router(video_routes.router, prefix="/video", tags=["Video Analysis"])
 app.include_router(scan_routes.router, prefix="/scan", tags=["Scan History"])
 app.include_router(job_routes.router, prefix="/jobs", tags=["Analysis Jobs"])
+app.include_router(durable_routes.router, tags=["Durable Jobs"])
+
+
+@app.get('/capabilities')
+async def capabilities():
+    cloud = os.getenv('JOB_BACKEND') == 'supabase'
+    worker = 'local'
+    if cloud:
+        from services.durable_jobs import DurableJobs
+        try:
+            worker = 'online' if await DurableJobs().worker_online() else 'offline'
+        except Exception:
+            worker = 'unavailable'
+    return {'report_schema_version': 2, 'durable_jobs': cloud,
+            'worker_status': worker,
+            'max_image_bytes': 50_000_000, 'max_video_bytes': 50_000_000 if cloud else 500_000_000,
+            'max_video_seconds': 180, 'max_image_pixels': 16_000_000,
+            'validated_detection_categories': [], 'provenance': 'offline_c2pa',
+            'metadata_export': True, 'watermarks': 'not_checked'}
 
 
 if __name__ == "__main__":
