@@ -14,6 +14,14 @@ Updated 1 October 2026. Budget INR 0; non-commercial research release.
 - Cloud processing readiness now checks worker availability through the database
   and returns 503 on failure, with a bounded wait. Liveness stays independent.
 - Backend suite: 145 tests passed; Ruff passed.
+- Commit `adba43e` passed all GitHub CI jobs and was deployed to Render. Hosted
+  capabilities and readiness confirmed the restarted PC worker online.
+- Both Linux container images built successfully. Non-root backend execution,
+  ML imports, credential-file exclusion, HTTP serving, PNG pixel preservation,
+  isolated image analysis with networking disabled, and three frontend auth
+  browser checks passed. The Linux analysis fixture used no bundled model weights;
+  validated trained-model deployment remains a separate gate. Temporary test
+  containers were stopped and removed; the authorized PC worker remains running.
 - Added bounded, licensed SafeIMG pilot acquisition and actual isolated-pipeline
   evaluation commands. This is not representative accuracy validation; see
   evaluation/PILOT.md for scope and missing data classes.
@@ -41,7 +49,7 @@ Render workspace confirmed: My Workspace. Vercel team discovered: Atharv Sawane'
 
 The user approved a temporary PC worker after the ZeroGPU rejection, while continuing research into free cloud alternatives. The PC worker polls actual queued work every 60 seconds and needs no inbound network port. Start it explicitly with `python -m services.remote_worker` from backend; stop with Ctrl+C. Its separate `worker.env.local` holds only the backend URL and worker secret. Polling consumes the shared Render free instance allowance while running.
 
-Current checks: **131 backend tests passed**, signed-URL live smoke passed, Ruff passed, TypeScript passed; production frontend build passed. Added admission limits: 100 jobs globally/day, estimated 2 GB transfer reservations/month, 400 MB database stop threshold. Provider usage must still be monitored because repeated signed downloads are not fully controlled by these reservations.
+Current checks: **145 backend tests passed**, signed-URL live smoke passed, Ruff passed, TypeScript passed; production frontend build passed. Added admission limits: 100 jobs globally/day, estimated 2 GB transfer reservations/month, 400 MB database stop threshold. Provider usage must still be monitored because repeated signed downloads are not fully controlled by these reservations.
 
 ## Remaining acceptance gates
 
@@ -49,7 +57,7 @@ Current checks: **131 backend tests passed**, signed-URL live smoke passed, Ruff
 2. Real email confirmation/recovery. The user corrected deployed auth redirects; mobile keyboard password login, export download and saved-history browser journeys passed.
 3. Licensed representative datasets and actual benchmark runs; calibrated model selection and license review. No measured accuracy is claimed.
 4. Validated AI-edit/conventional-edit/mixed classification, actual localization models and temporal/face video models. These capabilities remain withheld.
-5. Container runtime tests, backup/restore rehearsal, operational metrics and provider capacity monitoring. Pending jobs survive process restarts; recovery still needs an available worker and a real request to wake it.
+5. Backup/restore rehearsal, operational metrics and provider capacity monitoring. Basic container runtime checks passed; trained-model container performance/load tests remain. Pending jobs survive process restarts; recovery still needs an available worker and a real request to wake it.
 6. Further queue tests for quota exhaustion, cancellation races, malformed stored media and storage cleanup failures.
 
 ## Reproducible checks

@@ -57,7 +57,11 @@ Rehearse restore into an empty local PostgreSQL/Supabase environment, never the 
 
 Run backend tests with `python -m pytest tests -q`, then `ruff check .` and `pip-audit`. Frontend checks: `npx tsc --noEmit --incremental false`, `npm run build`, `npm audit`. CI uses locked dependencies and blocks lint/security failures. The test client emits one upstream httpx deprecation warning.
 
-Observed: 131 backend tests passed, real isolated worker inference and metadata export passed, and the frontend builds and type-checks. Hosted Chromium tests passed mobile keyboard sign-in, private upload/export download, image-job completion with an Inconclusive result, and saved history. Live Supabase integration passed; Docker runtime, email delivery and backup/restore remain unverified.
+Observed: 145 backend tests passed, real isolated worker inference and metadata export passed, and the frontend builds and type-checks. Hosted Chromium tests passed mobile keyboard sign-in, private upload/export download, image-job completion with an Inconclusive result, and saved history. Live Supabase integration passed. On 1 October both Docker images built and served HTTP successfully; backend non-root execution, ML imports, secret-file exclusion, PNG pixel preservation and isolated analysis without networking passed. Three auth browser checks passed against the containerized frontend. The container analysis used no bundled model weights. Trained-model container load testing, email delivery and backup/restore remain unverified.
+
+Use `/health/` for API liveness. `/health/ready` checks cloud worker availability
+through the database and returns 503 when processing is unavailable; this must not
+be used to restart an otherwise healthy API repeatedly while the PC is off.
 
 Browser checks: install Chromium with `npx playwright install chromium` in frontend, run the app, then run `npx playwright test auth.spec.ts`. Set `E2E_BASE_URL` to test a deployed frontend. The separate hosted fixture suite requires explicit `E2E_LIVE=1`, backend server credentials locally, and an online PC worker; it creates and removes an isolated confirmed test user without sending email. Browser traces/screenshots are disabled to avoid saving credentials.
 
