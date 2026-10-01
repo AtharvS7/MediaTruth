@@ -1,6 +1,22 @@
 # Approved completion plan: implementation record
 
-Updated 30 September 2026. Budget INR 0; non-commercial research release.
+Updated 1 October 2026. Budget INR 0; non-commercial research release.
+
+## Current work after PC-worker decision
+
+- User chose to retain the temporary PC worker; cloud replacement is deferred.
+  CLOUD_OPTIONS.md records additional candidates and their unresolved constraints.
+- Added failure-case tests for tampered/oversized/malformed worker inputs, export
+  cancellation, storage credential separation, offline admission, cleanup failure,
+  and export retention. Fixed download expiry to reject new links after 24 hours
+  even when cleanup has not run. Previously issued URLs can remain valid for their
+  remaining lifetime (at most two minutes).
+- Cloud processing readiness now checks worker availability through the database
+  and returns 503 on failure, with a bounded wait. Liveness stays independent.
+- Backend suite: 145 tests passed; Ruff passed.
+- Added bounded, licensed SafeIMG pilot acquisition and actual isolated-pipeline
+  evaluation commands. This is not representative accuracy validation; see
+  evaluation/PILOT.md for scope and missing data classes.
 
 ## Implemented and verified
 

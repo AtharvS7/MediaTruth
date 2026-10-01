@@ -39,7 +39,7 @@ WEIGHTS_DIR.mkdir(parents=True, exist_ok=True)
 # These are publicly available models that work WITHOUT any form submission.
 # They activate automatically when no local .pth weights are found.
 # Source: https://huggingface.co/dima806/deepfake_vs_real_image_detection
-#         Confirmed working: 99.27% accuracy on 76k face image test set.
+# External model-card results do not establish accuracy on MediaTruth workloads.
 HF_DEEPFAKE_MODEL_ID = "dima806/deepfake_vs_real_image_detection"
 # GAN fallback — general AI image detector
 HF_GAN_MODEL_ID = "umm-maybe/AI-image-detector"

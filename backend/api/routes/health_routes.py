@@ -6,9 +6,12 @@ Model details are NOT exposed to unauthenticated requests.
 """
 
 import logging
+import asyncio
+import os
 from typing import Dict
 
 from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -21,10 +24,14 @@ async def health(request: Request) -> Dict[str, str]:
 
 
 @router.get("/ready")
-async def readiness(request: Request) -> Dict[str, bool]:
-    """Readiness probe — indicates whether the local job manager is initialized.
-
-    Intended for internal/ops use (e.g., Kubernetes readiness probe).
-    """
+async def readiness(request: Request):
+    """Processing readiness; liveness remains independent of worker outages."""
+    if os.getenv('JOB_BACKEND', 'local') == 'supabase':
+        from services.durable_jobs import DurableJobs
+        try:
+            ready = bool(await asyncio.wait_for(DurableJobs().worker_online(), timeout=5))
+        except Exception:
+            ready = False
+        return JSONResponse({'ready': ready}, status_code=200 if ready else 503)
     loader = getattr(request.app.state, "model_loader", None)
     return {"ready": bool(loader.ready) if loader else False}

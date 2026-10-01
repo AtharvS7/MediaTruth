@@ -1,6 +1,7 @@
 """Bounded upload handoff and lease-fenced worker API."""
 import hmac
 import os
+from datetime import datetime, timedelta, timezone
 from typing import Literal
 from uuid import UUID
 
@@ -70,6 +71,10 @@ async def finalize(job_id: UUID, user=Depends(get_current_user), db=Depends(coor
 async def download(job_id: UUID, user=Depends(get_current_user), db=Depends(coordinator)):
     job = await action(db, 'get', id=str(job_id), owner=user['id'])
     if job['kind'] != 'clean' or job['status'] != 'completed' or job['output_deleted']:
+        raise HTTPException(404, 'Export unavailable or expired')
+    # Enforce retention even if the worker/cleanup process has been asleep.
+    created = datetime.fromisoformat(job['created_at'].replace('Z', '+00:00'))
+    if created <= datetime.now(timezone.utc) - timedelta(hours=24):
         raise HTTPException(404, 'Export unavailable or expired')
     return {'url': await db.download_url(job, True)}
 

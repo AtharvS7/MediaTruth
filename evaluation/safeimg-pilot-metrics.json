@@ -1,0 +1,121 @@
+{
+  "samples": 12,
+  "coverage": 0.0,
+  "abstentions": 12,
+  "per_class": {
+    "ai_edited": {
+      "support": 0,
+      "precision": null,
+      "recall": null
+    },
+    "ai_generated": {
+      "support": 12,
+      "precision": null,
+      "recall": 0.0
+    },
+    "mixed": {
+      "support": 0,
+      "precision": null,
+      "recall": null
+    },
+    "original": {
+      "support": 0,
+      "precision": null,
+      "recall": null
+    },
+    "traditional_edit": {
+      "support": 0,
+      "precision": null,
+      "recall": null
+    }
+  },
+  "false_positive_rate_originals": null,
+  "confusion": [
+    {
+      "truth": "ai_generated",
+      "prediction": "inconclusive",
+      "count": 12
+    }
+  ],
+  "original_fpr_95": null,
+  "release_gates": {
+    "ai_edited": {
+      "passed": false,
+      "checks": {
+        "independent_groups": true,
+        "category_support": false,
+        "original_support": false,
+        "precision": false,
+        "precision_lower_95": false,
+        "original_fpr_upper_95": false,
+        "recall": false
+      },
+      "precision_95": null,
+      "recall_95": null
+    },
+    "ai_generated": {
+      "passed": false,
+      "checks": {
+        "independent_groups": true,
+        "category_support": false,
+        "original_support": false,
+        "precision": false,
+        "precision_lower_95": false,
+        "original_fpr_upper_95": false,
+        "recall": false
+      },
+      "precision_95": null,
+      "recall_95": [
+        2.7755575615628914e-17,
+        0.24249400665524085
+      ]
+    },
+    "mixed": {
+      "passed": false,
+      "checks": {
+        "independent_groups": true,
+        "category_support": false,
+        "original_support": false,
+        "precision": false,
+        "precision_lower_95": false,
+        "original_fpr_upper_95": false,
+        "recall": false
+      },
+      "precision_95": null,
+      "recall_95": null
+    },
+    "original": {
+      "passed": false,
+      "checks": {
+        "independent_groups": true,
+        "category_support": false,
+        "original_support": false,
+        "precision": false,
+        "precision_lower_95": false,
+        "original_fpr_upper_95": false,
+        "recall": false
+      },
+      "precision_95": null,
+      "recall_95": null
+    },
+    "traditional_edit": {
+      "passed": false,
+      "checks": {
+        "independent_groups": true,
+        "category_support": false,
+        "original_support": false,
+        "precision": false,
+        "precision_lower_95": false,
+        "original_fpr_upper_95": false,
+        "recall": false
+      },
+      "precision_95": null,
+      "recall_95": null
+    }
+  },
+  "approval_note": "Metrics alone do not approve licensing, holdouts or deployment.",
+  "scope": "Public pipeline pilot only; not raw detector accuracy or a release approval",
+  "parent_independence_verified": false,
+  "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+  "run_date": "2026-10-01"
+}

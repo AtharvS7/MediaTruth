@@ -1,6 +1,8 @@
 from unittest.mock import AsyncMock
 from types import SimpleNamespace
 from uuid import uuid4
+from datetime import datetime, timedelta, timezone
+import pytest
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -16,6 +18,7 @@ def setup(monkeypatch):
     app.include_router(router)
     db = SimpleNamespace(call=AsyncMock(), cleanup=AsyncMock(), upload_url=AsyncMock(),
                          check_object=AsyncMock(), checkin=AsyncMock(), worker_online=AsyncMock(return_value=True))
+    db.download_url = AsyncMock(return_value='https://storage.invalid/export')
     app.dependency_overrides[coordinator] = lambda: db
     app.dependency_overrides[get_current_user] = lambda: {'id': str(uuid4())}
     return TestClient(app), db
@@ -47,3 +50,26 @@ def test_worker_cannot_select_export_mode_for_an_image(monkeypatch):
     assert response.status_code == 200
     assert db.call.call_args.kwargs['result']['final_verdict'] == 'Inconclusive'
     assert db.call.call_args.kwargs['result']['confidence'] == 0
+
+
+@pytest.mark.parametrize('age_hours,expected', [(23, 200), (25, 404)])
+def test_export_expiry_does_not_depend_on_cleanup(monkeypatch, age_hours, expected):
+    client, db = setup(monkeypatch)
+    identity = str(uuid4())
+    db.call.return_value = dict(id=identity, kind='clean', status='completed',
+        output_deleted=False,
+        created_at=(datetime.now(timezone.utc)-timedelta(hours=age_hours)).isoformat())
+    response = client.get(f'/jobs/{identity}/download')
+    assert response.status_code == expected
+    assert db.download_url.await_count == (1 if expected == 200 else 0)
+
+
+def test_offline_worker_does_not_reserve_storage(monkeypatch):
+    client, db = setup(monkeypatch)
+    db.worker_online.return_value = False
+    monkeypatch.setenv('WORKER_URL', '')
+    response = client.post('/uploads', json={'kind': 'image', 'filename': 'a.png',
+        'byte_size': 100, 'input_sha256': 'a'*64, 'idempotency_key': str(uuid4())})
+    assert response.status_code == 503
+    db.call.assert_not_called()
+    db.upload_url.assert_not_called()
