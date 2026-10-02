@@ -1,0 +1,85 @@
+{
+  "release_eligible": false,
+  "source_revision": "89c4fe9efd0ebc7ce5c7641ef57d578ccd639c69",
+  "partitions": {
+    "validation": {
+      "manifest_sha256": "14f017a135f0dd5b361ea8105e1506d87d3af79982356d59244b15792f31dae9",
+      "classes": {
+        "original": 24,
+        "ai_generated": 24
+      },
+      "generators": {
+        "Real": 24,
+        "Midjourney": 3,
+        "SD15": 2,
+        "GLIDE": 5,
+        "VQDM": 3,
+        "Wukong": 3,
+        "ADM": 7,
+        "BigGAN": 1
+      }
+    },
+    "test": {
+      "manifest_sha256": "b069dbf6a1af0683a658c9e7fa4bb612a708ce319cf1c07ece2013e9d8da1095",
+      "classes": {
+        "original": 24,
+        "ai_generated": 24
+      },
+      "generators": {
+        "Real": 24,
+        "SD15": 2,
+        "BigGAN": 3,
+        "Midjourney": 3,
+        "VQDM": 6,
+        "Wukong": 7,
+        "GLIDE": 3
+      }
+    }
+  },
+  "cross_partition_near_duplicate_candidates": [],
+  "independence_note": "Decoded pixel hashes remove exact duplicates; dHash is only a screening heuristic, not proof of independence",
+  "acquisition": {
+    "requested_per_class_per_split": 24,
+    "acquired": 96,
+    "bytes": 4193237,
+    "failures": [
+      {
+        "split": "train",
+        "offset": 1819,
+        "type": "RetryError"
+      },
+      {
+        "split": "train",
+        "offset": 16591,
+        "type": "RetryError"
+      },
+      {
+        "split": "train",
+        "offset": 584,
+        "type": "RetryError"
+      },
+      {
+        "split": "validation",
+        "offset": 1470,
+        "type": "RetryError"
+      },
+      {
+        "split": "validation",
+        "offset": 6950,
+        "type": "RetryError"
+      },
+      {
+        "split": "validation",
+        "offset": 6777,
+        "type": "RetryError"
+      },
+      {
+        "split": "validation",
+        "offset": 6723,
+        "type": "RetryError"
+      }
+    ],
+    "release_eligible": false,
+    "selection": "seeded shuffled source offsets, balanced without looking at model scores"
+  }
+}

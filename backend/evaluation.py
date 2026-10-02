@@ -87,6 +87,31 @@ def read_manifest(path: Path) -> list[dict]:
     return rows
 
 
+def binary_production_gates(rows, predictions):
+    """95% target for a named still-image distribution, never universal certification."""
+    if any(r['label'] not in {'original','ai_generated'} for r in rows):
+        raise ValueError('Binary production target cannot validate editing/video categories')
+    result = release_gates(rows, predictions)
+    classes = result['per_class']
+    recalls = [classes[c]['recall'] for c in ('original','ai_generated')]
+    balanced = sum(recalls)/2 if all(v is not None for v in recalls) else None
+    correct = sum(c['count'] for c in result['confusion'] if c['truth']==c['prediction'])
+    accuracy = correct/result['samples']
+    interval = wilson(correct,result['samples'])
+    checks = {
+        'existing_release_checks':all(result['release_gates'][c]['passed'] for c in ('original','ai_generated')),
+        'balanced_accuracy_95':balanced is not None and balanced >= .95,
+        'each_class_precision_95':all(classes[c]['precision'] is not None and classes[c]['precision']>=.95
+                                      for c in ('original','ai_generated')),
+        'each_class_recall_95':all(v is not None and v>=.95 for v in recalls),
+        'accuracy_lower_bound_95':interval[0]>=.95,
+    }
+    return {**result,'accuracy':accuracy,'accuracy_95':interval,'balanced_accuracy':balanced,
+            'production_target_checks':checks,'statistical_target_passed':all(checks.values()),
+            'deployment_approved':False,
+            'scope_note':'Requires independent licensing, robustness and operational approval; no universal accuracy guarantee'}
+
+
 def evaluate(rows: list[dict], predictions: list[dict]) -> dict:
     samples = {row["id"]: row for row in rows if row["split"] == "test"}
     guessed = {}

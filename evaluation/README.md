@@ -19,4 +19,8 @@ python backend/evaluation.py evaluation/data/manifest.jsonl evaluation/data/pred
 
 The report includes per-class precision/recall, confusion, original-image false-positive rate, abstention coverage and Wilson confidence intervals with release gates. Abstentions reduce recall. Calibration, localization quality and unseen-generator evaluation still require additional work. Treat raw detector scores as uncalibrated.
 
-Dataset acquisition and model license review remain pending. Use the primary dataset sources listed in `UPGRADE_PLAN.md`; ordinary internet images without documented provenance are not ground truth. Download only subsets with suitable terms. Data and generated reports are ignored by Git.
+Representative release datasets and commercial model eligibility remain pending.
+The new calibration experiment is described in `CALIBRATION_ITERATION.md`; the
+95% acceptance target and planning completion estimate are in `PRODUCTION_TARGET.md`.
+Use documented primary sources; ordinary internet images are not reliable ground
+truth. Local media and generated reports are ignored by Git.

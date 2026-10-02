@@ -35,24 +35,49 @@ def verify_artifacts(source, weights, artifacts):
                 raise ValueError(f'FSD weight digest mismatch: {name}')
 
 
-def run(source, weights, manifest, output, jpeg_quality=None):
+def run(source, weights, manifest, output, jpeg_quality=None, split='test', threads=2, resume=False):
     if output.exists():
         raise ValueError('Preserve existing benchmark evidence; choose a new output')
     artifacts = json.loads(ARTIFACTS.read_text())
     verify_artifacts(source, weights, artifacts)
     rows = read_manifest(manifest)
+    if split not in {'test', 'validation'} or threads not in range(1,5):
+        raise ValueError('Unsupported partition or CPU thread budget')
     if any(row['label'] not in {'original', 'ai_generated'} for row in rows):
         raise ValueError('FSD experiment supports binary generation labels only')
     import torch
-    torch.set_num_threads(2)
+    torch.set_num_threads(threads)
     sys.path.insert(0, str(source.resolve()))
     import fsd
     if Path(fsd.__file__).resolve().parent != (source / 'fsd').resolve():
         raise ValueError('An unexpected FSD package was already imported')
     detector = fsd.FSDDetector.load(weights_dir=weights, device='cpu', attribution=False)
+    versions = {p: importlib.metadata.version(p) for p in ('numpy','scipy','torch','Pillow')}
+    identity = {'manifest_sha256': hashlib.sha256(manifest.read_bytes()).hexdigest(),
+                'artifacts_sha256':hashlib.sha256(ARTIFACTS.read_bytes()).hexdigest(),
+                'split':split,'threads':threads,'jpeg_quality':jpeg_quality,'software_versions':versions}
+    output.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint = output.with_suffix(output.suffix+'.checkpoint.jsonl')
     predictions = []
+    if checkpoint.exists():
+        if not resume:
+            raise ValueError('Checkpoint exists; use --resume with identical inputs')
+        entries = [json.loads(line) for line in checkpoint.read_text().splitlines()]
+        if not entries or entries[0] != identity:
+            raise ValueError('Checkpoint configuration mismatch')
+        predictions = entries[1:]
+    else:
+        with checkpoint.open('x',encoding='utf-8') as stream:
+            stream.write(json.dumps(identity)+'\n')
+    expected = {r['id']:r for r in rows if r['split']==split}
+    completed = set()
+    for prediction in predictions:
+        key = prediction['id']
+        if key in completed or key not in expected or prediction['sha256'] != expected[key]['sha256']:
+            raise ValueError('Invalid checkpoint sample identity')
+        completed.add(key)
     for row in rows:
-        if row['split'] != 'test':
+        if row['split'] != split or row['id'] in completed:
             continue
         start = time.monotonic()
         try:
@@ -79,17 +104,20 @@ def run(source, weights, manifest, output, jpeg_quality=None):
         prediction.update(id=row['id'], sha256=row['sha256'], truth=row['label'],
                           seconds=time.monotonic()-start)
         predictions.append(prediction)
+        with checkpoint.open('a',encoding='utf-8') as stream:
+            stream.write(json.dumps(prediction,allow_nan=False)+'\n')
         print(json.dumps(prediction, allow_nan=False), flush=True)
     report = {'candidate': 'FSD v1.2.0, streaming patches', 'release_eligible': False,
               'scope': 'Exploratory, public pilot; not independent validation',
               'score_semantics': 'GMM standardized log likelihood, not an AI probability',
               'threshold_selection': 'Unchanged upstream -2.0; no test-set tuning',
+              'evaluation_split':split, 'cpu_threads':threads,
               'artifacts': artifacts,
-              'software_versions': {p: importlib.metadata.version(p)
-                                    for p in ('numpy', 'scipy', 'torch', 'Pillow')},
+              'software_versions': versions,
               'manifest_sha256': hashlib.sha256(manifest.read_bytes()).hexdigest(),
               'variant': 'source_bytes' if jpeg_quality is None else f'jpeg_quality_{jpeg_quality}',
-              'metrics': release_gates(rows, predictions), 'predictions': predictions}
+              'metrics': release_gates([{**r,'split':'test'} for r in rows if r['split']==split], predictions),
+              'predictions': predictions}
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open('x', encoding='utf-8') as stream:
         json.dump(report, stream, indent=2, allow_nan=False)
@@ -103,5 +131,9 @@ if __name__ == '__main__':
     parser.add_argument('manifest', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--jpeg-quality', type=int, choices=range(1, 101))
+    parser.add_argument('--split', choices=('test','validation'), default='test')
+    parser.add_argument('--threads', type=int, choices=range(1,5), default=2)
+    parser.add_argument('--resume', action='store_true')
     args = parser.parse_args()
-    run(args.source, args.weights, args.manifest, args.output, args.jpeg_quality)
+    run(args.source, args.weights, args.manifest, args.output, args.jpeg_quality,
+        args.split,args.threads,args.resume)
