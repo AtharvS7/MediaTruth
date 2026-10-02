@@ -13,10 +13,12 @@ from evaluation import read_manifest, release_gates
 from inference_pipeline.generation_candidates import CANDIDATES, GenerationCandidate
 
 
-def run(name, weights, manifest, output, jpeg_quality=None):
+def run(name, weights, manifest, output, jpeg_quality=None, split='test'):
     if output.exists():
         raise ValueError('Preserve existing benchmark evidence; choose a new output')
     rows = read_manifest(manifest)
+    if split not in {'test','validation'}:
+        raise ValueError('Unsupported evaluation partition')
     if any(r['label'] not in {'original','ai_generated'} for r in rows):
         raise ValueError('This experiment supports binary generation labels only')
     import torch
@@ -26,7 +28,7 @@ def run(name, weights, manifest, output, jpeg_quality=None):
     load_seconds = time.monotonic()-start
     predictions = []
     for row in rows:
-        if row['split'] != 'test':
+        if row['split'] != split:
             continue
         start = time.monotonic()
         try:
@@ -48,13 +50,15 @@ def run(name, weights, manifest, output, jpeg_quality=None):
             'seconds':time.monotonic()-start, **result})
     report = {'scope':'Exploratory; public benchmark, not independent release approval',
         'release_eligible':False,
+        'evaluation_split':split,
         'manifest_sha256':hashlib.sha256(manifest.read_bytes()).hexdigest(),
         'software_versions':{package:importlib.metadata.version(package)
                              for package in ('torch','timm','Pillow','safetensors')},
         'variant':'source_bytes' if jpeg_quality is None else f'jpeg_quality_{jpeg_quality}',
         'candidate':name, 'model':asdict(CANDIDATES[name]), 'load_seconds':load_seconds,
         'threshold_selection':'Fixed upstream rules; no tuning on this dataset',
-        'metrics':release_gates(rows, [{'id':p['id'],'label':p['label']} for p in predictions]),
+        'metrics':release_gates([{**r,'split':'test'} for r in rows if r['split']==split],
+                               [{'id':p['id'],'label':p['label']} for p in predictions]),
         'failures':sum(not p['available'] for p in predictions), 'predictions':predictions}
     acquisition = manifest.parent/'acquisition.json'
     if acquisition.exists():
@@ -71,5 +75,6 @@ if __name__ == '__main__':
     p.add_argument('manifest',type=Path)
     p.add_argument('output',type=Path)
     p.add_argument('--jpeg-quality',type=int,choices=range(1,101))
+    p.add_argument('--split',choices=('test','validation'),default='test')
     a = p.parse_args()
-    run(a.candidate,a.weights,a.manifest,a.output,a.jpeg_quality)
+    run(a.candidate,a.weights,a.manifest,a.output,a.jpeg_quality,a.split)

@@ -45,7 +45,8 @@ on supported provider capabilities; unavailable checks must remain explicit.
 
 ## Next accuracy experiment
 
-The FSD/Community Forensics combiner is implemented and tested only as a research
-candidate. It uses calibration-only fitting and preserves the baseline. Its
-development evaluations must be reviewed before any further training decision;
-neither repeated tuning on these images nor a small high score qualifies release.
+The FSD/Community Forensics combiner was implemented, fitted on calibration only
+and evaluated. It scored 89.6% on source images and 91.7% on JPEG copies, so it
+was rejected for promotion. The next iteration needs broader training/calibration
+data covering the observed failures and a fresh locked validation set. Neither
+repeated tuning on these images nor a small high score qualifies release.
