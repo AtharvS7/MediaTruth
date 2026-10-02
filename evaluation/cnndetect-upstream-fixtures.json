@@ -1,0 +1,39 @@
+{
+  "scope": "Exploratory binary probe; no release approval, calibration or deployment change",
+  "transform": "RGB; center crop 224 without resize; ImageNet normalization",
+  "threshold": 0.5,
+  "threshold_selection": "existing fixed threshold; not tuned on pilot",
+  "model_weights_sha256": {
+    "gan_detect": "3533f3e58a3b82215f21197f2faf4e99b911ec42a4a6e2d7823e04d5f3fd245a"
+  },
+  "samples": 2,
+  "failures": 0,
+  "synthetic_count": 1,
+  "synthetic_flagged": 1,
+  "synthetic_detection_rate": 1.0,
+  "synthetic_detection_rate_95": [
+    0.20654931437723745,
+    1.0
+  ],
+  "original_count": 1,
+  "original_false_positive_rate": 0.0,
+  "parent_independence_verified": false,
+  "predictions": [
+    {
+      "id": "upstream-real",
+      "sha256": "a2560a17f14006305580ba64d8bdc7d9128adbef5ce0f995396a267e23a587f9",
+      "truth": "original",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "upstream-fake",
+      "sha256": "7407a8a7bda0c1f8295347d8b5751ad8b9b3847f9243afdd362c2a923cdafe2e",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.9995,
+      "detector_positive": true
+    }
+  ]
+}

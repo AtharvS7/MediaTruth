@@ -10,6 +10,6 @@ Prediction JSONL rows require `id` and `label`; `inconclusive` is allowed. Every
 python backend/evaluation.py evaluation/data/manifest.jsonl evaluation/data/predictions.jsonl
 ```
 
-The report includes per-class precision/recall, confusion, original-image false-positive rate and abstention coverage. Abstentions reduce recall. It does not report calibration, confidence intervals, localization quality or unseen-generator performance; those require additional evaluation. Treat raw detector scores as uncalibrated.
+The report includes per-class precision/recall, confusion, original-image false-positive rate, abstention coverage and Wilson confidence intervals with release gates. Abstentions reduce recall. Calibration, localization quality and unseen-generator evaluation still require additional work. Treat raw detector scores as uncalibrated.
 
 Dataset acquisition and model license review remain pending. Use the primary dataset sources listed in `UPGRADE_PLAN.md`; ordinary internet images without documented provenance are not ground truth. Download only subsets with suitable terms. Data and generated reports are ignored by Git.

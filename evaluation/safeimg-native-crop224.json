@@ -1,0 +1,119 @@
+{
+  "scope": "Exploratory binary probe; no release approval, calibration or deployment change",
+  "transform": "RGB; center crop 224 without resize; ImageNet normalization",
+  "threshold": 0.5,
+  "threshold_selection": "existing fixed threshold; not tuned on pilot",
+  "model_weights_sha256": {
+    "gan_detect": "3533f3e58a3b82215f21197f2faf4e99b911ec42a4a6e2d7823e04d5f3fd245a"
+  },
+  "samples": 12,
+  "failures": 0,
+  "synthetic_count": 12,
+  "synthetic_flagged": 0,
+  "synthetic_detection_rate": 0.0,
+  "synthetic_detection_rate_95": [
+    2.7755575615628914e-17,
+    0.24249400665524085
+  ],
+  "original_count": 0,
+  "original_false_positive_rate": null,
+  "parent_independence_verified": false,
+  "predictions": [
+    {
+      "id": "safeimg-0",
+      "sha256": "49ab997d924a9c616f846b6f96080c3aaac7eaa87b0520598c6ff2aad89db62c",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-94",
+      "sha256": "70446d3a26514c212c9d168a38659bbbad3a43914db75d19e626dc0b63b096ee",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-188",
+      "sha256": "9be6f0b32b320920daf4353d9c37789373db83d9b873be10646d010f6591b084",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-282",
+      "sha256": "9b63e05a31d008849e082fcaffeee20b2749ba2b682d5b5700efd2b8324bd88a",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-377",
+      "sha256": "761324c7bfe017a901ce1fe9cb07e62ff8244fa00150304c8b06d719480f103c",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-471",
+      "sha256": "1611a880df1475c2f75578f3fbfb1717b2bb0a1ae8a714f753036ceca73e6987",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-565",
+      "sha256": "4dec1e85b3ed0bfe8b9e3a335b78d77d05711aea1eefd0c2df4aba962380e5b5",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-659",
+      "sha256": "d5cffa067ca187be68f68393847564839125cdadc7b80b9c10c47eadc58d2bfe",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-754",
+      "sha256": "96546b1ccc9af0ec50c3e25b62d7ec593ed084936cbbbee59bbcfc35695aa6b6",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-848",
+      "sha256": "d96de434ec98143dc4a93cee86bb3c8ff8bdf9960a51e4911d2a5f7ae02d45e3",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-942",
+      "sha256": "17db469a9c4e5ec470c9a47eaafc677aa603f8bfad76eb089379d8976b240438",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.0,
+      "detector_positive": false
+    },
+    {
+      "id": "safeimg-1036",
+      "sha256": "a62d3cc333b0de0a961d98a101ab942eba43b9cbf543c094d2a05a2910c06eb5",
+      "truth": "ai_generated",
+      "available": true,
+      "score": 0.2476,
+      "detector_positive": false
+    }
+  ]
+}

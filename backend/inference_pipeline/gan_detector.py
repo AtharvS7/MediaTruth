@@ -15,6 +15,7 @@ API_SUCCESS FLAG:
 """
 
 import logging
+import math
 import os
 import time
 from typing import Any, Dict, Optional
@@ -217,18 +218,22 @@ class GANDetector:
             import torchvision.transforms as T
 
             transform = T.Compose([
-                T.Resize((224, 224)),
+                # Upstream CNNDetect supports center cropping without resizing.
+                # Preserve forensic pixel scale; bound CPU memory to a 224px crop.
+                T.CenterCrop(224),
                 T.ToTensor(),
                 T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ])
-            img = Image.open(image_path).convert("RGB")
-            tensor = transform(img).unsqueeze(0)
+            with Image.open(image_path) as img:
+                tensor = transform(img.convert("RGB")).unsqueeze(0)
 
             device = getattr(self.model_loader, "device", "cpu")
             self.model.eval()
             with torch.no_grad():
                 output = self.model(tensor.to(device))
                 prob = torch.sigmoid(output).item()
+            if not math.isfinite(prob):
+                raise ValueError('Model produced a non-finite score')
 
             return {
                 "score": round(prob, 4),

@@ -49,7 +49,15 @@ Render workspace confirmed: My Workspace. Vercel team discovered: Atharv Sawane'
 
 The user approved a temporary PC worker after the ZeroGPU rejection, while continuing research into free cloud alternatives. The PC worker polls actual queued work every 60 seconds and needs no inbound network port. Start it explicitly with `python -m services.remote_worker` from backend; stop with Ctrl+C. Its separate `worker.env.local` holds only the backend URL and worker secret. Polling consumes the shared Render free instance allowance while running.
 
-Current checks: **145 backend tests passed**, signed-URL live smoke passed, Ruff passed, TypeScript passed; production frontend build passed. Added admission limits: 100 jobs globally/day, estimated 2 GB transfer reservations/month, 400 MB database stop threshold. Provider usage must still be monitored because repeated signed downloads are not fully controlled by these reservations.
+Current checks: **147 backend tests passed**, signed-URL live smoke passed, Ruff passed, TypeScript passed; production frontend build passed. Added admission limits: 100 jobs globally/day, estimated 2 GB transfer reservations/month, 400 MB database stop threshold. Provider usage must still be monitored because repeated signed downloads are not fully controlled by these reservations.
+
+## October 2 detector review
+
+- Corrected the bounded CNNDetect preprocessing to its upstream optional center crop, preserving pixel scale instead of resizing. Added regression coverage for the transform and rejection of non-finite model outputs; processing version is 2.0.1.
+- The corrected model still flagged 0/12 modern SafeIMG synthetic pilot images at the unchanged 0.5 threshold. The upstream real/fake example pair passes as an implementation fixture only. These findings do not establish accuracy or justify enabling verdicts. See evaluation/MODEL_REVIEW.md and the preserved benchmark JSON files.
+- Withheld report scores now display as unavailable instead of misleading zero percentages. Independent category validation remains required.
+- Live browser verification passed against the local production frontend/API and Supabase queue: password login, private image upload, worker processing, unavailable-score display and saved history. The temporary account and its media were removed by fixture cleanup.
+- PostgreSQL Session pooler is reachable, but the latest connection check failed password authentication. Backup/restore verification has not run. Supabase API access uses separate credentials.
 
 ## Remaining acceptance gates
 

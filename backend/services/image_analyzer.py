@@ -81,7 +81,7 @@ class ImageAnalyzer:
             "file_type": "image",
             "processing_version": "1.1.0",
             "model_weights_sha256": getattr(self.model_loader, "weight_fingerprints", {}),
-            "native_input_transform": "RGB; resize 224x224; ImageNet mean/std normalization",
+            "native_input_transform": "RGB; GAN center crop 224x224 without resize; deepfake resize 224x224; ImageNet mean/std normalization",
             "provenance": provenance,
             "editing_assessment": {
                 "status": "not_validated",

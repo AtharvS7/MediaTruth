@@ -252,7 +252,9 @@ export default function ResultsPage() {
                   {verdict}
                 </p>
                 <p className="font-mono text-xs text-white/40 mt-1">
-                  {Math.round((result.confidence || 0) * 100)}% analysis score
+                  {result.score_semantics === 'withheld_pending_validation'
+                    ? 'Analysis score not available'
+                    : `${Math.round((result.confidence || 0) * 100)}% analysis score`}
                 </p>
               </div>
             </motion.div>
@@ -335,12 +337,17 @@ export default function ResultsPage() {
             <h2 className="font-display font-semibold text-lg mb-6">
               Experimental Analysis Scores
             </h2>
-            <ProbabilityMatrix
+            {result.score_semantics === 'withheld_pending_validation' ? (
+              <p role="status" className="text-white/70">
+                Category scores are not available until independent validation passes.
+                This is not a zero probability of AI generation or editing.
+              </p>
+            ) : <ProbabilityMatrix
               aiGenerated={result.ai_generated_probability || 0}
               aiEdited={result.ai_edited_probability || 0}
               traditionalEdit={result.traditional_edit_probability || 0}
               authentic={result.authentic_probability || 0}
-            />
+            />}
             <p className="text-sm text-white/60 mt-4">
               These scores are not calibrated probabilities or proof of origin.
               AI editing and conventional editing can produce similar signals.

@@ -83,3 +83,38 @@ def test_partial_video_marks_coverage_gap():
 async def test_readiness_uses_loader_property():
     request = SimpleNamespace(app=SimpleNamespace(state=SimpleNamespace(model_loader=SimpleNamespace(ready=True))))
     assert await readiness(request) == {"ready": True}
+
+
+def test_native_gan_preserves_pixels_in_center_crop(tmp_path):
+    import torch
+    from PIL import Image
+    # A white center and black border make a destructive resize observable.
+    image = Image.new('RGB', (448, 448), 'black')
+    image.paste('white', (112, 112, 336, 336))
+    path = tmp_path / 'crop.png'
+    image.save(path)
+    class Model:
+        def eval(self):
+            return self
+        def __call__(self, tensor):
+            assert tensor.shape == (1, 3, 224, 224)
+            assert torch.allclose(tensor[0, 0], torch.full((224, 224), (1-.485)/.229))
+            return torch.tensor([[0.]])
+    loader = SimpleNamespace(get_model=lambda name: Model(), has_weights=lambda name: True,
+                             _hf_api_mode=False, device='cpu')
+    assert GANDetector(loader).predict(str(path))['api_success'] is True
+
+
+def test_native_gan_rejects_nonfinite_logit(tmp_path):
+    import torch
+    from PIL import Image
+    path = tmp_path / 'input.png'
+    Image.new('RGB', (224, 224)).save(path)
+    class Model:
+        def eval(self):
+            return self
+        def __call__(self, tensor):
+            return torch.tensor([[float('nan')]])
+    loader = SimpleNamespace(get_model=lambda name: Model(), has_weights=lambda name: True,
+                             _hf_api_mode=False, device='cpu')
+    assert GANDetector(loader).predict(str(path))['api_success'] is False

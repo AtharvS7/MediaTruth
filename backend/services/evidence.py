@@ -7,7 +7,7 @@ outputs are retained as experimental evidence, never presented as probabilities.
 
 def public_report(result):
     report = dict(result)
-    report.update(report_schema_version=2, processing_version='2.0.0',
+    report.update(report_schema_version=2, processing_version='2.0.1',
                   final_verdict='Inconclusive', confidence=0.0, limited_mode=True,
                   score_semantics='withheld_pending_validation',
                   validation_status='not_validated',

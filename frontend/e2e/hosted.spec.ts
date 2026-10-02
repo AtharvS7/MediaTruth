@@ -44,6 +44,9 @@ test.describe('explicit live browser smoke', () => {
     await page.locator('#analyze-btn').click();
     await expect(page).toHaveURL(/\/results\//,{timeout:210_000});
     await expect(page.getByText('Inconclusive',{exact:true}).first()).toBeVisible();
+    await expect(page.getByText('Analysis score not available', {exact:true})).toBeVisible();
+    await expect(page.getByText('0% analysis score', {exact:true})).toHaveCount(0);
+    await expect(page.getByRole('status').filter({hasText:'Category scores are not available'})).toBeVisible();
     await page.goto('/history');
     await expect(page.getByText('fixture.png').first()).toBeVisible({timeout:30_000});
   });
