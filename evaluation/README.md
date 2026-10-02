@@ -1,10 +1,17 @@
 # Evaluation inputs
 
-No accuracy benchmark has been claimed or completed. `backend/evaluation.py` validates the manifest and scores categorical predictions separately from software smoke tests.
+Exploratory model comparisons are documented in `ACCURACY_ITERATION.md`; no independent accuracy validation has passed. `backend/evaluation.py` validates the manifest and scores categorical predictions separately from software smoke tests.
 
 Each JSONL manifest row requires `id`, relative `path`, `label`, `source`, `license`, `sha256`, `group_id`, and `split`. Labels: `original`, `ai_generated`, `ai_edited`, `traditional_edit`, `mixed`. Splits: `train`, `validation`, `test`. Keep the original, crops, recompressions, edits and video frames in one group/split. Include generator/tool/version and edit-mask metadata as additional fields where available. Merely writing a license label is not a legal review.
 
-Prediction JSONL rows require `id` and `label`; `inconclusive` is allowed. Every test sample must have exactly one prediction; never omit failures. Run:
+Prediction JSONL rows require `id` and `label`; `inconclusive` is allowed. Every test sample must have exactly one prediction; never omit failures.
+
+Release gates additionally require `independence_verified: true` for every test
+sample, assigned only after reviewing parent identity and split provenance.
+Unique filenames or hashes alone do not establish independence. Public pilot
+data with unverified parents must leave this false or absent.
+
+Run:
 
 ```sh
 python backend/evaluation.py evaluation/data/manifest.jsonl evaluation/data/predictions.jsonl

@@ -30,6 +30,7 @@ backend/models/weights/*.pt
 backend/models/weights/*.bin
 backend/models/weights/*.ckpt
 backend/models/weights/*.h5
+backend/models/weights/*.safetensors
 # Root-level models dir (accidental download location)
 models/
 

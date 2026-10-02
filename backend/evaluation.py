@@ -35,7 +35,8 @@ def release_gates(rows, predictions, minimum_support=200):
     metrics = evaluate(rows, predictions)
     samples = [row for row in rows if row['split'] == 'test']
     groups = [row.get('group_id') for row in samples]
-    independent = all(groups) and len(groups) == len(set(groups))
+    independent = (all(groups) and len(groups) == len(set(groups))
+                   and all(row.get('independence_verified') is True for row in samples))
     confusion = {(item['truth'], item['prediction']): item['count'] for item in metrics['confusion']}
     original_count = metrics['per_class']['original']['support']
     false_flags = sum(n for (truth, guess), n in confusion.items()

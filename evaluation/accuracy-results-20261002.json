@@ -1,0 +1,3803 @@
+{
+  "date": "2026-10-02",
+  "release_eligible": false,
+  "limitations": [
+    "Adaptive exploratory model selection; no independent holdout",
+    "Control acquisition incomplete: 23/96 rows; 73 failed requests",
+    "Parent independence not verified; intervals are descriptive only",
+    "FSD, B-Free and datasets restricted to noncommercial/nonprofit use",
+    "No threshold tuned on these results; production verdicts remain withheld"
+  ],
+  "datasets": {
+    "safeimg": {
+      "manifest_sha256": "5edfa06143d7b014fbca01ca54dfa9e223d8b685bfa32e603b9ef9c1395b88f0",
+      "samples": [
+        {
+          "id": "safeimg-0",
+          "sha256": "49ab997d924a9c616f846b6f96080c3aaac7eaa87b0520598c6ff2aad89db62c",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-0",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-94",
+          "sha256": "70446d3a26514c212c9d168a38659bbbad3a43914db75d19e626dc0b63b096ee",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-94",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-188",
+          "sha256": "9be6f0b32b320920daf4353d9c37789373db83d9b873be10646d010f6591b084",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-188",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-282",
+          "sha256": "9b63e05a31d008849e082fcaffeee20b2749ba2b682d5b5700efd2b8324bd88a",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-282",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-377",
+          "sha256": "761324c7bfe017a901ce1fe9cb07e62ff8244fa00150304c8b06d719480f103c",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-377",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-471",
+          "sha256": "1611a880df1475c2f75578f3fbfb1717b2bb0a1ae8a714f753036ceca73e6987",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-471",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-565",
+          "sha256": "4dec1e85b3ed0bfe8b9e3a335b78d77d05711aea1eefd0c2df4aba962380e5b5",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-565",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-659",
+          "sha256": "d5cffa067ca187be68f68393847564839125cdadc7b80b9c10c47eadc58d2bfe",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-659",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-754",
+          "sha256": "96546b1ccc9af0ec50c3e25b62d7ec593ed084936cbbbee59bbcfc35695aa6b6",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-754",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-848",
+          "sha256": "d96de434ec98143dc4a93cee86bb3c8ff8bdf9960a51e4911d2a5f7ae02d45e3",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-848",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-942",
+          "sha256": "17db469a9c4e5ec470c9a47eaafc677aa603f8bfad76eb089379d8976b240438",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-942",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "safeimg-1036",
+          "sha256": "a62d3cc333b0de0a961d98a101ab942eba43b9cbf543c094d2a05a2910c06eb5",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "source_revision": "389a7c555191c9e946727a470500fcd9b045381c",
+          "group_id": "safeimg-1036",
+          "license": "CC-BY-NC-SA-4.0"
+        }
+      ]
+    },
+    "controls": {
+      "manifest_sha256": "03865c0b6fc3c9aac62fe5b1270d31f440f3eca128e68564c0c5a636d1d53bb8",
+      "samples": [
+        {
+          "id": "commfor-0",
+          "sha256": "8130cec38b21c7f1fb7c8cb0f3e6117377666c77201a17a698aae64cea508a1b",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "coco:000000017467.jpg",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-539",
+          "sha256": "41b4a8ff3d49c778267898571f80671229284b73e0ce6a503538030c5b1a2a62",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "DFGAN:000142.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-1079",
+          "sha256": "a7094ceb8f5227a89409ed3a35bb3e961f2bf6020081108c7b672e5dcd82546b",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "LAION:00021778.webp",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-1619",
+          "sha256": "644683875388aab830161084ce23d3e7a9cc4526e5873edb4f6392f7830f008f",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "LAION:00042313.jpeg",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-2159",
+          "sha256": "27b6fcfc4a8c337ce9bb8521ae75a1fd4030cc4e25fd9ca13d23dad2bb5d248b",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "stable_cascade:000261.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-2699",
+          "sha256": "aa6b611e1a460a0dcb64694c7bd249e8fb389b2e6a25905ce3cec7c4e821fab6",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "stable_cascade:000301.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-3239",
+          "sha256": "b2651c6e67ef152b7184e87d8efe6f3d3cf0f50a3de23d256aa34bd21482a4d0",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "MidjourneyV5_2:00000281_1.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-3779",
+          "sha256": "760e65b7a4d40ccad55351cbe44970cfbe59d4b4f0f8a06ee608d0671fec3137",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "MidjourneyV5_2:00000341_1.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-4319",
+          "sha256": "21736cf6a3ea4576c1953d5f472a29f219aeb5313d69752c656e9a1a9c61cd95",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "LAION:00022871.gif",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-4859",
+          "sha256": "aec829c596cbb3f189457d523190dc2a9cf08c73ba63adc79b18e92ab024a3e5",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "LAION:00024343.jpeg",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-5939",
+          "sha256": "4d3552bc14e179e73868ec7a0c57dee7e6032e63e9013b1abf097a948332513b",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "GALIP:000657.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-6479",
+          "sha256": "28c2b93cd7012e0412e243d087cbc970990e8127ead5c079d5a5e1a1920c159c",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "MidjourneyV5_2:00000109_3.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-7019",
+          "sha256": "b8daf3ebcb6ef74e170566cc2240f6396e37a0dbc3b133f34fdb1288ad592dea",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "LCM_lora_sdxl:000154.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-7559",
+          "sha256": "7cf653c66203b978afe68425c034bd038ee89cbebb7c80a7fde32db3f2cd859c",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "LCM_lora_sdxl:000725.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-8099",
+          "sha256": "cd23607c71445560216b38980b542cbc55a2ae07b10fb072ca5eed4ab8ddcf4c",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "Firefly_Image2:00000407_3.jpg",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-8639",
+          "sha256": "fc51cd7a025f798d61cfeb023ee1964fb646f5361c86dba6158b3119ffe4f9e4",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "Firefly_Image2:00000259_3.jpg",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-9179",
+          "sha256": "1122bf46c223cc205739902c5dd2669c397cbac3a79320155add32d9952e6e86",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "MidjourneyV6_1:00000440_0.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-9719",
+          "sha256": "73dfcaf37d518c69599cff00ba3b12cab931801bd0b3ba6f5793f88845391271",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "MidjourneyV6_1:00000007_3.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-10259",
+          "sha256": "8569b47c6698beced8bc7da54e96ce2b721d55ca20552f51214872f17bfed11d",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "imagenet:ILSVRC2012_val_00033693.JPEG",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-10799",
+          "sha256": "771594524ab0261721c41df376ac364bafb1dfef553dcaf4de84f13c18824711",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "imagenet:ILSVRC2012_val_00018505.JPEG",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-11339",
+          "sha256": "1d000fa13ea936a0f5ad58778efd966cb4e4d078b265ce37e369635afbe5e9b7",
+          "label": "ai_generated",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "kvikontent_midjourney_v6:000343.png",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-12419",
+          "sha256": "53a87ba93deb90b8a3d9d0257bb24909fff6c7dc3dc3031d2fd0b6b2a4a4fb4e",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "LAION:00046226.jpeg",
+          "license": "CC-BY-NC-SA-4.0"
+        },
+        {
+          "id": "commfor-12959",
+          "sha256": "cf42bb809d72c03d72af8ea75b9b78d62a04beecfd42aea89cd376aa02a8273a",
+          "label": "original",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "source_revision": "7d4a74a88d2cac93b513c0853bf92c260eaceea0",
+          "group_id": "ffhq:57446.png",
+          "license": "CC-BY-NC-SA-4.0"
+        }
+      ]
+    }
+  },
+  "experiments": [
+    {
+      "candidate": "community",
+      "dataset": "safeimg",
+      "original_report_sha256": "f89971b294996f1138a40f7f5e6c33931929bd3123ea04afb745b99af5801ade",
+      "model": {
+        "repository": "OwensLab/commfor-model-224",
+        "revision": "26afc31e6b40c312c3fd42c05a758be62446215b",
+        "sha256": "a6cc439d5a6d2dfadd60c77d27a2838ad55b34e601ecd30f46ad97266d6ac4e0",
+        "architecture": "vit_small_patch16_224.augreg_in21k_ft_in1k",
+        "input_size": 224,
+        "temperature": 1.0,
+        "positive_is_real": false
+      },
+      "metrics": {
+        "samples": 12,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 12,
+            "precision": 1.0,
+            "recall": 0.16666666666666666
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 0,
+            "precision": 0.0,
+            "recall": null
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": null,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 2
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 10
+          }
+        ],
+        "original_fpr_95": null,
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": true,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": [
+              0.34238022750665303,
+              1.0
+            ],
+            "recall_95": [
+              0.04696514218385378,
+              0.4480308622529734
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": [
+              0.0,
+              0.2775327998628892
+            ],
+            "recall_95": null
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "id": "safeimg-0",
+          "sha256": "49ab997d924a9c616f846b6f96080c3aaac7eaa87b0520598c6ff2aad89db62c",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 1.0160000000000764,
+          "score": 0.006174669025306017,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-94",
+          "sha256": "70446d3a26514c212c9d168a38659bbbad3a43914db75d19e626dc0b63b096ee",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.15599999999994907,
+          "score": 0.0036096296452118163,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-188",
+          "sha256": "9be6f0b32b320920daf4353d9c37789373db83d9b873be10646d010f6591b084",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.11000000000012733,
+          "score": 0.06384161029689826,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-282",
+          "sha256": "9b63e05a31d008849e082fcaffeee20b2749ba2b682d5b5700efd2b8324bd88a",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.1089999999999236,
+          "score": 0.06285425573681055,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-377",
+          "sha256": "761324c7bfe017a901ce1fe9cb07e62ff8244fa00150304c8b06d719480f103c",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.1089999999999236,
+          "score": 0.23905051108914682,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-471",
+          "sha256": "1611a880df1475c2f75578f3fbfb1717b2bb0a1ae8a714f753036ceca73e6987",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.09400000000005093,
+          "score": 0.6499405163174571,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-565",
+          "sha256": "4dec1e85b3ed0bfe8b9e3a335b78d77d05711aea1eefd0c2df4aba962380e5b5",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.1089999999999236,
+          "score": 0.2967201601335673,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-659",
+          "sha256": "d5cffa067ca187be68f68393847564839125cdadc7b80b9c10c47eadc58d2bfe",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.11000000000012733,
+          "score": 0.1775042273998913,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-754",
+          "sha256": "96546b1ccc9af0ec50c3e25b62d7ec593ed084936cbbbee59bbcfc35695aa6b6",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.1089999999999236,
+          "score": 0.1547896142196579,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-848",
+          "sha256": "d96de434ec98143dc4a93cee86bb3c8ff8bdf9960a51e4911d2a5f7ae02d45e3",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.125,
+          "score": 0.6443075893270803,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-942",
+          "sha256": "17db469a9c4e5ec470c9a47eaafc677aa603f8bfad76eb089379d8976b240438",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.07799999999997453,
+          "score": 0.001906064861367136,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-1036",
+          "sha256": "a62d3cc333b0de0a961d98a101ab942eba43b9cbf543c094d2a05a2910c06eb5",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.07799999999997453,
+          "score": 0.005462737201836468,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        }
+      ]
+    },
+    {
+      "candidate": "community",
+      "dataset": "controls",
+      "original_report_sha256": "71b24769032222925ceb68006eae6e6e57487c4ccd670e43703b1c1a24d181f0",
+      "model": {
+        "repository": "OwensLab/commfor-model-224",
+        "revision": "26afc31e6b40c312c3fd42c05a758be62446215b",
+        "sha256": "a6cc439d5a6d2dfadd60c77d27a2838ad55b34e601ecd30f46ad97266d6ac4e0",
+        "architecture": "vit_small_patch16_224.augreg_in21k_ft_in1k",
+        "input_size": 224,
+        "temperature": 1.0,
+        "positive_is_real": false
+      },
+      "metrics": {
+        "samples": 23,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 14,
+            "precision": 1.0,
+            "recall": 0.7857142857142857
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 9,
+            "precision": 0.75,
+            "recall": 1.0
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": 0.0,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 11
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 3
+          },
+          {
+            "truth": "original",
+            "prediction": "original",
+            "count": 9
+          }
+        ],
+        "original_fpr_95": [
+          0.0,
+          0.2991450484195441
+        ],
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": true,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.7411670330319684,
+              1.0
+            ],
+            "recall_95": [
+              0.524107694133997,
+              0.9242861328730683
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.46769466506643426,
+              0.9110583316059453
+            ],
+            "recall_95": [
+              0.7008549515804559,
+              1.0
+            ]
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "id": "commfor-0",
+          "sha256": "8130cec38b21c7f1fb7c8cb0f3e6117377666c77201a17a698aae64cea508a1b",
+          "truth": "original",
+          "generator": "DFGAN",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.1570000000001528,
+          "score": 0.0010776996907040867,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-539",
+          "sha256": "41b4a8ff3d49c778267898571f80671229284b73e0ce6a503538030c5b1a2a62",
+          "truth": "ai_generated",
+          "generator": "DFGAN",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.10900000000037835,
+          "score": 0.9999837406611857,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-1079",
+          "sha256": "a7094ceb8f5227a89409ed3a35bb3e961f2bf6020081108c7b672e5dcd82546b",
+          "truth": "original",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.125,
+          "score": 0.0025152889818043436,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-1619",
+          "sha256": "644683875388aab830161084ce23d3e7a9cc4526e5873edb4f6392f7830f008f",
+          "truth": "original",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.06199999999989814,
+          "score": 0.00031580220528671743,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-2159",
+          "sha256": "27b6fcfc4a8c337ce9bb8521ae75a1fd4030cc4e25fd9ca13d23dad2bb5d248b",
+          "truth": "ai_generated",
+          "generator": "stable_cascade",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.10999999999967258,
+          "score": 0.7969780732061273,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-2699",
+          "sha256": "aa6b611e1a460a0dcb64694c7bd249e8fb389b2e6a25905ce3cec7c4e821fab6",
+          "truth": "ai_generated",
+          "generator": "stable_cascade",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.10900000000037835,
+          "score": 0.9999954921971916,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-3239",
+          "sha256": "b2651c6e67ef152b7184e87d8efe6f3d3cf0f50a3de23d256aa34bd21482a4d0",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.10999999999967258,
+          "score": 0.9992012704222707,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-3779",
+          "sha256": "760e65b7a4d40ccad55351cbe44970cfbe59d4b4f0f8a06ee608d0671fec3137",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.0929999999998472,
+          "score": 0.9999949288913763,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-4319",
+          "sha256": "21736cf6a3ea4576c1953d5f472a29f219aeb5313d69752c656e9a1a9c61cd95",
+          "truth": "original",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.07800000000042928,
+          "score": 0.000733332757268302,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-4859",
+          "sha256": "aec829c596cbb3f189457d523190dc2a9cf08c73ba63adc79b18e92ab024a3e5",
+          "truth": "original",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.07899999999972351,
+          "score": 0.0006384379931084329,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-5939",
+          "sha256": "4d3552bc14e179e73868ec7a0c57dee7e6032e63e9013b1abf097a948332513b",
+          "truth": "ai_generated",
+          "generator": "GALIP",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.0929999999998472,
+          "score": 0.9997165761072057,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-6479",
+          "sha256": "28c2b93cd7012e0412e243d087cbc970990e8127ead5c079d5a5e1a1920c159c",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.125,
+          "score": 0.28947418763831684,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-7019",
+          "sha256": "b8daf3ebcb6ef74e170566cc2240f6396e37a0dbc3b133f34fdb1288ad592dea",
+          "truth": "ai_generated",
+          "generator": "LCM_lora_sdxl",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.09400000000005093,
+          "score": 0.9997000057870047,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-7559",
+          "sha256": "7cf653c66203b978afe68425c034bd038ee89cbebb7c80a7fde32db3f2cd859c",
+          "truth": "ai_generated",
+          "generator": "LCM_lora_sdxl",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.10900000000037835,
+          "score": 0.9999495908055784,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-8099",
+          "sha256": "cd23607c71445560216b38980b542cbc55a2ae07b10fb072ca5eed4ab8ddcf4c",
+          "truth": "ai_generated",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.125,
+          "score": 0.05495245636722428,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-8639",
+          "sha256": "fc51cd7a025f798d61cfeb023ee1964fb646f5361c86dba6158b3119ffe4f9e4",
+          "truth": "ai_generated",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.10999999999967258,
+          "score": 0.013460985060470504,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-9179",
+          "sha256": "1122bf46c223cc205739902c5dd2669c397cbac3a79320155add32d9952e6e86",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.09400000000005093,
+          "score": 0.736177770465636,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-9719",
+          "sha256": "73dfcaf37d518c69599cff00ba3b12cab931801bd0b3ba6f5793f88845391271",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.0929999999998472,
+          "score": 0.8987203915513657,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-10259",
+          "sha256": "8569b47c6698beced8bc7da54e96ce2b721d55ca20552f51214872f17bfed11d",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.06300000000010186,
+          "score": 0.006379482888145001,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-10799",
+          "sha256": "771594524ab0261721c41df376ac364bafb1dfef553dcaf4de84f13c18824711",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.07800000000042928,
+          "score": 0.0014294629024148124,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-11339",
+          "sha256": "1d000fa13ea936a0f5ad58778efd966cb4e4d078b265ce37e369635afbe5e9b7",
+          "truth": "ai_generated",
+          "generator": "kvikontent_midjourney_v6",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.07799999999951979,
+          "score": 0.9999405298544006,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-12419",
+          "sha256": "53a87ba93deb90b8a3d9d0257bb24909fff6c7dc3dc3031d2fd0b6b2a4a4fb4e",
+          "truth": "original",
+          "generator": "Dalle3",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.06300000000010186,
+          "score": 7.272550719945016e-05,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-12959",
+          "sha256": "cf42bb809d72c03d72af8ea75b9b78d62a04beecfd42aea89cd376aa02a8273a",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.14000000000032742,
+          "score": 0.003886569416918083,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        }
+      ]
+    },
+    {
+      "candidate": "community_384",
+      "dataset": "safeimg",
+      "original_report_sha256": "5a8d5242c923bde2e54058fb1aa83452b461bd019e05745bb17dff857b211dc4",
+      "model": {
+        "repository": "OwensLab/commfor-model-384",
+        "revision": "6076002bf0d9dd37537f965ee2f06f826c333b61",
+        "sha256": "b89f36275f3bf5e2b040eee36597a8f19db051bff9a473a9cf7b2466284fb387",
+        "architecture": "vit_small_patch16_384.augreg_in21k_ft_in1k",
+        "input_size": 384,
+        "temperature": 1.0,
+        "positive_is_real": false
+      },
+      "metrics": {
+        "samples": 12,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 12,
+            "precision": 1.0,
+            "recall": 0.08333333333333333
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 0,
+            "precision": 0.0,
+            "recall": null
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": null,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 1
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 11
+          }
+        ],
+        "original_fpr_95": null,
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": true,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": [
+              0.20654931437723745,
+              1.0
+            ],
+            "recall_95": [
+              0.014865094404917095,
+              0.35387991114111694
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": [
+              0.0,
+              0.2588329669680317
+            ],
+            "recall_95": null
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "id": "safeimg-0",
+          "sha256": "49ab997d924a9c616f846b6f96080c3aaac7eaa87b0520598c6ff2aad89db62c",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.2969999999995707,
+          "score": 0.00039194836696396706,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-94",
+          "sha256": "70446d3a26514c212c9d168a38659bbbad3a43914db75d19e626dc0b63b096ee",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.25,
+          "score": 0.0033275318591197535,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-188",
+          "sha256": "9be6f0b32b320920daf4353d9c37789373db83d9b873be10646d010f6591b084",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.26600000000053114,
+          "score": 0.04147204305927527,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-282",
+          "sha256": "9b63e05a31d008849e082fcaffeee20b2749ba2b682d5b5700efd2b8324bd88a",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.25,
+          "score": 0.014311224993737532,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-377",
+          "sha256": "761324c7bfe017a901ce1fe9cb07e62ff8244fa00150304c8b06d719480f103c",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.25,
+          "score": 0.04204692396464923,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-471",
+          "sha256": "1611a880df1475c2f75578f3fbfb1717b2bb0a1ae8a714f753036ceca73e6987",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.23399999999946886,
+          "score": 0.8575671517691931,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-565",
+          "sha256": "4dec1e85b3ed0bfe8b9e3a335b78d77d05711aea1eefd0c2df4aba962380e5b5",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.25,
+          "score": 0.06649414692578375,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-659",
+          "sha256": "d5cffa067ca187be68f68393847564839125cdadc7b80b9c10c47eadc58d2bfe",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.26600000000053114,
+          "score": 0.00483051021243249,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-754",
+          "sha256": "96546b1ccc9af0ec50c3e25b62d7ec593ed084936cbbbee59bbcfc35695aa6b6",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.25,
+          "score": 0.008610417604793133,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-848",
+          "sha256": "d96de434ec98143dc4a93cee86bb3c8ff8bdf9960a51e4911d2a5f7ae02d45e3",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.23399999999946886,
+          "score": 0.15551060228143213,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-942",
+          "sha256": "17db469a9c4e5ec470c9a47eaafc677aa603f8bfad76eb089379d8976b240438",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.21900000000005093,
+          "score": 0.0008869399611109337,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-1036",
+          "sha256": "a62d3cc333b0de0a961d98a101ab942eba43b9cbf543c094d2a05a2910c06eb5",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.21900000000005093,
+          "score": 0.004772231974774762,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        }
+      ]
+    },
+    {
+      "candidate": "community_384",
+      "dataset": "controls",
+      "original_report_sha256": "fdb5df4e391066415eb979093ddaf3a6be8f28e340ec44034f21ebcf7a99ebfa",
+      "model": {
+        "repository": "OwensLab/commfor-model-384",
+        "revision": "6076002bf0d9dd37537f965ee2f06f826c333b61",
+        "sha256": "b89f36275f3bf5e2b040eee36597a8f19db051bff9a473a9cf7b2466284fb387",
+        "architecture": "vit_small_patch16_384.augreg_in21k_ft_in1k",
+        "input_size": 384,
+        "temperature": 1.0,
+        "positive_is_real": false
+      },
+      "metrics": {
+        "samples": 23,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 14,
+            "precision": 1.0,
+            "recall": 0.7857142857142857
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 9,
+            "precision": 0.75,
+            "recall": 1.0
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": 0.0,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 11
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 3
+          },
+          {
+            "truth": "original",
+            "prediction": "original",
+            "count": 9
+          }
+        ],
+        "original_fpr_95": [
+          0.0,
+          0.2991450484195441
+        ],
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": true,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.7411670330319684,
+              1.0
+            ],
+            "recall_95": [
+              0.524107694133997,
+              0.9242861328730683
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.46769466506643426,
+              0.9110583316059453
+            ],
+            "recall_95": [
+              0.7008549515804559,
+              1.0
+            ]
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "id": "commfor-0",
+          "sha256": "8130cec38b21c7f1fb7c8cb0f3e6117377666c77201a17a698aae64cea508a1b",
+          "truth": "original",
+          "generator": "DFGAN",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.21900000000005093,
+          "score": 0.0003400905254151154,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-539",
+          "sha256": "41b4a8ff3d49c778267898571f80671229284b73e0ce6a503538030c5b1a2a62",
+          "truth": "ai_generated",
+          "generator": "DFGAN",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.20300000000042928,
+          "score": 0.9999998855660341,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-1079",
+          "sha256": "a7094ceb8f5227a89409ed3a35bb3e961f2bf6020081108c7b672e5dcd82546b",
+          "truth": "original",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.28099999999994907,
+          "score": 0.025819742975472824,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-1619",
+          "sha256": "644683875388aab830161084ce23d3e7a9cc4526e5873edb4f6392f7830f008f",
+          "truth": "original",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2039999999997235,
+          "score": 1.483442051860211e-05,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-2159",
+          "sha256": "27b6fcfc4a8c337ce9bb8521ae75a1fd4030cc4e25fd9ca13d23dad2bb5d248b",
+          "truth": "ai_generated",
+          "generator": "stable_cascade",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.23400000000037835,
+          "score": 0.9999326389504476,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-2699",
+          "sha256": "aa6b611e1a460a0dcb64694c7bd249e8fb389b2e6a25905ce3cec7c4e821fab6",
+          "truth": "ai_generated",
+          "generator": "stable_cascade",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.23399999999946886,
+          "score": 0.9999996633143103,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-3239",
+          "sha256": "b2651c6e67ef152b7184e87d8efe6f3d3cf0f50a3de23d256aa34bd21482a4d0",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.25,
+          "score": 0.9899588047840767,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-3779",
+          "sha256": "760e65b7a4d40ccad55351cbe44970cfbe59d4b4f0f8a06ee608d0671fec3137",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.23500000000058208,
+          "score": 0.9999582435282502,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-4319",
+          "sha256": "21736cf6a3ea4576c1953d5f472a29f219aeb5313d69752c656e9a1a9c61cd95",
+          "truth": "original",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2029999999995198,
+          "score": 8.679936978690238e-06,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-4859",
+          "sha256": "aec829c596cbb3f189457d523190dc2a9cf08c73ba63adc79b18e92ab024a3e5",
+          "truth": "original",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.20300000000042928,
+          "score": 3.393347095573056e-05,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-5939",
+          "sha256": "4d3552bc14e179e73868ec7a0c57dee7e6032e63e9013b1abf097a948332513b",
+          "truth": "ai_generated",
+          "generator": "GALIP",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.18699999999989814,
+          "score": 0.9993051222724914,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-6479",
+          "sha256": "28c2b93cd7012e0412e243d087cbc970990e8127ead5c079d5a5e1a1920c159c",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.25,
+          "score": 0.3245391782017653,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-7019",
+          "sha256": "b8daf3ebcb6ef74e170566cc2240f6396e37a0dbc3b133f34fdb1288ad592dea",
+          "truth": "ai_generated",
+          "generator": "LCM_lora_sdxl",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.21900000000005093,
+          "score": 0.9617348963120465,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-7559",
+          "sha256": "7cf653c66203b978afe68425c034bd038ee89cbebb7c80a7fde32db3f2cd859c",
+          "truth": "ai_generated",
+          "generator": "LCM_lora_sdxl",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.23499999999967258,
+          "score": 0.9879196336459993,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-8099",
+          "sha256": "cd23607c71445560216b38980b542cbc55a2ae07b10fb072ca5eed4ab8ddcf4c",
+          "truth": "ai_generated",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.25,
+          "score": 0.831486109849593,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-8639",
+          "sha256": "fc51cd7a025f798d61cfeb023ee1964fb646f5361c86dba6158b3119ffe4f9e4",
+          "truth": "ai_generated",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.23400000000037835,
+          "score": 0.005740767161579826,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-9179",
+          "sha256": "1122bf46c223cc205739902c5dd2669c397cbac3a79320155add32d9952e6e86",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.21900000000005093,
+          "score": 0.016735889181025823,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-9719",
+          "sha256": "73dfcaf37d518c69599cff00ba3b12cab931801bd0b3ba6f5793f88845391271",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2179999999998472,
+          "score": 0.9578199466671159,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-10259",
+          "sha256": "8569b47c6698beced8bc7da54e96ce2b721d55ca20552f51214872f17bfed11d",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2039999999997235,
+          "score": 0.0003086074598116707,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-10799",
+          "sha256": "771594524ab0261721c41df376ac364bafb1dfef553dcaf4de84f13c18824711",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2179999999998472,
+          "score": 5.414323431618073e-06,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-11339",
+          "sha256": "1d000fa13ea936a0f5ad58778efd966cb4e4d078b265ce37e369635afbe5e9b7",
+          "truth": "ai_generated",
+          "generator": "kvikontent_midjourney_v6",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.20300000000042928,
+          "score": 0.9999996534876872,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-12419",
+          "sha256": "53a87ba93deb90b8a3d9d0257bb24909fff6c7dc3dc3031d2fd0b6b2a4a4fb4e",
+          "truth": "original",
+          "generator": "Dalle3",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2039999999997235,
+          "score": 2.3202297807378637e-05,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-12959",
+          "sha256": "cf42bb809d72c03d72af8ea75b9b78d62a04beecfd42aea89cd376aa02a8273a",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2650000000003274,
+          "score": 0.004002127064582268,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        }
+      ]
+    },
+    {
+      "candidate": "modern_clip",
+      "dataset": "safeimg",
+      "original_report_sha256": "ff3806bd9333e0e26a1bcc194c5bdf10645976b3a7434521409825f7fef6a049",
+      "model": {
+        "repository": "wkaandemir/ai-image-detector",
+        "revision": "fefa013737a0c3477961d36ee8dbbdc751352366",
+        "sha256": "41ce93c6c206a4f3929e19cf9b43b663c63a47422ab27a9bbb67757db5f42339",
+        "architecture": "vit_base_patch16_clip_224.openai",
+        "input_size": 256,
+        "temperature": 0.594889223575592,
+        "positive_is_real": true
+      },
+      "metrics": {
+        "samples": 12,
+        "coverage": 0.8333333333333334,
+        "abstentions": 2,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 12,
+            "precision": 1.0,
+            "recall": 0.6666666666666666
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 0,
+            "precision": 0.0,
+            "recall": null
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": null,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 8
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "inconclusive",
+            "count": 2
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 2
+          }
+        ],
+        "original_fpr_95": null,
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": true,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.6755924351161198,
+              1.0
+            ],
+            "recall_95": [
+              0.39062208887279953,
+              0.8618799089087867
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": [
+              0.0,
+              0.6576197724933469
+            ],
+            "recall_95": null
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "id": "safeimg-0",
+          "sha256": "49ab997d924a9c616f846b6f96080c3aaac7eaa87b0520598c6ff2aad89db62c",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 1.1090000000003783,
+          "score": 0.9927582320042128,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-94",
+          "sha256": "70446d3a26514c212c9d168a38659bbbad3a43914db75d19e626dc0b63b096ee",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.375,
+          "score": 0.9354428841796752,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-188",
+          "sha256": "9be6f0b32b320920daf4353d9c37789373db83d9b873be10646d010f6591b084",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.39099999999962165,
+          "score": 0.07838535946956693,
+          "label": "inconclusive",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-282",
+          "sha256": "9b63e05a31d008849e082fcaffeee20b2749ba2b682d5b5700efd2b8324bd88a",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.4530000000004293,
+          "score": 0.10257086115917757,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-377",
+          "sha256": "761324c7bfe017a901ce1fe9cb07e62ff8244fa00150304c8b06d719480f103c",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.375,
+          "score": 0.9778843205375298,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-471",
+          "sha256": "1611a880df1475c2f75578f3fbfb1717b2bb0a1ae8a714f753036ceca73e6987",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.3899999999994179,
+          "score": 0.16266764064474182,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-565",
+          "sha256": "4dec1e85b3ed0bfe8b9e3a335b78d77d05711aea1eefd0c2df4aba962380e5b5",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.4070000000001528,
+          "score": 0.031878828655457325,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-659",
+          "sha256": "d5cffa067ca187be68f68393847564839125cdadc7b80b9c10c47eadc58d2bfe",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.375,
+          "score": 0.9850449095637849,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-754",
+          "sha256": "96546b1ccc9af0ec50c3e25b62d7ec593ed084936cbbbee59bbcfc35695aa6b6",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.3900000000003274,
+          "score": 0.07444940008329248,
+          "label": "inconclusive",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-848",
+          "sha256": "d96de434ec98143dc4a93cee86bb3c8ff8bdf9960a51e4911d2a5f7ae02d45e3",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.39099999999962165,
+          "score": 0.8602278455338712,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-942",
+          "sha256": "17db469a9c4e5ec470c9a47eaafc677aa603f8bfad76eb089379d8976b240438",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.3280000000004293,
+          "score": 0.06043241783674902,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-1036",
+          "sha256": "a62d3cc333b0de0a961d98a101ab942eba43b9cbf543c094d2a05a2910c06eb5",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 0.3279999999995198,
+          "score": 0.9180586676357544,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        }
+      ]
+    },
+    {
+      "candidate": "modern_clip",
+      "dataset": "controls",
+      "original_report_sha256": "510dfc8d2b234aaa39dca95dab1542a69e6e9ba908d32aacf2ce928c437f4d66",
+      "model": {
+        "repository": "wkaandemir/ai-image-detector",
+        "revision": "fefa013737a0c3477961d36ee8dbbdc751352366",
+        "sha256": "41ce93c6c206a4f3929e19cf9b43b663c63a47422ab27a9bbb67757db5f42339",
+        "architecture": "vit_base_patch16_clip_224.openai",
+        "input_size": 256,
+        "temperature": 0.594889223575592,
+        "positive_is_real": true
+      },
+      "metrics": {
+        "samples": 23,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 14,
+            "precision": 0.5789473684210527,
+            "recall": 0.7857142857142857
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 9,
+            "precision": 0.25,
+            "recall": 0.1111111111111111
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": 0.8888888888888888,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 11
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 3
+          },
+          {
+            "truth": "original",
+            "prediction": "ai_generated",
+            "count": 8
+          },
+          {
+            "truth": "original",
+            "prediction": "original",
+            "count": 1
+          }
+        ],
+        "original_fpr_95": [
+          0.5650002944233439,
+          0.9801091123614551
+        ],
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.3627590353425504,
+              0.7685810871754576
+            ],
+            "recall_95": [
+              0.524107694133997,
+              0.9242861328730683
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": [
+              0.04558726080970055,
+              0.6993581574175981
+            ],
+            "recall_95": [
+              0.019890887638544907,
+              0.434999705576656
+            ]
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "id": "commfor-0",
+          "sha256": "8130cec38b21c7f1fb7c8cb0f3e6117377666c77201a17a698aae64cea508a1b",
+          "truth": "original",
+          "generator": "DFGAN",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 1.344000000000051,
+          "score": 0.9809329231806507,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-539",
+          "sha256": "41b4a8ff3d49c778267898571f80671229284b73e0ce6a503538030c5b1a2a62",
+          "truth": "ai_generated",
+          "generator": "DFGAN",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.3599999999996726,
+          "score": 0.012790852484519832,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-1079",
+          "sha256": "a7094ceb8f5227a89409ed3a35bb3e961f2bf6020081108c7b672e5dcd82546b",
+          "truth": "original",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.5619999999998981,
+          "score": 0.034937736171045786,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-1619",
+          "sha256": "644683875388aab830161084ce23d3e7a9cc4526e5873edb4f6392f7830f008f",
+          "truth": "original",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2970000000004802,
+          "score": 0.5698958752626058,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-2159",
+          "sha256": "27b6fcfc4a8c337ce9bb8521ae75a1fd4030cc4e25fd9ca13d23dad2bb5d248b",
+          "truth": "ai_generated",
+          "generator": "stable_cascade",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.31199999999989814,
+          "score": 0.9929210943125001,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-2699",
+          "sha256": "aa6b611e1a460a0dcb64694c7bd249e8fb389b2e6a25905ce3cec7c4e821fab6",
+          "truth": "ai_generated",
+          "generator": "stable_cascade",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.3599999999996726,
+          "score": 0.9882469237419655,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-3239",
+          "sha256": "b2651c6e67ef152b7184e87d8efe6f3d3cf0f50a3de23d256aa34bd21482a4d0",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.35900000000037835,
+          "score": 0.9922837855611787,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-3779",
+          "sha256": "760e65b7a4d40ccad55351cbe44970cfbe59d4b4f0f8a06ee608d0671fec3137",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.34400000000005093,
+          "score": 0.026880057733446483,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-4319",
+          "sha256": "21736cf6a3ea4576c1953d5f472a29f219aeb5313d69752c656e9a1a9c61cd95",
+          "truth": "original",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.34400000000005093,
+          "score": 0.6508785401763972,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-4859",
+          "sha256": "aec829c596cbb3f189457d523190dc2a9cf08c73ba63adc79b18e92ab024a3e5",
+          "truth": "original",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.28099999999994907,
+          "score": 0.09562860674267692,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-5939",
+          "sha256": "4d3552bc14e179e73868ec7a0c57dee7e6032e63e9013b1abf097a948332513b",
+          "truth": "ai_generated",
+          "generator": "GALIP",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2969999999995707,
+          "score": 0.014104054298100133,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-6479",
+          "sha256": "28c2b93cd7012e0412e243d087cbc970990e8127ead5c079d5a5e1a1920c159c",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV5_2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.34400000000005093,
+          "score": 0.9917421926797034,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-7019",
+          "sha256": "b8daf3ebcb6ef74e170566cc2240f6396e37a0dbc3b133f34fdb1288ad592dea",
+          "truth": "ai_generated",
+          "generator": "LCM_lora_sdxl",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.31199999999989814,
+          "score": 0.9847259413174586,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-7559",
+          "sha256": "7cf653c66203b978afe68425c034bd038ee89cbebb7c80a7fde32db3f2cd859c",
+          "truth": "ai_generated",
+          "generator": "LCM_lora_sdxl",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.3280000000004293,
+          "score": 0.9890448111837878,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-8099",
+          "sha256": "cd23607c71445560216b38980b542cbc55a2ae07b10fb072ca5eed4ab8ddcf4c",
+          "truth": "ai_generated",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.39099999999962165,
+          "score": 0.9791587974255834,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-8639",
+          "sha256": "fc51cd7a025f798d61cfeb023ee1964fb646f5361c86dba6158b3119ffe4f9e4",
+          "truth": "ai_generated",
+          "generator": "Firefly_Image2",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.34400000000005093,
+          "score": 0.9906039885802937,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-9179",
+          "sha256": "1122bf46c223cc205739902c5dd2669c397cbac3a79320155add32d9952e6e86",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2960000000002765,
+          "score": 0.9895151461927854,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-9719",
+          "sha256": "73dfcaf37d518c69599cff00ba3b12cab931801bd0b3ba6f5793f88845391271",
+          "truth": "ai_generated",
+          "generator": "MidjourneyV6_1",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.3289999999997235,
+          "score": 0.9910170915191251,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-10259",
+          "sha256": "8569b47c6698beced8bc7da54e96ce2b721d55ca20552f51214872f17bfed11d",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2960000000002765,
+          "score": 0.9808233318926312,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-10799",
+          "sha256": "771594524ab0261721c41df376ac364bafb1dfef553dcaf4de84f13c18824711",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.31300000000010186,
+          "score": 0.4105517092231381,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-11339",
+          "sha256": "1d000fa13ea936a0f5ad58778efd966cb4e4d078b265ce37e369635afbe5e9b7",
+          "truth": "ai_generated",
+          "generator": "kvikontent_midjourney_v6",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.31199999999989814,
+          "score": 0.9934724638182355,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-12419",
+          "sha256": "53a87ba93deb90b8a3d9d0257bb24909fff6c7dc3dc3031d2fd0b6b2a4a4fb4e",
+          "truth": "original",
+          "generator": "Dalle3",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.2969999999995707,
+          "score": 0.294363772672513,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "commfor-12959",
+          "sha256": "cf42bb809d72c03d72af8ea75b9b78d62a04beecfd42aea89cd376aa02a8273a",
+          "truth": "original",
+          "generator": "Hourglass",
+          "source": "https://huggingface.co/datasets/OwensLab/CommunityForensics-Eval",
+          "seconds": 0.3280000000004293,
+          "score": 0.9877067324776616,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        }
+      ]
+    },
+    {
+      "candidate": "bfree",
+      "dataset": "safeimg",
+      "original_report_sha256": "5c16d0c7df9e342bd72a3cd6a2e9ddac661b17a0d52f52594d7c069edd3cf55d",
+      "model": {
+        "repository": "grip-unina/B-Free",
+        "revision": "c6a9f898782fb466b29af01f21960b67415afb0e",
+        "sha256": "5948ca78f4d94e820c250d24cdf155035b4a85960443800bfe6bb7f06bffe947",
+        "architecture": "vit_base_patch14_reg4_dinov2.lvd142m",
+        "input_size": 504,
+        "temperature": 1.0,
+        "positive_is_real": false
+      },
+      "metrics": {
+        "samples": 12,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 12,
+            "precision": 1.0,
+            "recall": 0.08333333333333333
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 0,
+            "precision": 0.0,
+            "recall": null
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": null,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 1
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 11
+          }
+        ],
+        "original_fpr_95": null,
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": true,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": [
+              0.20654931437723745,
+              1.0
+            ],
+            "recall_95": [
+              0.014865094404917095,
+              0.35387991114111694
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": [
+              0.0,
+              0.2588329669680317
+            ],
+            "recall_95": null
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "id": "safeimg-0",
+          "sha256": "49ab997d924a9c616f846b6f96080c3aaac7eaa87b0520598c6ff2aad89db62c",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 10.78099999999904,
+          "score": 0.8686458148280328,
+          "label": "ai_generated",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-94",
+          "sha256": "70446d3a26514c212c9d168a38659bbbad3a43914db75d19e626dc0b63b096ee",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 9.610000000000582,
+          "score": 0.021510640224450477,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-188",
+          "sha256": "9be6f0b32b320920daf4353d9c37789373db83d9b873be10646d010f6591b084",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 9.295999999998457,
+          "score": 0.24186136169195446,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-282",
+          "sha256": "9b63e05a31d008849e082fcaffeee20b2749ba2b682d5b5700efd2b8324bd88a",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 9.1720000000023,
+          "score": 0.005969520062753445,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-377",
+          "sha256": "761324c7bfe017a901ce1fe9cb07e62ff8244fa00150304c8b06d719480f103c",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 9.5779999999977,
+          "score": 0.04966472286222234,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-471",
+          "sha256": "1611a880df1475c2f75578f3fbfb1717b2bb0a1ae8a714f753036ceca73e6987",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 9.079000000001543,
+          "score": 0.12728719157112486,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-565",
+          "sha256": "4dec1e85b3ed0bfe8b9e3a335b78d77d05711aea1eefd0c2df4aba962380e5b5",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 9.609000000000378,
+          "score": 0.29383694540636224,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-659",
+          "sha256": "d5cffa067ca187be68f68393847564839125cdadc7b80b9c10c47eadc58d2bfe",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 10.609000000000378,
+          "score": 0.016139541064287437,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-754",
+          "sha256": "96546b1ccc9af0ec50c3e25b62d7ec593ed084936cbbbee59bbcfc35695aa6b6",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 11.735000000000582,
+          "score": 0.0011496449322330306,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-848",
+          "sha256": "d96de434ec98143dc4a93cee86bb3c8ff8bdf9960a51e4911d2a5f7ae02d45e3",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 12.3279999999977,
+          "score": 0.0029549314109061846,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-942",
+          "sha256": "17db469a9c4e5ec470c9a47eaafc677aa603f8bfad76eb089379d8976b240438",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 14.139999999999418,
+          "score": 0.40198766547470355,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        },
+        {
+          "id": "safeimg-1036",
+          "sha256": "a62d3cc333b0de0a961d98a101ab942eba43b9cbf543c094d2a05a2910c06eb5",
+          "truth": "ai_generated",
+          "generator": "GPT Image 2",
+          "source": "https://huggingface.co/datasets/Snowstorm1492/SafeIMG",
+          "seconds": 12.06300000000192,
+          "score": 0.41588259538647787,
+          "label": "original",
+          "score_semantics": "experimental_not_calibrated_for_mediatruth",
+          "available": true
+        }
+      ]
+    },
+    {
+      "candidate": "CNNDetect",
+      "dataset": "controls",
+      "original_report_sha256": "22076971b6614acff5a1422719aa7e2caab6af8534fa2db04dbec6312369587b",
+      "model": {
+        "gan_detect": "3533f3e58a3b82215f21197f2faf4e99b911ec42a4a6e2d7823e04d5f3fd245a"
+      },
+      "metrics": {
+        "samples": 23,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 14,
+            "precision": null,
+            "recall": 0.0
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 9,
+            "precision": 0.391304347826087,
+            "recall": 1.0
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": 0.0,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 14
+          },
+          {
+            "truth": "original",
+            "prediction": "original",
+            "count": 9
+          }
+        ],
+        "original_fpr_95": [
+          0.0,
+          0.2991450484195441
+        ],
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": [
+              1.3877787807814457e-17,
+              0.2153108027376358
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.22157622792477952,
+              0.592144776086183
+            ],
+            "recall_95": [
+              0.7008549515804559,
+              1.0
+            ]
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "id": "commfor-0",
+          "sha256": "8130cec38b21c7f1fb7c8cb0f3e6117377666c77201a17a698aae64cea508a1b",
+          "truth": "original",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-539",
+          "sha256": "41b4a8ff3d49c778267898571f80671229284b73e0ce6a503538030c5b1a2a62",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0009,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-1079",
+          "sha256": "a7094ceb8f5227a89409ed3a35bb3e961f2bf6020081108c7b672e5dcd82546b",
+          "truth": "original",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-1619",
+          "sha256": "644683875388aab830161084ce23d3e7a9cc4526e5873edb4f6392f7830f008f",
+          "truth": "original",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-2159",
+          "sha256": "27b6fcfc4a8c337ce9bb8521ae75a1fd4030cc4e25fd9ca13d23dad2bb5d248b",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-2699",
+          "sha256": "aa6b611e1a460a0dcb64694c7bd249e8fb389b2e6a25905ce3cec7c4e821fab6",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-3239",
+          "sha256": "b2651c6e67ef152b7184e87d8efe6f3d3cf0f50a3de23d256aa34bd21482a4d0",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-3779",
+          "sha256": "760e65b7a4d40ccad55351cbe44970cfbe59d4b4f0f8a06ee608d0671fec3137",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-4319",
+          "sha256": "21736cf6a3ea4576c1953d5f472a29f219aeb5313d69752c656e9a1a9c61cd95",
+          "truth": "original",
+          "available": true,
+          "score": 0.0001,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-4859",
+          "sha256": "aec829c596cbb3f189457d523190dc2a9cf08c73ba63adc79b18e92ab024a3e5",
+          "truth": "original",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-5939",
+          "sha256": "4d3552bc14e179e73868ec7a0c57dee7e6032e63e9013b1abf097a948332513b",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-6479",
+          "sha256": "28c2b93cd7012e0412e243d087cbc970990e8127ead5c079d5a5e1a1920c159c",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-7019",
+          "sha256": "b8daf3ebcb6ef74e170566cc2240f6396e37a0dbc3b133f34fdb1288ad592dea",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-7559",
+          "sha256": "7cf653c66203b978afe68425c034bd038ee89cbebb7c80a7fde32db3f2cd859c",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-8099",
+          "sha256": "cd23607c71445560216b38980b542cbc55a2ae07b10fb072ca5eed4ab8ddcf4c",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-8639",
+          "sha256": "fc51cd7a025f798d61cfeb023ee1964fb646f5361c86dba6158b3119ffe4f9e4",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-9179",
+          "sha256": "1122bf46c223cc205739902c5dd2669c397cbac3a79320155add32d9952e6e86",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-9719",
+          "sha256": "73dfcaf37d518c69599cff00ba3b12cab931801bd0b3ba6f5793f88845391271",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-10259",
+          "sha256": "8569b47c6698beced8bc7da54e96ce2b721d55ca20552f51214872f17bfed11d",
+          "truth": "original",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-10799",
+          "sha256": "771594524ab0261721c41df376ac364bafb1dfef553dcaf4de84f13c18824711",
+          "truth": "original",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-11339",
+          "sha256": "1d000fa13ea936a0f5ad58778efd966cb4e4d078b265ce37e369635afbe5e9b7",
+          "truth": "ai_generated",
+          "available": true,
+          "score": 0.0,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-12419",
+          "sha256": "53a87ba93deb90b8a3d9d0257bb24909fff6c7dc3dc3031d2fd0b6b2a4a4fb4e",
+          "truth": "original",
+          "available": true,
+          "score": 0.0037,
+          "detector_positive": false,
+          "label": "original"
+        },
+        {
+          "id": "commfor-12959",
+          "sha256": "cf42bb809d72c03d72af8ea75b9b78d62a04beecfd42aea89cd376aa02a8273a",
+          "truth": "original",
+          "available": true,
+          "score": 0.0002,
+          "detector_positive": false,
+          "label": "original"
+        }
+      ]
+    },
+    {
+      "candidate": "FSD",
+      "dataset": "safeimg",
+      "original_report_sha256": "405fc626e8e2783c31f17587b72f6c63c35a07c221e1ada980e205cd32436ab9",
+      "artifacts": "experiments/fsd_artifacts.json",
+      "metrics": {
+        "samples": 12,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 12,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": null,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 12
+          }
+        ],
+        "original_fpr_95": null,
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": true,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.7575059933447592,
+              1.0
+            ],
+            "recall_95": [
+              0.7575059933447592,
+              1.0
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-0",
+          "sha256": "49ab997d924a9c616f846b6f96080c3aaac7eaa87b0520598c6ff2aad89db62c",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -12.14099716260204,
+          "threshold": -2.0,
+          "seconds": 37.5470000000023
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-94",
+          "sha256": "70446d3a26514c212c9d168a38659bbbad3a43914db75d19e626dc0b63b096ee",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -9.870999408482458,
+          "threshold": -2.0,
+          "seconds": 39.89099999999962
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-188",
+          "sha256": "9be6f0b32b320920daf4353d9c37789373db83d9b873be10646d010f6591b084",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -18.436159330330813,
+          "threshold": -2.0,
+          "seconds": 45.67199999999866
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-282",
+          "sha256": "9b63e05a31d008849e082fcaffeee20b2749ba2b682d5b5700efd2b8324bd88a",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -7.2581743753082115,
+          "threshold": -2.0,
+          "seconds": 45.04599999999846
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-377",
+          "sha256": "761324c7bfe017a901ce1fe9cb07e62ff8244fa00150304c8b06d719480f103c",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -10.410500094355243,
+          "threshold": -2.0,
+          "seconds": 47.03200000000288
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-471",
+          "sha256": "1611a880df1475c2f75578f3fbfb1717b2bb0a1ae8a714f753036ceca73e6987",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -9.860701178160758,
+          "threshold": -2.0,
+          "seconds": 48.96799999999712
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-565",
+          "sha256": "4dec1e85b3ed0bfe8b9e3a335b78d77d05711aea1eefd0c2df4aba962380e5b5",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -13.133137376883647,
+          "threshold": -2.0,
+          "seconds": 48.31300000000192
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-659",
+          "sha256": "d5cffa067ca187be68f68393847564839125cdadc7b80b9c10c47eadc58d2bfe",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -25.515738342899954,
+          "threshold": -2.0,
+          "seconds": 44.17199999999866
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-754",
+          "sha256": "96546b1ccc9af0ec50c3e25b62d7ec593ed084936cbbbee59bbcfc35695aa6b6",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -11.325167133161592,
+          "threshold": -2.0,
+          "seconds": 45.70300000000134
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-848",
+          "sha256": "d96de434ec98143dc4a93cee86bb3c8ff8bdf9960a51e4911d2a5f7ae02d45e3",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -20.403615277894097,
+          "threshold": -2.0,
+          "seconds": 44.40599999999904
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-942",
+          "sha256": "17db469a9c4e5ec470c9a47eaafc677aa603f8bfad76eb089379d8976b240438",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -8.749331863317732,
+          "threshold": -2.0,
+          "seconds": 43.78099999999904
+        },
+        {
+          "dataset": "safeimg-pilot-20261001",
+          "id": "safeimg-1036",
+          "sha256": "a62d3cc333b0de0a961d98a101ab942eba43b9cbf543c094d2a05a2910c06eb5",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -15.491611052708858,
+          "threshold": -2.0,
+          "seconds": 44.81300000000192
+        }
+      ]
+    },
+    {
+      "candidate": "FSD",
+      "dataset": "controls",
+      "original_report_sha256": "405fc626e8e2783c31f17587b72f6c63c35a07c221e1ada980e205cd32436ab9",
+      "artifacts": "experiments/fsd_artifacts.json",
+      "metrics": {
+        "samples": 23,
+        "coverage": 1.0,
+        "abstentions": 0,
+        "per_class": {
+          "ai_edited": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "ai_generated": {
+            "support": 14,
+            "precision": 0.8666666666666667,
+            "recall": 0.9285714285714286
+          },
+          "mixed": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          },
+          "original": {
+            "support": 9,
+            "precision": 0.875,
+            "recall": 0.7777777777777778
+          },
+          "traditional_edit": {
+            "support": 0,
+            "precision": null,
+            "recall": null
+          }
+        },
+        "false_positive_rate_originals": 0.2222222222222222,
+        "confusion": [
+          {
+            "truth": "ai_generated",
+            "prediction": "ai_generated",
+            "count": 13
+          },
+          {
+            "truth": "ai_generated",
+            "prediction": "original",
+            "count": 1
+          },
+          {
+            "truth": "original",
+            "prediction": "ai_generated",
+            "count": 2
+          },
+          {
+            "truth": "original",
+            "prediction": "original",
+            "count": 7
+          }
+        ],
+        "original_fpr_95": [
+          0.06322510711784671,
+          0.5474110308930111
+        ],
+        "release_gates": {
+          "ai_edited": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "ai_generated": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.6211801716767764,
+              0.9626387408969346
+            ],
+            "recall_95": [
+              0.6853129557584889,
+              0.9872777847521093
+            ]
+          },
+          "mixed": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          },
+          "original": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": true
+            },
+            "precision_95": [
+              0.5291118177871464,
+              0.9775825085499433
+            ],
+            "recall_95": [
+              0.45258896910698887,
+              0.9367748928821533
+            ]
+          },
+          "traditional_edit": {
+            "passed": false,
+            "checks": {
+              "independent_groups": false,
+              "category_support": false,
+              "original_support": false,
+              "precision": false,
+              "precision_lower_95": false,
+              "original_fpr_upper_95": false,
+              "recall": false
+            },
+            "precision_95": null,
+            "recall_95": null
+          }
+        },
+        "approval_note": "Metrics alone do not approve licensing, holdouts or deployment."
+      },
+      "predictions": [
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-0",
+          "sha256": "8130cec38b21c7f1fb7c8cb0f3e6117377666c77201a17a698aae64cea508a1b",
+          "truth": "original",
+          "label": "original",
+          "z_score": 0.53294784675857,
+          "threshold": -2.0,
+          "seconds": 43.14099999999962
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-539",
+          "sha256": "41b4a8ff3d49c778267898571f80671229284b73e0ce6a503538030c5b1a2a62",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -11.138224292269575,
+          "threshold": -2.0,
+          "seconds": 46.78100000000268
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-1079",
+          "sha256": "a7094ceb8f5227a89409ed3a35bb3e961f2bf6020081108c7b672e5dcd82546b",
+          "truth": "original",
+          "label": "ai_generated",
+          "z_score": -2.234960723291748,
+          "threshold": -2.0,
+          "seconds": 42.9529999999977
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-1619",
+          "sha256": "644683875388aab830161084ce23d3e7a9cc4526e5873edb4f6392f7830f008f",
+          "truth": "original",
+          "label": "original",
+          "z_score": 0.0804830948843244,
+          "threshold": -2.0,
+          "seconds": 41.90600000000268
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-2159",
+          "sha256": "27b6fcfc4a8c337ce9bb8521ae75a1fd4030cc4e25fd9ca13d23dad2bb5d248b",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -19.92931012716902,
+          "threshold": -2.0,
+          "seconds": 40.5779999999977
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-2699",
+          "sha256": "aa6b611e1a460a0dcb64694c7bd249e8fb389b2e6a25905ce3cec7c4e821fab6",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -8.678953333024742,
+          "threshold": -2.0,
+          "seconds": 40.46900000000096
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-3239",
+          "sha256": "b2651c6e67ef152b7184e87d8efe6f3d3cf0f50a3de23d256aa34bd21482a4d0",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -3.3016580582745245,
+          "threshold": -2.0,
+          "seconds": 40.76599999999962
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-3779",
+          "sha256": "760e65b7a4d40ccad55351cbe44970cfbe59d4b4f0f8a06ee608d0671fec3137",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -4.742520885445453,
+          "threshold": -2.0,
+          "seconds": 41.0
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-4319",
+          "sha256": "21736cf6a3ea4576c1953d5f472a29f219aeb5313d69752c656e9a1a9c61cd95",
+          "truth": "original",
+          "label": "original",
+          "z_score": 0.5345662608128486,
+          "threshold": -2.0,
+          "seconds": 38.53099999999904
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-4859",
+          "sha256": "aec829c596cbb3f189457d523190dc2a9cf08c73ba63adc79b18e92ab024a3e5",
+          "truth": "original",
+          "label": "original",
+          "z_score": -1.4729082791852584,
+          "threshold": -2.0,
+          "seconds": 39.35900000000038
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-5939",
+          "sha256": "4d3552bc14e179e73868ec7a0c57dee7e6032e63e9013b1abf097a948332513b",
+          "truth": "ai_generated",
+          "label": "original",
+          "z_score": 0.3662028291647303,
+          "threshold": -2.0,
+          "seconds": 39.75
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-6479",
+          "sha256": "28c2b93cd7012e0412e243d087cbc970990e8127ead5c079d5a5e1a1920c159c",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -9.024457946122004,
+          "threshold": -2.0,
+          "seconds": 40.82800000000134
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-7019",
+          "sha256": "b8daf3ebcb6ef74e170566cc2240f6396e37a0dbc3b133f34fdb1288ad592dea",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -2.74897237231809,
+          "threshold": -2.0,
+          "seconds": 40.81299999999828
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-7559",
+          "sha256": "7cf653c66203b978afe68425c034bd038ee89cbebb7c80a7fde32db3f2cd859c",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -10.564251205476555,
+          "threshold": -2.0,
+          "seconds": 41.18700000000172
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-8099",
+          "sha256": "cd23607c71445560216b38980b542cbc55a2ae07b10fb072ca5eed4ab8ddcf4c",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -3.1628639377174115,
+          "threshold": -2.0,
+          "seconds": 91.76599999999962
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-8639",
+          "sha256": "fc51cd7a025f798d61cfeb023ee1964fb646f5361c86dba6158b3119ffe4f9e4",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -3.342411586706084,
+          "threshold": -2.0,
+          "seconds": 93.59400000000096
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-9179",
+          "sha256": "1122bf46c223cc205739902c5dd2669c397cbac3a79320155add32d9952e6e86",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -16.47911028549248,
+          "threshold": -2.0,
+          "seconds": 46.0
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-9719",
+          "sha256": "73dfcaf37d518c69599cff00ba3b12cab931801bd0b3ba6f5793f88845391271",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -13.63160877865999,
+          "threshold": -2.0,
+          "seconds": 45.38999999999942
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-10259",
+          "sha256": "8569b47c6698beced8bc7da54e96ce2b721d55ca20552f51214872f17bfed11d",
+          "truth": "original",
+          "label": "original",
+          "z_score": -0.478061538264979,
+          "threshold": -2.0,
+          "seconds": 44.89099999999962
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-10799",
+          "sha256": "771594524ab0261721c41df376ac364bafb1dfef553dcaf4de84f13c18824711",
+          "truth": "original",
+          "label": "original",
+          "z_score": 0.3724374617491371,
+          "threshold": -2.0,
+          "seconds": 45.18700000000172
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-11339",
+          "sha256": "1d000fa13ea936a0f5ad58778efd966cb4e4d078b265ce37e369635afbe5e9b7",
+          "truth": "ai_generated",
+          "label": "ai_generated",
+          "z_score": -10.394171190648283,
+          "threshold": -2.0,
+          "seconds": 44.15599999999904
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-12419",
+          "sha256": "53a87ba93deb90b8a3d9d0257bb24909fff6c7dc3dc3031d2fd0b6b2a4a4fb4e",
+          "truth": "original",
+          "label": "original",
+          "z_score": -0.03676342207035374,
+          "threshold": -2.0,
+          "seconds": 43.625
+        },
+        {
+          "dataset": "commfor-controls-20261002-v2",
+          "id": "commfor-12959",
+          "sha256": "cf42bb809d72c03d72af8ea75b9b78d62a04beecfd42aea89cd376aa02a8273a",
+          "truth": "original",
+          "label": "ai_generated",
+          "z_score": -5.508344667938917,
+          "threshold": -2.0,
+          "seconds": 45.01599999999962
+        }
+      ]
+    }
+  ],
+  "bfree_upstream_parity": {
+    "upstream_revision": "c6a9f898782fb466b29af01f21960b67415afb0e",
+    "results": [
+      {
+        "fixture": "img0000.png",
+        "expected_logit": -5.9374785,
+        "actual_logit": -5.937470436096191,
+        "absolute_error": 8.063903808697148e-06
+      },
+      {
+        "fixture": "img0001.png",
+        "expected_logit": -4.441922,
+        "actual_logit": -4.441921710968018,
+        "absolute_error": 2.8903198234786487e-07
+      },
+      {
+        "fixture": "img0002.png",
+        "expected_logit": 4.430519,
+        "actual_logit": 4.430546760559076,
+        "absolute_error": 2.7760559075495905e-05
+      },
+      {
+        "fixture": "img0003.png",
+        "expected_logit": 3.8499813,
+        "actual_logit": 3.8500030040741007,
+        "absolute_error": 2.1704074100625803e-05
+      }
+    ]
+  },
+  "fsd_small_fixture_parity_max_absolute_error": 0.0
+}

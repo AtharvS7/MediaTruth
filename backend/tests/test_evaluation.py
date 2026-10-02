@@ -40,10 +40,19 @@ def test_perfect_tiny_benchmark_cannot_enable_a_category():
 
 def test_independent_perfect_benchmark_passes_but_variants_do_not():
     rows = [dict(id=str(i), label='original' if i < 200 else 'ai_generated',
-                 split='test', group_id=str(i)) for i in range(400)]
+                 split='test', group_id=str(i), independence_verified=True) for i in range(400)]
     predictions = [dict(id=r['id'], label=r['label']) for r in rows]
     result = release_gates(rows, predictions)
     assert result['release_gates']['ai_generated']['passed']
     assert not result['release_gates']['ai_edited']['passed']
     rows[1]['group_id'] = rows[0]['group_id']
     assert not release_gates(rows, predictions)['release_gates']['ai_generated']['passed']
+
+
+def test_unique_identifiers_do_not_prove_parent_independence():
+    rows = [dict(id=str(i), label='original' if i < 200 else 'ai_generated',
+                 split='test', group_id=str(i)) for i in range(400)]
+    predictions = [dict(id=r['id'], label=r['label']) for r in rows]
+    result = release_gates(rows,predictions)
+    assert not result['release_gates']['ai_generated']['checks']['independent_groups']
+    assert not result['release_gates']['ai_generated']['passed']

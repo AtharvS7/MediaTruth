@@ -1,0 +1,42 @@
+{
+  "repository": "https://github.com/ductai199x/Forensic-Self-Descriptions-CVPR25",
+  "revision": "50f2eae06efdac2e5a33f407ca9a27a2295133ac",
+  "license": "CC-BY-NC-SA-4.0",
+  "patched_source_sha256": {
+    "__init__.py": "cd55645d42b65b390780a99fcf1d1280ae7c5c111a15e6260978dd662a129449",
+    "detector.py": "8d8ddbce2fc36b03ba5d13df64b442585b13f2dd8b25fa10c7266782150f2b0a",
+    "fre.py": "351d4e41c6a46e55b156870336c192a08f5d4b5c72af169a978f1cb7a7073acb",
+    "fsd_computation.py": "7456d98be454929dc5a2f15b92069d13d6c75774cbb419e9d1f6739a6aa44848",
+    "projection.py": "336dd6a59e41c84676846e5a23f77f8674268a739997a75ffcbcf01e80306bba",
+    "gmm.py": "a6c476732fe783726d25cf0eb3ea2262bb3c23c69185a0b4d46b18148d9fa35d",
+    "weights.py": "6a1413c0a9fc50318729d941c1c4639d0b4e4b6950ae6cc596a5308178fb98ad",
+    "attribution.py": "a1904196cfb0c26deff4aefdad6aad6b5d1576a906a9f3da095a12c6c7f51861"
+  },
+  "weights": {
+    "config.json": {
+      "sha256": "7cc34433045adb998762e00de7de25c50f9c1e10dbac1c18899c6c63c4cfafe4",
+      "bytes": 634,
+      "url": "https://github.com/ductai199x/Forensic-Self-Descriptions-CVPR25/releases/download/v1.2.0/config.json"
+    },
+    "fre.pt": {
+      "sha256": "d95b9c50837dbf7b660bbefa20cdaa5db5e59601a9d6544573c10e78e04906bb",
+      "bytes": 9861,
+      "url": "https://github.com/ductai199x/Forensic-Self-Descriptions-CVPR25/releases/download/v1.2.0/fre.pt"
+    },
+    "fsd_transforms.pt": {
+      "sha256": "1e87d792b413101e58d9de71551182a1fab8b879ca6f6ba9780b6adcb9a5a699",
+      "bytes": 42177409,
+      "url": "https://github.com/ductai199x/Forensic-Self-Descriptions-CVPR25/releases/download/v1.2.0/fsd_transforms.pt"
+    },
+    "gmm.pt": {
+      "sha256": "0f9fa030a3d5816266d0329fd0fb614b65e322d4bda6d083613c713bfe9bc829",
+      "bytes": 14786229,
+      "url": "https://github.com/ductai199x/Forensic-Self-Descriptions-CVPR25/releases/download/v1.2.0/gmm.pt"
+    }
+  },
+  "tested_versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.15.3",
+    "torch": "2.14.0+cpu"
+  }
+}
