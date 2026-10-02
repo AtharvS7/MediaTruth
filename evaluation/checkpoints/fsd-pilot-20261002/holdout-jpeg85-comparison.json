@@ -1,0 +1,519 @@
+{
+  "release_eligible": false,
+  "policy_sha256": "5fa9219cc528cdf518ab735a1878d15ec0c4f6498aef943442154a6deb1ce5b1",
+  "baseline": {
+    "samples": 48,
+    "coverage": 1.0,
+    "abstentions": 0,
+    "per_class": {
+      "ai_edited": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      },
+      "ai_generated": {
+        "support": 24,
+        "precision": 0.9545454545454546,
+        "recall": 0.875
+      },
+      "mixed": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      },
+      "original": {
+        "support": 24,
+        "precision": 0.8846153846153846,
+        "recall": 0.9583333333333334
+      },
+      "traditional_edit": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      }
+    },
+    "false_positive_rate_originals": 0.041666666666666664,
+    "confusion": [
+      {
+        "truth": "ai_generated",
+        "prediction": "ai_generated",
+        "count": 21
+      },
+      {
+        "truth": "ai_generated",
+        "prediction": "original",
+        "count": 3
+      },
+      {
+        "truth": "original",
+        "prediction": "ai_generated",
+        "count": 1
+      },
+      {
+        "truth": "original",
+        "prediction": "original",
+        "count": 23
+      }
+    ],
+    "original_fpr_95": [
+      0.0073934561655057685,
+      0.20241806478655938
+    ],
+    "release_gates": {
+      "ai_edited": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": false,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": false
+        },
+        "precision_95": null,
+        "recall_95": null
+      },
+      "ai_generated": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": true,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": true
+        },
+        "precision_95": [
+          0.7820195416134267,
+          0.991930572378736
+        ],
+        "recall_95": [
+          0.6899611872949993,
+          0.9565566591987655
+        ]
+      },
+      "mixed": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": false,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": false
+        },
+        "precision_95": null,
+        "recall_95": null
+      },
+      "original": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": false,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": true
+        },
+        "precision_95": [
+          0.7102409678828635,
+          0.9599675537638938
+        ],
+        "recall_95": [
+          0.7975819352134406,
+          0.9926065438344942
+        ]
+      },
+      "traditional_edit": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": false,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": false
+        },
+        "precision_95": null,
+        "recall_95": null
+      }
+    },
+    "approval_note": "Metrics alone do not approve licensing, holdouts or deployment.",
+    "accuracy": 0.9166666666666666,
+    "accuracy_95": [
+      0.8044669820963272,
+      0.9671162431819081
+    ],
+    "balanced_accuracy": 0.9166666666666667,
+    "production_target_checks": {
+      "existing_release_checks": false,
+      "balanced_accuracy_95": false,
+      "each_class_precision_95": false,
+      "each_class_recall_95": false,
+      "accuracy_lower_bound_95": false
+    },
+    "statistical_target_passed": false,
+    "deployment_approved": false,
+    "scope_note": "Requires independent licensing, robustness and operational approval; no universal accuracy guarantee"
+  },
+  "calibrated": {
+    "samples": 48,
+    "coverage": 1.0,
+    "abstentions": 0,
+    "per_class": {
+      "ai_edited": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      },
+      "ai_generated": {
+        "support": 24,
+        "precision": 0.9545454545454546,
+        "recall": 0.875
+      },
+      "mixed": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      },
+      "original": {
+        "support": 24,
+        "precision": 0.8846153846153846,
+        "recall": 0.9583333333333334
+      },
+      "traditional_edit": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      }
+    },
+    "false_positive_rate_originals": 0.041666666666666664,
+    "confusion": [
+      {
+        "truth": "ai_generated",
+        "prediction": "ai_generated",
+        "count": 21
+      },
+      {
+        "truth": "ai_generated",
+        "prediction": "original",
+        "count": 3
+      },
+      {
+        "truth": "original",
+        "prediction": "ai_generated",
+        "count": 1
+      },
+      {
+        "truth": "original",
+        "prediction": "original",
+        "count": 23
+      }
+    ],
+    "original_fpr_95": [
+      0.0073934561655057685,
+      0.20241806478655938
+    ],
+    "release_gates": {
+      "ai_edited": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": false,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": false
+        },
+        "precision_95": null,
+        "recall_95": null
+      },
+      "ai_generated": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": true,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": true
+        },
+        "precision_95": [
+          0.7820195416134267,
+          0.991930572378736
+        ],
+        "recall_95": [
+          0.6899611872949993,
+          0.9565566591987655
+        ]
+      },
+      "mixed": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": false,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": false
+        },
+        "precision_95": null,
+        "recall_95": null
+      },
+      "original": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": false,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": true
+        },
+        "precision_95": [
+          0.7102409678828635,
+          0.9599675537638938
+        ],
+        "recall_95": [
+          0.7975819352134406,
+          0.9926065438344942
+        ]
+      },
+      "traditional_edit": {
+        "passed": false,
+        "checks": {
+          "independent_groups": false,
+          "category_support": false,
+          "original_support": false,
+          "precision": false,
+          "precision_lower_95": false,
+          "original_fpr_upper_95": false,
+          "recall": false
+        },
+        "precision_95": null,
+        "recall_95": null
+      }
+    },
+    "approval_note": "Metrics alone do not approve licensing, holdouts or deployment.",
+    "accuracy": 0.9166666666666666,
+    "accuracy_95": [
+      0.8044669820963272,
+      0.9671162431819081
+    ],
+    "balanced_accuracy": 0.9166666666666667,
+    "production_target_checks": {
+      "existing_release_checks": false,
+      "balanced_accuracy_95": false,
+      "each_class_precision_95": false,
+      "each_class_recall_95": false,
+      "accuracy_lower_bound_95": false
+    },
+    "statistical_target_passed": false,
+    "deployment_approved": false,
+    "scope_note": "Requires independent licensing, robustness and operational approval; no universal accuracy guarantee"
+  },
+  "predictions": [
+    {
+      "id": "tiny-validation-3200",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-1018",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-290",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-5284",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-5903",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-6412",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-1207",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-1841",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-2447",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-2113",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-864",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-419",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-4671",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-5487",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-2027",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-6940",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-2967",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-581",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-3532",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-3363",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-1274",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-4266",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-3160",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-1912",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-4436",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-1774",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-3706",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-3262",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-277",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-1763",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-3619",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-6331",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-1873",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-2505",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-4998",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-216",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-4382",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-5961",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-5319",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-3085",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-2553",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-5166",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-3760",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-2441",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-2640",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-5387",
+      "label": "ai_generated"
+    },
+    {
+      "id": "tiny-validation-1244",
+      "label": "original"
+    },
+    {
+      "id": "tiny-validation-824",
+      "label": "original"
+    }
+  ],
+  "note": "Public research pilot; no independent provenance or production approval"
+}

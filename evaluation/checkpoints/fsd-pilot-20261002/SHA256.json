@@ -1,0 +1,30 @@
+[
+    {
+        "file":  "calibration.json",
+        "sha256":  "4f29bb72ac51298f6e0ccbbb734e3f7546bad359fd8e483dc193df3f8e0c07fb"
+    },
+    {
+        "file":  "frozen-policy.json",
+        "sha256":  "5fa9219cc528cdf518ab735a1878d15ec0c4f6498aef943442154a6deb1ce5b1"
+    },
+    {
+        "file":  "holdout-comparison.json",
+        "sha256":  "e81c448639b53ddb1c3fed86a99c5f96bffd4a299db16d236d5bb68bb2545a2d"
+    },
+    {
+        "file":  "holdout-jpeg85-comparison.json",
+        "sha256":  "e81c448639b53ddb1c3fed86a99c5f96bffd4a299db16d236d5bb68bb2545a2d"
+    },
+    {
+        "file":  "holdout-jpeg85.json",
+        "sha256":  "3b3b57e64209f89408e5e0c57a28ba9dc2886810cf1fe42084f5bc7527bf69e1"
+    },
+    {
+        "file":  "holdout.json",
+        "sha256":  "27648f12291570be291cd89f0454efc53166c52e8554c6557f5db20faaf11077"
+    },
+    {
+        "file":  "prior-diagnostic-comparison.json",
+        "sha256":  "431051fccf8dcde3e6d6f0d64194534c56217680aae8d51cff5d8456b54372f8"
+    }
+]

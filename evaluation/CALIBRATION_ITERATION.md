@@ -56,5 +56,8 @@ Expected CPU cost is several hours for 144 image evaluations (48 calibration,
 48 original holdout, 48 JPEG holdout). Four-thread smoke inference preserved the
 two-thread score within 4.1e-11. No paid service or external upload of user media is used.
 
-The local run has started. No calibrated accuracy improvement or production
-qualification is claimed until its comparisons are complete and reviewed.
+The run completed at 21:54 IST on 2 October 2026: all 144 evaluations finished.
+Original and JPEG-85 holdout accuracy both remained 44/48 (91.7%) after calibration.
+AI recall was 21/24 (87.5%); one of 24 originals was falsely flagged. The original
+35-image diagnostics also did not improve. Production qualification failed.
+Immutable report copies are in `checkpoints/fsd-pilot-20261002`.

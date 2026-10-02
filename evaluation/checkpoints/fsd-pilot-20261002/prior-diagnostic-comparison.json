@@ -1,0 +1,60 @@
+{
+  "scope": "Previously inspected diagnostic set, not an independent holdout",
+  "policy_sha256": "5fa9219cc528cdf518ab735a1878d15ec0c4f6498aef943442154a6deb1ce5b1",
+  "calibrated": {
+    "samples": 35,
+    "coverage": 1.0,
+    "abstentions": 0,
+    "per_class": {
+      "ai_edited": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      },
+      "ai_generated": {
+        "support": 26,
+        "precision": 0.9259259259259259,
+        "recall": 0.9615384615384616
+      },
+      "mixed": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      },
+      "original": {
+        "support": 9,
+        "precision": 0.875,
+        "recall": 0.7777777777777778
+      },
+      "traditional_edit": {
+        "support": 0,
+        "precision": null,
+        "recall": null
+      }
+    },
+    "false_positive_rate_originals": 0.2222222222222222,
+    "confusion": [
+      {
+        "truth": "ai_generated",
+        "prediction": "ai_generated",
+        "count": 25
+      },
+      {
+        "truth": "ai_generated",
+        "prediction": "original",
+        "count": 1
+      },
+      {
+        "truth": "original",
+        "prediction": "ai_generated",
+        "count": 2
+      },
+      {
+        "truth": "original",
+        "prediction": "original",
+        "count": 7
+      }
+    ]
+  },
+  "release_eligible": false
+}
