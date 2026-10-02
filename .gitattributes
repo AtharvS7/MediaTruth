@@ -1,0 +1,2 @@
+# Preserve checkpoint report bytes so published SHA-256 manifests remain valid.
+evaluation/checkpoints/**/*.json -text
