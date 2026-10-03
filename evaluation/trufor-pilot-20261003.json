@@ -1,0 +1,576 @@
+{
+  "model": {
+    "source_commit": "ae54475df6f41a491d7615100feb19263dec13f7",
+    "source_sha256": {
+      "README.md": "6b33d900b96b38182c312d7a7c2eada0731227d3bfc690769b2a158e387d58e8",
+      "LICENSE.txt": "07201e07e3d2c1ac55480037a87734fcccacbb0cd0e25a31e3b89ac7ffadf8b4",
+      "LICENSE_CMX.txt": "687ff4d0ea13200541df7359799a08c2db626094ecacbb8a3fe63ffad177f2a1",
+      "dataset/dataset_test.py": "53de9aeb6a13727ada9b9d43cf7a0d85595e655951f48445ffa54802d875f72a",
+      "lib/config/trufor_ph3.yaml": "a87108eb0df40d9bab6a303eb91419564b7c106d5105bbd5d8ecaec1567b5b8b",
+      "lib/models/DnCNN.py": "3736b7c625d03b85accea77c26a41ea2da956dae07d70182532e7df9b74ae882",
+      "lib/models/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lib/models/cmx/LICENSE_CMX.txt": "687ff4d0ea13200541df7359799a08c2db626094ecacbb8a3fe63ffad177f2a1",
+      "lib/models/cmx/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lib/models/cmx/builder_np_conf.py": "b31b02a96417b424228f0301ac653a44d257e522c3ddede414d3c95209d80ded",
+      "lib/models/cmx/decoders/MLPDecoder.py": "172efeeb155591f9857f888263c513b9f8d03bb41c4ebf64a74eb15e8b250a91",
+      "lib/models/cmx/encoders/dual_segformer.py": "faf1d8483a559d25d151c58fbf171e52b504c88ba4c05235d15dc96467a7ac60",
+      "lib/models/cmx/init_func.py": "20dad47877caaf5ee485d49b6618c5c3de68261ef0090c586eb409e605f976a4",
+      "lib/models/cmx/layer_utils.py": "4d75874f1c793b6db0893f734853cd074d8efa1cafc3c33519360c8357005a2e",
+      "lib/models/cmx/net_utils.py": "171239507b49f00026ca46db88cbb101f8c24f47dd7a93b1b5a7f919deb8ed21"
+    },
+    "weights": {
+      "bytes": 281496429,
+      "sha256": "ac1d90e329a72e0d66e8665e123a19e94bfae3209c3ef8a4f9ca3b91578c7844"
+    },
+    "license": "TruFor informational and nonprofit use only",
+    "source_url": "https://github.com/grip-unina/TruFor",
+    "weight_url": "https://www.grip.unina.it/download/prog/TruFor/TruFor_weights.zip"
+  },
+  "data": {
+    "source": "https://www.grip.unina.it/download/prog/TruFor/CocoGlide.zip",
+    "archive_sha256": "fc848643ad0a81010ba2a6ab8c055762782f54e4fb9e407210dbfe1c3b538af9",
+    "selection": "seeded shuffle of license IDs 4/5, before inference",
+    "licenses": [
+      {
+        "url": "http://creativecommons.org/licenses/by/2.0/",
+        "id": 4,
+        "name": "Attribution License"
+      },
+      {
+        "url": "http://creativecommons.org/licenses/by-sa/2.0/",
+        "id": 5,
+        "name": "Attribution-ShareAlike License"
+      }
+    ],
+    "samples": [
+      {
+        "id": "313130",
+        "files": {
+          "real": {
+            "path": "0-real.png",
+            "sha256": "320ddde4ee443722b284feed6e7a345e6147831ad16e4262636e114181e70571",
+            "archive_path": "real/microwave_313130.png"
+          },
+          "fake": {
+            "path": "0-fake.png",
+            "sha256": "c0f81a9e6d2e96f7711c3f73893dc9f7c9450e5ecf936421e623eb19e8880883",
+            "archive_path": "fake/glide_inpainting_val2017_313130_up.png"
+          },
+          "mask": {
+            "path": "0-mask.png",
+            "sha256": "583eb87fbaae71d06014032619756000536a34543166dc6be361e5029f92c654",
+            "archive_path": "mask/microwave_313130_mask.png"
+          }
+        },
+        "license_id": 4
+      },
+      {
+        "id": "451090",
+        "files": {
+          "real": {
+            "path": "1-real.png",
+            "sha256": "0d17d88b6c5735da7d60cc6298003edf7218a66d66515dd17ee9b5b49211ac7d",
+            "archive_path": "real/boat_451090.png"
+          },
+          "fake": {
+            "path": "1-fake.png",
+            "sha256": "88644d6bba67eac01b9b7a643ce0bf41ecfe71ad497ce8b9902970451ae9dd49",
+            "archive_path": "fake/glide_inpainting_val2017_451090_up.png"
+          },
+          "mask": {
+            "path": "1-mask.png",
+            "sha256": "99d1538eb45669633afa889ef586bdfb95ee13bfb55b747fc086fdb3a30e8c52",
+            "archive_path": "mask/boat_451090_mask.png"
+          }
+        },
+        "license_id": 5
+      },
+      {
+        "id": "268375",
+        "files": {
+          "real": {
+            "path": "2-real.png",
+            "sha256": "4248f1411c45f74067a889488b1c9f2722704a4d4c0ff81c99f5dfddc89f8639",
+            "archive_path": "real/elephant_268375.png"
+          },
+          "fake": {
+            "path": "2-fake.png",
+            "sha256": "63678f5269dded826558bf5ecbaac16c20cd954f3e49d8bdc3d246a3d0cad3a0",
+            "archive_path": "fake/glide_inpainting_val2017_268375_up.png"
+          },
+          "mask": {
+            "path": "2-mask.png",
+            "sha256": "e4cb17315935aa4d6483b8b584217acb245fb6eb2d83e40f58ed8878a0524e16",
+            "archive_path": "mask/elephant_268375_mask.png"
+          }
+        },
+        "license_id": 4
+      },
+      {
+        "id": "366141",
+        "files": {
+          "real": {
+            "path": "3-real.png",
+            "sha256": "9ad5119e9a5ee1850fa064989f0726e85ffc5c6963d6a5384811c28ddac5c4ab",
+            "archive_path": "real/tv_366141.png"
+          },
+          "fake": {
+            "path": "3-fake.png",
+            "sha256": "c4d2cec924c8cdb366017a7916bb3bd63c5002a70f0e725c432d1bb9d1b52dc3",
+            "archive_path": "fake/glide_inpainting_val2017_366141_up.png"
+          },
+          "mask": {
+            "path": "3-mask.png",
+            "sha256": "ba8c760672def7ffa7905fd5cd8242a1cb0179140260840fd86445190ead47ce",
+            "archive_path": "mask/tv_366141_mask.png"
+          }
+        },
+        "license_id": 5
+      },
+      {
+        "id": "232348",
+        "files": {
+          "real": {
+            "path": "4-real.png",
+            "sha256": "a64fea4db56e7223a66d5e03050935ffc1492293e37062927c092d7e65fe7311",
+            "archive_path": "real/toaster_232348.png"
+          },
+          "fake": {
+            "path": "4-fake.png",
+            "sha256": "b953ea2a0fcaa4849dcb778d49af4313171b7a5ab3a5a70a3e875fec0bcee56f",
+            "archive_path": "fake/glide_inpainting_val2017_232348_up.png"
+          },
+          "mask": {
+            "path": "4-mask.png",
+            "sha256": "ce4e8eb3fcfeab9a4e767ed91afc81196110c101008456bbaa1e2128d70fcae5",
+            "archive_path": "mask/toaster_232348_mask.png"
+          }
+        },
+        "license_id": 4
+      },
+      {
+        "id": "318114",
+        "files": {
+          "real": {
+            "path": "5-real.png",
+            "sha256": "72982c0841463b8a06cd11961ab0443ca319065f9aa4aeb7e9c66f325c16affb",
+            "archive_path": "real/orange_318114.png"
+          },
+          "fake": {
+            "path": "5-fake.png",
+            "sha256": "7aa53e07d464ef8a16d6b192e08594f5b345c3a53612ccd903e3a25084dbf627",
+            "archive_path": "fake/glide_inpainting_val2017_318114_up.png"
+          },
+          "mask": {
+            "path": "5-mask.png",
+            "sha256": "70682c753424ce2b8a332a45cb097eee145e85016aad280c64ed044b9daec4ed",
+            "archive_path": "mask/orange_318114_mask.png"
+          }
+        },
+        "license_id": 5
+      },
+      {
+        "id": "491725",
+        "files": {
+          "real": {
+            "path": "6-real.png",
+            "sha256": "f3c5a047c6ff0a4d77a7cfce7b9c5e24e67898a8a02d53844af8459461c117a8",
+            "archive_path": "real/boat_491725.png"
+          },
+          "fake": {
+            "path": "6-fake.png",
+            "sha256": "e64f5b52fcc6fdd61aca753d218d16c09cbbdccd6628e07350a8f04637d9f09e",
+            "archive_path": "fake/glide_inpainting_val2017_491725_up.png"
+          },
+          "mask": {
+            "path": "6-mask.png",
+            "sha256": "9a5c23a6702af73e7a1cdd12edc12425141186baac43813a8f9c1e93454f4671",
+            "archive_path": "mask/boat_491725_mask.png"
+          }
+        },
+        "license_id": 4
+      },
+      {
+        "id": "320632",
+        "files": {
+          "real": {
+            "path": "7-real.png",
+            "sha256": "9dc31b81420da09d3a55662029d331c8eee75613b3c8df2f1769a305f8830943",
+            "archive_path": "real/zebra_320632.png"
+          },
+          "fake": {
+            "path": "7-fake.png",
+            "sha256": "4373d2caf7c6fcd017878599bb3928c516c231823483b64334edf287319fbf58",
+            "archive_path": "fake/glide_inpainting_val2017_320632_up.png"
+          },
+          "mask": {
+            "path": "7-mask.png",
+            "sha256": "13eb324580e6f155251d001e26771aa09befc161d422c99fe299ea63cb165c23",
+            "archive_path": "mask/zebra_320632_mask.png"
+          }
+        },
+        "license_id": 5
+      },
+      {
+        "id": "213224",
+        "files": {
+          "real": {
+            "path": "8-real.png",
+            "sha256": "5cb959a8479ceac4b3f1af74068f340a46c8a8b9588462e468e7041440bb89a5",
+            "archive_path": "real/chair_213224.png"
+          },
+          "fake": {
+            "path": "8-fake.png",
+            "sha256": "d661c3ac0f441fc3b3795665c6ebf7d8fc4d56267529d6213a20043d147bec2e",
+            "archive_path": "fake/glide_inpainting_val2017_213224_up.png"
+          },
+          "mask": {
+            "path": "8-mask.png",
+            "sha256": "80586dd0fd80cb9337827ad8b99c641fbd3c5f966e87e36ef5ebf36268870127",
+            "archive_path": "mask/chair_213224_mask.png"
+          }
+        },
+        "license_id": 4
+      },
+      {
+        "id": "70774",
+        "files": {
+          "real": {
+            "path": "9-real.png",
+            "sha256": "ca1f311482e78cb61a614e8f8ea6108ba90fd845a28d0fb477171d9ef70d1786",
+            "archive_path": "real/motorcycle_70774.png"
+          },
+          "fake": {
+            "path": "9-fake.png",
+            "sha256": "9b46ecaa8112b9fd2719c76a4dfad70cf6ce42b8cca9f858f3b79a2a14b5e3a3",
+            "archive_path": "fake/glide_inpainting_val2017_70774_up.png"
+          },
+          "mask": {
+            "path": "9-mask.png",
+            "sha256": "ea8f6af357cf281d36af9a0a107a0eee395f619f3fd460648e0de8423b2d7d8a",
+            "archive_path": "mask/motorcycle_70774_mask.png"
+          }
+        },
+        "license_id": 5
+      },
+      {
+        "id": "377882",
+        "files": {
+          "real": {
+            "path": "10-real.png",
+            "sha256": "f1d6b273b0f4ea00211391f087248e66590466e742aa8ee1ba428e283f9bc9be",
+            "archive_path": "real/surfboard_377882.png"
+          },
+          "fake": {
+            "path": "10-fake.png",
+            "sha256": "1078f46d753a5182b46af15f641132a4079d44be30e253e51c0d7fae2d8fb82f",
+            "archive_path": "fake/glide_inpainting_val2017_377882_up.png"
+          },
+          "mask": {
+            "path": "10-mask.png",
+            "sha256": "88519bc12b110dae2bbfb440a19122e6e344b4616d7419b07d166ea7b2f6b111",
+            "archive_path": "mask/surfboard_377882_mask.png"
+          }
+        },
+        "license_id": 4
+      },
+      {
+        "id": "189078",
+        "files": {
+          "real": {
+            "path": "11-real.png",
+            "sha256": "247d1b4a5343140ad118b5af17cf75993594464814c0abc0f34cbdebdc0533a9",
+            "archive_path": "real/orange_189078.png"
+          },
+          "fake": {
+            "path": "11-fake.png",
+            "sha256": "317f7fd9a39eb8697041a7d920168d0cd3ac73c54303bd8adbea12883c2e1698",
+            "archive_path": "fake/glide_inpainting_val2017_189078_up.png"
+          },
+          "mask": {
+            "path": "11-mask.png",
+            "sha256": "467dd45dcdebaba794c2484584a1b35a0a2654cf7dd858eefbb69dfbcda9a89f",
+            "archive_path": "mask/orange_189078_mask.png"
+          }
+        },
+        "license_id": 4
+      }
+    ]
+  },
+  "threshold": 0.5,
+  "samples": [
+    {
+      "id": "313130",
+      "kind": "real",
+      "seconds": 5.562000000001717,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.0,
+      "truth_pixels": 0,
+      "predicted_pixels": 0
+    },
+    {
+      "id": "313130",
+      "kind": "fake",
+      "seconds": 3.3909999999996217,
+      "attribution": "inconclusive",
+      "iou": 0.0,
+      "dice": 0.0,
+      "false_positive_area_original": null,
+      "truth_pixels": 3171,
+      "predicted_pixels": 0
+    },
+    {
+      "id": "451090",
+      "kind": "real",
+      "seconds": 3.9530000000013388,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.0,
+      "truth_pixels": 0,
+      "predicted_pixels": 0
+    },
+    {
+      "id": "451090",
+      "kind": "fake",
+      "seconds": 3.562999999998283,
+      "attribution": "inconclusive",
+      "iou": 0.0,
+      "dice": 0.0,
+      "false_positive_area_original": null,
+      "truth_pixels": 9083,
+      "predicted_pixels": 0
+    },
+    {
+      "id": "268375",
+      "kind": "real",
+      "seconds": 3.6410000000032596,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.002227783203125,
+      "truth_pixels": 0,
+      "predicted_pixels": 146
+    },
+    {
+      "id": "268375",
+      "kind": "fake",
+      "seconds": 3.875,
+      "attribution": "inconclusive",
+      "iou": 0.03130114566284779,
+      "dice": 0.06070224161872644,
+      "false_positive_area_original": null,
+      "truth_pixels": 24221,
+      "predicted_pixels": 984
+    },
+    {
+      "id": "366141",
+      "kind": "real",
+      "seconds": 3.7190000000009604,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.0,
+      "truth_pixels": 0,
+      "predicted_pixels": 0
+    },
+    {
+      "id": "366141",
+      "kind": "fake",
+      "seconds": 3.75,
+      "attribution": "inconclusive",
+      "iou": 0.0,
+      "dice": 0.0,
+      "false_positive_area_original": null,
+      "truth_pixels": 2369,
+      "predicted_pixels": 0
+    },
+    {
+      "id": "232348",
+      "kind": "real",
+      "seconds": 3.7969999999986612,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.000213623046875,
+      "truth_pixels": 0,
+      "predicted_pixels": 14
+    },
+    {
+      "id": "232348",
+      "kind": "fake",
+      "seconds": 3.735000000000582,
+      "attribution": "inconclusive",
+      "iou": 0.28666858900422915,
+      "dice": 0.44559817726814327,
+      "false_positive_area_original": null,
+      "truth_pixels": 20808,
+      "predicted_pixels": 5965
+    },
+    {
+      "id": "318114",
+      "kind": "real",
+      "seconds": 3.75,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.14093017578125,
+      "truth_pixels": 0,
+      "predicted_pixels": 9236
+    },
+    {
+      "id": "318114",
+      "kind": "fake",
+      "seconds": 3.625,
+      "attribution": "inconclusive",
+      "iou": 0.16696780551905388,
+      "dice": 0.2861566612710254,
+      "false_positive_area_original": null,
+      "truth_pixels": 2564,
+      "predicted_pixels": 11645
+    },
+    {
+      "id": "491725",
+      "kind": "real",
+      "seconds": 3.5469999999986612,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.0032196044921875,
+      "truth_pixels": 0,
+      "predicted_pixels": 211
+    },
+    {
+      "id": "491725",
+      "kind": "fake",
+      "seconds": 3.811999999998079,
+      "attribution": "inconclusive",
+      "iou": 0.0,
+      "dice": 0.0,
+      "false_positive_area_original": null,
+      "truth_pixels": 5862,
+      "predicted_pixels": 79
+    },
+    {
+      "id": "320632",
+      "kind": "real",
+      "seconds": 3.8439999999973224,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.0606231689453125,
+      "truth_pixels": 0,
+      "predicted_pixels": 3973
+    },
+    {
+      "id": "320632",
+      "kind": "fake",
+      "seconds": 1.7970000000022992,
+      "attribution": "inconclusive",
+      "iou": 0.006249520742274366,
+      "dice": 0.01242141360259097,
+      "false_positive_area_original": null,
+      "truth_pixels": 52162,
+      "predicted_pixels": 328
+    },
+    {
+      "id": "213224",
+      "kind": "real",
+      "seconds": 1.4690000000009604,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.063995361328125,
+      "truth_pixels": 0,
+      "predicted_pixels": 4194
+    },
+    {
+      "id": "213224",
+      "kind": "fake",
+      "seconds": 1.4689999999973224,
+      "attribution": "inconclusive",
+      "iou": 0.0,
+      "dice": 0.0,
+      "false_positive_area_original": null,
+      "truth_pixels": 2407,
+      "predicted_pixels": 2744
+    },
+    {
+      "id": "70774",
+      "kind": "real",
+      "seconds": 1.4689999999973224,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.0059814453125,
+      "truth_pixels": 0,
+      "predicted_pixels": 392
+    },
+    {
+      "id": "70774",
+      "kind": "fake",
+      "seconds": 1.4840000000003783,
+      "attribution": "inconclusive",
+      "iou": 0.07452710380322171,
+      "dice": 0.13871609853197311,
+      "false_positive_area_original": null,
+      "truth_pixels": 14961,
+      "predicted_pixels": 1115
+    },
+    {
+      "id": "377882",
+      "kind": "real",
+      "seconds": 1.7040000000015425,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.0,
+      "truth_pixels": 0,
+      "predicted_pixels": 0
+    },
+    {
+      "id": "377882",
+      "kind": "fake",
+      "seconds": 1.514999999999418,
+      "attribution": "inconclusive",
+      "iou": 0.0,
+      "dice": 0.0,
+      "false_positive_area_original": null,
+      "truth_pixels": 3209,
+      "predicted_pixels": 2
+    },
+    {
+      "id": "189078",
+      "kind": "real",
+      "seconds": 1.625,
+      "attribution": "inconclusive",
+      "iou": null,
+      "dice": null,
+      "false_positive_area_original": 0.00115966796875,
+      "truth_pixels": 0,
+      "predicted_pixels": 76
+    },
+    {
+      "id": "189078",
+      "kind": "fake",
+      "seconds": 1.4219999999986612,
+      "attribution": "inconclusive",
+      "iou": 0.7099583140342751,
+      "dice": 0.8303808440327212,
+      "false_positive_area_original": null,
+      "truth_pixels": 10694,
+      "predicted_pixels": 7765
+    }
+  ],
+  "mean_edited_iou": 0.10630603989715852,
+  "mean_edited_dice": 0.1478312863604317,
+  "mean_original_false_positive_area": 0.023195902506510418,
+  "release_eligible": false,
+  "limitations": [
+    "Small source-published benchmark; not independent release certification.",
+    "Anomaly localization is not AI-versus-conventional attribution.",
+    "Research/nonprofit model license; no commercial serving approval."
+  ]
+}

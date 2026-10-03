@@ -1,0 +1,75 @@
+{
+  "candidate": "Meso4_DF",
+  "source_revision": "2144d56a30e48cdcac1976ff13a1c5cdc86376c6",
+  "weights_sha256": "036ed30d04ffd9c7506f825b97c86aa64915f5818931da96817b169aad790af5",
+  "public_enabled": false,
+  "release_gate_passed": false,
+  "threshold": 0.5,
+  "score_semantics": "uncalibrated_face_forgery_score",
+  "summaries": [
+    {
+      "split": "pilot",
+      "kind": "aligned_face",
+      "total": 4,
+      "correct": 4,
+      "abstentions": 0,
+      "accuracy_including_abstentions": 1.0
+    }
+  ],
+  "samples": [
+    {
+      "fake_score": 0.9585882090032101,
+      "abstention_reason": null,
+      "id": "df00204",
+      "kind": "aligned_face",
+      "label": "fake",
+      "source_id": "df00204",
+      "split": "pilot",
+      "rights_note": "Official MesoNet repository example; Apache-2.0 repository, image-specific underlying rights not independently established. Research smoke test only.",
+      "prediction": "fake",
+      "elapsed_seconds": 0.02791509999997288
+    },
+    {
+      "fake_score": 0.9513062573969364,
+      "abstention_reason": null,
+      "id": "df01254",
+      "kind": "aligned_face",
+      "label": "fake",
+      "source_id": "df01254",
+      "split": "pilot",
+      "rights_note": "Official MesoNet repository example; Apache-2.0 repository, image-specific underlying rights not independently established. Research smoke test only.",
+      "prediction": "fake",
+      "elapsed_seconds": 0.010633699999971213
+    },
+    {
+      "fake_score": 0.01025247573852539,
+      "abstention_reason": null,
+      "id": "real00240",
+      "kind": "aligned_face",
+      "label": "real",
+      "source_id": "real00240",
+      "split": "pilot",
+      "rights_note": "Official MesoNet repository example; Apache-2.0 repository, image-specific underlying rights not independently established. Research smoke test only.",
+      "prediction": "real",
+      "elapsed_seconds": 0.007841999999982363
+    },
+    {
+      "fake_score": 0.002298414707183838,
+      "abstention_reason": null,
+      "id": "real00772",
+      "kind": "aligned_face",
+      "label": "real",
+      "source_id": "real00772",
+      "split": "pilot",
+      "rights_note": "Official MesoNet repository example; Apache-2.0 repository, image-specific underlying rights not independently established. Research smoke test only.",
+      "prediction": "real",
+      "elapsed_seconds": 0.0075114000001121894
+    }
+  ],
+  "limitations": [
+    "Face-specific 2018 model; no general AI-video capability.",
+    "YuNet face crops differ from original aligned preprocessing; no tracking.",
+    "Source examples are smoke tests, not independent validation.",
+    "Rights notes record provenance; they do not certify commercial permission."
+  ]
+}

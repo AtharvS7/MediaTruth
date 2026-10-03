@@ -1,0 +1,31 @@
+{
+  "reference": "Keras 3.11.3 / torch backend",
+  "tolerance": 1e-05,
+  "passed": true,
+  "comparisons": [
+    {
+      "file": "df00204.jpg",
+      "keras_fake_score": 0.958588220179081,
+      "torch_fake_score": 0.9585882090032101,
+      "absolute_difference": 1.1175870895385742e-08
+    },
+    {
+      "file": "df01254.jpg",
+      "keras_fake_score": 0.9513062797486782,
+      "torch_fake_score": 0.9513062573969364,
+      "absolute_difference": 2.2351741790771484e-08
+    },
+    {
+      "file": "real00240.jpg",
+      "keras_fake_score": 0.01025247573852539,
+      "torch_fake_score": 0.01025247573852539,
+      "absolute_difference": 0.0
+    },
+    {
+      "file": "real00772.jpg",
+      "keras_fake_score": 0.002298414707183838,
+      "torch_fake_score": 0.002298414707183838,
+      "absolute_difference": 0.0
+    }
+  ]
+}

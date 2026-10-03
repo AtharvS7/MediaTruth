@@ -72,3 +72,10 @@ Pooler `SUPABASE_DB_URL`. No credential changes are included in this update.
 
 Verification for this update: 220 backend tests passed; changed Python files
 passed Ruff. These are software checks, not 220 independent detection samples.
+
+Further model work is recorded in `evaluation/MODEL_VALIDATION_PROGRESS.md`:
+TruFor CPU integration and a 12-pair localization pilot (insufficient results),
+MesoNet CPU/parity verification (independent video data still access restricted),
+and a frozen 375-image background evaluation with the missing SD1.4 stratum
+explicitly recorded. Latest implementation verification: 241 backend tests and
+full backend Ruff passed. These experiments do not close the release gates yet.
