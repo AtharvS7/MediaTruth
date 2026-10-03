@@ -1,6 +1,6 @@
 # Production accuracy target and current completion estimate
 
-User target: at least 95% accuracy. This is a measurable target for specified
+User target (revised 3 October 2026): strictly above 90% accuracy. This is a measurable target for specified
 input distributions, not a guarantee for every image, unseen generator or attack.
 The initial scope is **fully AI-generated still images versus non-generated
 photos**. AI edits, traditional edits, mixed workflows and video require separate
@@ -9,11 +9,11 @@ validation and cannot inherit a still-image result.
 ## Iteration contract
 
 - Decision: assess whether FSD can reduce false flags after calibration on new data.
-- Primary target: held-out balanced accuracy >=95%; AI precision and recall >=95%.
+- Primary target: held-out balanced accuracy >90%; each class precision and recall >90%.
 - Guardrails: original false-positive rate <=5%; abstentions count as unsuccessful
   classifications, not correct answers; report coverage and confidence intervals.
-- A claim of at least 95% population accuracy also requires the lower 95%
-  confidence bound >=95%, not merely a point estimate over that value.
+- A claim of above 90% population accuracy also requires the lower 95%
+  confidence bound >90%, not merely a point estimate over that value.
 - Minimum release support: 200 independently verified examples per enabled class,
   with unseen-source/generator and recompression/crop/resize slices reported.
 - No public promotion without provenance, licensing, resource and serving checks.
@@ -40,7 +40,7 @@ reflect both implemented behavior and verification, using equal ten-point weight
 | Durable jobs and resource control | 9 | Capacity/operational validation |
 | Metadata export | 9 | Format coverage; no universal trace-removal claim |
 | Provenance | 8 | Broader credential/provider coverage |
-| AI-generation accuracy | 2 | Independent calibration and >=95% validation |
+| AI-generation accuracy | 2 | Independent calibration and >90% validation |
 | Edit attribution and localization | 1 | Validated models and labeled pairs/masks |
 | Advanced video forensics | 3 | Temporal/face models and video validation |
 | Production operations | 6 | Monitoring, recovery, load evidence and cloud worker |

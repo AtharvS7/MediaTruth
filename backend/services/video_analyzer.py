@@ -1,11 +1,12 @@
 """
-VideoAnalyzer — Full video forensics pipeline.
+VideoAnalyzer — Sampled frame analysis and experimental temporal diagnostics.
 
 Pipeline:
   1. Extract frames with OpenCV
-  2. Sample evenly (target: ~1 frame/3 seconds, max 60 frames)
-  3. Run ImageAnalyzer on each frame in batches of 8
+  2. Bounded uniform and scene-change sampling (max 20 frames)
+  3. Run ImageAnalyzer on each frame serially
   4. Aggregate per-frame results to video-level verdict
+  5. Measure short adjacent-frame windows without changing the verdict
 """
 
 import asyncio
@@ -21,6 +22,7 @@ from services.image_analyzer import ImageAnalyzer
 from inference_pipeline.provenance import inspect_provenance
 from inference_pipeline.aggregator import ConfidenceAggregator
 from utils.video_utils import extract_frames, get_video_metadata
+from utils.temporal_video import analyze_temporal_windows
 
 logger = logging.getLogger(__name__)
 
@@ -69,11 +71,14 @@ class VideoAnalyzer:
             per_frame_results
         )
 
+        temporal_diagnostics = await asyncio.to_thread(analyze_temporal_windows, video_path)
+
         return {
             "file_type": "video",
             "provenance": await asyncio.to_thread(inspect_provenance, video_path),
             "sampled_frame_fraction": len(frames) / meta["frame_count"] if meta.get("frame_count", 0) > 0 else None,
-            "coverage_note": "Sampled frames only; audio, face tracking and temporal manipulation models are not analyzed.",
+            "coverage_note": "Sampled image frames and sparse adjacent-frame diagnostics only; no validated temporal manipulation, face tracking or audio analysis.",
+            "temporal_diagnostics": temporal_diagnostics,
             "score_semantics": "uncalibrated_heuristic",
             "duration_seconds": duration,
             "frames_analyzed": len(frames),

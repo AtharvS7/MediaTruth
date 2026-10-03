@@ -1,4 +1,4 @@
-# Remaining release targets — 3 October 2026
+# Remaining release targets - 3 October 2026
 
 Planning completion remains **approximately 65%**, using the explicit 64/100 rubric
 in `evaluation/PRODUCTION_TARGET.md`. Detection accuracy is a different metric.
@@ -15,7 +15,7 @@ No public verdict was enabled. Application infrastructure remains implemented.
 
 ## Release targets, in priority order
 
-1. **Validated still-image detection:** meet the predeclared >=95% balanced
+1. **Validated still-image detection:** meet the revised >90% balanced
    accuracy, precision/recall and uncertainty checks; measure failures and
    false-positive rates. The current AI recall is 87.5% on the new holdout.
 2. **Fresh representative data and rights:** at least 200 verified independent
@@ -50,3 +50,25 @@ and evaluated. It scored 89.6% on source images and 91.7% on JPEG copies, so it
 was rejected for promotion. The next iteration needs broader training/calibration
 data covering the observed failures and a fresh locked validation set. Neither
 repeated tuning on these images nor a small high score qualifies release.
+
+## Implementation update - 3 October
+
+The user revised acceptance to strictly above 90%. The evaluator now records
+that policy explicitly, retains 95% confidence intervals and rejects exactly
+90% class recall. Historical checkpoint reports are unchanged. The reassessment
+in `evaluation/target-reassessment-20261003.json` retains 44/48 correct, with a
+95% Wilson interval of 80.4%-96.7%. All three BigGAN examples were missed. The
+native GAN fallback also flagged zero of 24 generated examples and is rejected.
+This is a reassessment of existing data, not fresh validation or model training.
+
+Editing now has an offline paired-original/history/mask evaluator with leakage
+and integrity checks; it does not supply a validated editing model. Video now
+has bounded adjacent-frame optical-flow diagnostics with explicit coverage and
+failure reporting; these measurements do not influence public verdicts. See
+`evaluation/EDITING_EVALUATION.md` and `evaluation/VIDEO_TEMPORAL_DIAGNOSTICS.md`.
+
+Database-dependent recovery work remains deferred pending a working Session
+Pooler `SUPABASE_DB_URL`. No credential changes are included in this update.
+
+Verification for this update: 220 backend tests passed; changed Python files
+passed Ruff. These are software checks, not 220 independent detection samples.

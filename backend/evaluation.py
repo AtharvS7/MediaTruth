@@ -88,7 +88,11 @@ def read_manifest(path: Path) -> list[dict]:
 
 
 def binary_production_gates(rows, predictions):
-    """95% target for a named still-image distribution, never universal certification."""
+    """Above-90% target for a named distribution, never universal certification.
+
+    Confidence intervals remain 95% intervals; the confidence level is not the
+    requested accuracy threshold. Historical saved reports remain unchanged.
+    """
     if any(r['label'] not in {'original','ai_generated'} for r in rows):
         raise ValueError('Binary production target cannot validate editing/video categories')
     result = release_gates(rows, predictions)
@@ -100,16 +104,47 @@ def binary_production_gates(rows, predictions):
     interval = wilson(correct,result['samples'])
     checks = {
         'existing_release_checks':all(result['release_gates'][c]['passed'] for c in ('original','ai_generated')),
-        'balanced_accuracy_95':balanced is not None and balanced >= .95,
-        'each_class_precision_95':all(classes[c]['precision'] is not None and classes[c]['precision']>=.95
+        'balanced_accuracy_above_90':balanced is not None and balanced > .90,
+        'each_class_precision_above_90':all(classes[c]['precision'] is not None and classes[c]['precision']>.90
                                       for c in ('original','ai_generated')),
-        'each_class_recall_95':all(v is not None and v>=.95 for v in recalls),
-        'accuracy_lower_bound_95':interval[0]>=.95,
+        'each_class_recall_above_90':all(v is not None and v>.90 for v in recalls),
+        'accuracy_lower_95_bound_above_90':interval[0]>.90,
     }
     return {**result,'accuracy':accuracy,'accuracy_95':interval,'balanced_accuracy':balanced,
             'production_target_checks':checks,'statistical_target_passed':all(checks.values()),
             'deployment_approved':False,
+            'slices':binary_slices(rows, predictions),
+            'target_policy':{'version':'2026-10-03-above-90', 'accuracy_threshold':.90,
+                             'comparison':'strictly_greater', 'confidence_level':.95},
             'scope_note':'Requires independent licensing, robustness and operational approval; no universal accuracy guarantee'}
+
+
+def binary_slices(rows, predictions):
+    """Expose generator/source blind spots without treating small slices as proof."""
+    # Validate completeness, labels and duplicate IDs before computing any slice.
+    evaluate(rows, predictions)
+    guesses = {p['id']: p['label'] for p in predictions}
+    result = {}
+    for field in ('generator', 'source'):
+        groups = {}
+        for row in rows:
+            if row['split'] == 'test':
+                value = row.get(field)
+                key = value if isinstance(value, str) and value.strip() else 'unspecified'
+                groups.setdefault(key, []).append(row)
+        result[field] = {}
+        for name, samples in sorted(groups.items()):
+            count = len(samples)
+            correct = sum(guesses[r['id']] == r['label'] for r in samples)
+            abstained = sum(guesses[r['id']] == 'inconclusive' for r in samples)
+            result[field][name] = {
+                'samples': count, 'correct': correct, 'accuracy': correct / count,
+                'accuracy_95': wilson(correct, count), 'coverage': (count-abstained)/count,
+                'abstentions': abstained, 'independence_verified': all(
+                    r.get('independence_verified') is True for r in samples),
+                'scope': 'Descriptive slice; not an independent release approval',
+            }
+    return result
 
 
 def evaluate(rows: list[dict], predictions: list[dict]) -> dict:
